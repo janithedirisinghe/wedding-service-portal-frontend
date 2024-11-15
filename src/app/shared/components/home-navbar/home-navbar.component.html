@@ -1,0 +1,24 @@
+<div class="card ">
+    <p-menubar [model]="items">
+      <!-- Logo SVG -->
+      <ng-template pTemplate="start">
+        <ng-template pTemplate="items" let-item let-root="root">
+          <a pRipple class="flex align-items-center p-menuitem-link">
+            <span [class]="item.icon"></span>
+            <span class="ml-2">{{ item.label }}</span>
+           </a>
+        </ng-template>
+      </ng-template>
+  
+      <!-- Menu items -->
+      
+  
+      <!-- Search bar on the right -->
+      <ng-template pTemplate="end">
+        <div class="logo">
+          <span class="wed">Wed</span><span class="ease">Ease</span>
+      </div>
+      </ng-template>
+    </p-menubar>
+  </div>
+  

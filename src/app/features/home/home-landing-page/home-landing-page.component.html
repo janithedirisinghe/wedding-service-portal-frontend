@@ -1,0 +1,116 @@
+<div class="p-5 bg-gray-50 min-h-screen">
+    <!-- Navbar Component -->
+    <app-home-navbar></app-home-navbar>
+
+    <!-- Main Section with Two-Column Layout -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 items-center mt-3">
+
+        <!-- Left Column (Text Content) -->
+        <div class="order-2 md:order-1 text-center md:text-left p-6">
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-4">Ready to plan the wedding</h1>
+            <h2 class="text-3xl md:text-4xl lg:text-5xl text-primary font-bold mb-6">of your dreams?</h2>
+
+            <p class="text-gray-600 leading-relaxed mb-8">
+                Let’s make it happen with WedEase. Join our growing community of couples and wedding professionals who
+                trust WedEase to handle every detail of their big day.
+            </p>
+
+            <!-- Buttons with Accessible Labels and Hover Effects -->
+            <button pButton pRipple label="Get Started" type="button"
+                class="p-button-raised text-lg px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white transition-all rounded-md">
+               
+            </button>
+        </div>
+
+        <!-- Right Column (Image) -->
+        <div
+            class="order-1 md:order-2 flex justify-center md:justify-end lg:justify-end xl:justify-end 2xl:justify-end">
+            <img src="assets/homeimage.jpg" alt="Wedding planning image"
+                class="w-full max-w-md h-auto object-cover rounded-lg shadow-lg lg:max-w-lg xl:max-w-xl"
+                style="clip-path: polygon(8% 0, 100% 0%, 100% 100%, 0 100%);">
+        </div>
+    </div>
+
+    <!-- About Section -->
+    <div class="text-center p-2 mt-20 ">
+        <div class="logo"> <span class="font-semibold text-3xl">About </span>
+            <span class="wed text-3xl">Wed</span><span class="ease text-3xl">Ease</span>
+        </div>
+    </div>
+    <!-- About Text -->
+    <div class="text-center mt-10 font-semibold p-5">
+        Welcome to WedEase, your go-to platform for stress-free wedding planning! We know planning a wedding can be
+        overwhelming, so we're here to make it easier. From finding the perfect venue and vendors to managing your guest
+        list and RSVPs, we provide everything you need in one place.
+        Whether you're a couple, wedding planner, or service provider, WedEase helps you handle all the details
+        smoothly. No matter if you're searching for a stunning venue or a photographer to capture the moment, we're here
+        to bring your wedding vision to life.
+    </div>
+
+    <!-- Service Section -->
+    <div class="text-center p-2 mt-20 ">
+        <div class="logo">
+            <span class="wed text-3xl">Wed</span><span class="ease text-3xl">Ease</span>
+            <span class="font-semibold text-3xl"> Services</span>
+        </div>
+    </div>
+    <!-- Service Tabs -->
+    <div class="card text-center pt-10">
+        <p-tabView class="text-black">
+            <p-tabPanel header="Vendor Discovery" class="font-semibold text-black">
+                <p class="p-10">
+                    Find the best venues, photographers, florists, and more through our comprehensive directory. Filter
+                    by location, price, and availability to find the perfect match for your wedding. </p>
+            </p-tabPanel>
+            <p-tabPanel header="Schedule meetings" class="font-semibold text-black">
+                <p class="p-10">
+                    Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium,
+                    totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae
+                    dicta sunt explicabo. Nemo enim
+                    ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni
+                    dolores eos qui ratione voluptatem sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam
+                    eius modi.
+                </p>
+            </p-tabPanel>
+            <p-tabPanel header="Chat with vendors" class="font-semibold text-black">
+                <p class="p-10">
+                    At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum
+                    deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non
+                    provident, similique sunt in culpa
+                    qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis
+                    est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil
+                    impedit quo minus.
+                </p>
+            </p-tabPanel>
+            <p-tabPanel header="Visit Profiles" class="font-semibold text-black">
+                <p class="p-10">
+                    At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum
+                    deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non
+                    provident, similique sunt in culpa
+                    qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis
+                    est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil
+                    impedit quo minus.
+                </p>
+            </p-tabPanel>
+            <p-tabPanel header="Show your works" class="font-semibold text-black">
+                <p class="p-10">
+                    At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum
+                    deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non
+                    provident, similique sunt in culpa
+                    qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis
+                    est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil
+                    impedit quo minus.
+                </p>
+            </p-tabPanel>
+        </p-tabView>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="text-center p-2 mt-20 ">
+        <div class="logo"> <span class="font-semibold text-3xl">Contact </span>
+            <span class="wed text-3xl">Wed</span><span class="ease text-3xl">Ease</span>
+        </div>
+    </div>
+
+   <app-home-footer></app-home-footer>
+</div>

@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  .logo .wed {
+    color: #FFD700; /* Yellow color */
+  }
+  .logo .ease {
+    color: #000000; /* Black color */
+  }

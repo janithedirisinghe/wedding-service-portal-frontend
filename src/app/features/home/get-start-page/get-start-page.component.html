@@ -1,0 +1,26 @@
+<div class="p-5 bg-gray-50 min-h-screen">
+    <!-- Navbar Component -->
+    <app-home-navbar></app-home-navbar>
+
+
+    <div class="card flex justify-content-center mt-10 mb-60">
+        <p-fieldset legend="Select">
+            <p class="m-0">
+                At WedEase, your journey begins by selecting your role. Are you a Customer, planning your dream wedding
+                and looking for the best venues, vendors, and services? Or are you a Vendor, offering your expertise to
+                help couples create their perfect day? Choose your role !</p>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class=" mt-5 text-center">
+                    <p-button label="Coustomer" [outlined]="true" severity="secondary" />
+
+                </div>
+                <div class="mt-5 text-center">
+                    <p-button label="Vender" [outlined]="true" severity="secondary" />
+                </div>
+            </div>
+        </p-fieldset>
+    </div>
+
+    <app-home-footer></app-home-footer>
+</div>
