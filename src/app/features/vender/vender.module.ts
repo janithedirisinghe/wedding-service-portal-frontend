@@ -5,11 +5,15 @@ import { VenderBodyPageComponent } from './vender-body-page/vender-body-page.com
 import { VenderRoutingModule } from './vender-routing.module';
 import { VenderSidebarComponent } from '../../shared/components/vender-sidebar/vender-sidebar.component';
 import { VenderPostsPageComponent } from './vender-posts-page/vender-posts-page.component';
+import { VenderCalenderComponent } from './vender-calender/vender-calender.component';
+import { VenderMeetingRequstsComponent } from './vender-meeting-requsts/vender-meeting-requsts.component';
 
 @NgModule({
 declarations: [
     VenderBodyPageComponent,
     VenderPostsPageComponent,
+    VenderCalenderComponent,
+    VenderMeetingRequstsComponent,
 
   ],
   imports: [

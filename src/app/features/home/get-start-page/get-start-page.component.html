@@ -1,26 +1,30 @@
-<div class="p-5 bg-gray-50 min-h-screen">
+<div class="min-h-screen bg-gray-100 flex flex-col">
     <!-- Navbar Component -->
     <app-home-navbar></app-home-navbar>
 
+    <div class="flex-grow flex items-center justify-center">
+        <div class="bg-white shadow-lg rounded-xl p-10 max-w-3xl w-full mx-4">
+            <fieldset class="border-t-4 border-gray-300 rounded-lg p-6">
+                <legend class="text-xl font-bold text-gray-800 px-4">Choose Your Role</legend>
+                <p class="mt-4 text-gray-600 leading-relaxed text-center">
+                    At <span class="text-indigo-600 font-semibold">WedEase</span>, your journey begins by selecting your role. 
+                    Are you a <span class="font-medium text-gray-900">Customer</span>, planning your dream wedding, or a 
+                    <span class="font-medium text-gray-900">Vendor</span>, offering your expertise to help couples? 
+                    Choose your role below!
+                </p>
 
-    <div class="card flex justify-content-center mt-10 mb-60">
-        <p-fieldset legend="Select">
-            <p class="m-0">
-                At WedEase, your journey begins by selecting your role. Are you a Customer, planning your dream wedding
-                and looking for the best venues, vendors, and services? Or are you a Vendor, offering your expertise to
-                help couples create their perfect day? Choose your role !</p>
-
-            <div class="grid grid-cols-2 gap-4">
-                <div class=" mt-5 text-center">
-                    <p-button label="Coustomer" [outlined]="true" severity="secondary" />
-
+                <div class="grid grid-cols-2 gap-6 mt-6">
+                    <button class="py-1 px-3 text-lg font-semibold text-white color rounded-lg shadow-md hover:bg-indigo-700 transition-all duration-300">
+                        Customer
+                    </button>
+                    <button class="py-3 px-3 text-lg font-semibold text-white border-2 color rounded-lg shadow-md hover:bg-indigo-600 hover:text-white transition-all duration-300">
+                        Vendor
+                    </button>
                 </div>
-                <div class="mt-5 text-center">
-                    <p-button label="Vender" [outlined]="true" severity="secondary" />
-                </div>
-            </div>
-        </p-fieldset>
+            </fieldset>
+        </div>
     </div>
 
+    <!-- Footer Component -->
     <app-home-footer></app-home-footer>
 </div>

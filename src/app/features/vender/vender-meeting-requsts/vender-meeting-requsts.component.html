@@ -1,0 +1,29 @@
+<div class="mx-auto bg-white shadow-lg rounded-lg p-4">
+    <div class="space-y-4">
+        <!-- Meeting Request Item -->
+        <div *ngFor="let request of paginatedRequests" class="flex flex-col md:flex-row justify-between items-start md:items-center bg-gray-50 p-3 rounded-lg shadow">
+            <div class="mb-2 md:mb-0">
+                <p class="font-semibold">Meeting Request</p>
+                <p class="text-gray-600">Date : {{ request.date }}</p>
+            </div>
+            <p class="text-gray-700 mb-2 md:mb-0">{{ request.userName }}</p>
+            <div class="flex gap-2">
+                <button class="bg-green-500 text-white px-2 py-2 rounded-lg">Accept</button>
+                <button class="bg-red-500 text-white px-2 py-2 rounded-lg">Reject</button>
+                <button class="bg-gray-200 px-3 py-2 rounded-lg">+</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="flex flex-col md:flex-row justify-between items-center mt-6 p-4 bg-gray-100 rounded-lg">
+        <p class="text-gray-700 mb-2 md:mb-0">Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ currentPage * itemsPerPage }} of {{ totalItems }} entries</p>
+        <div class="flex gap-2">
+            <button (click)="changePage(1)" class="px-3 py-1 bg-gray-200 rounded-lg" [disabled]="currentPage === 1">&laquo;</button>
+            <button (click)="changePage(currentPage - 1)" class="px-3 py-1 bg-gray-200 rounded-lg" [disabled]="currentPage === 1">&lt;</button>
+            <button *ngFor="let page of [].constructor(Math.ceil(totalItems / itemsPerPage)); let i = index" (click)="changePage(i + 1)" class="px-3 py-1" [ngClass]="{'bg-blue-500 text-white': currentPage === i + 1, 'bg-gray-200': currentPage !== i + 1}">{{ i + 1 }}</button>
+            <button (click)="changePage(currentPage + 1)" class="px-3 py-1 bg-gray-200 rounded-lg" [disabled]="currentPage === Math.ceil(totalItems / itemsPerPage)">&gt;</button>
+            <button (click)="changePage(Math.ceil(totalItems / itemsPerPage))" class="px-3 py-1 bg-gray-200 rounded-lg" [disabled]="currentPage === Math.ceil(totalItems / itemsPerPage)">&raquo;</button>
+        </div>
+    </div>
+</div>

@@ -2,6 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-.color{
-    background-color: rgb(59, 130, 246);
+.highlight {
+  background-color: skyblue;
 }

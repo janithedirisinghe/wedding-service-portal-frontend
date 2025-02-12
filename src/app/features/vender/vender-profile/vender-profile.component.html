@@ -1,0 +1,77 @@
+<div class="mx-auto bg-white shadow-lg rounded-lg p-6">
+  <!-- Profile Header -->
+  <div class="flex items-center space-x-4">
+    <img src="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" alt="Profile Image" class="w-20 h-20 rounded-full">
+    <div>
+      <h2 class="text-2xl font-semibold">Kathryn Murphy</h2>
+      <div class="flex items-center text-yellow-500">
+        <span class="text-lg font-semibold">4.9</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M10 15l-5.878 3.09 1.122-6.54L1 7.09l6.561-.95L10 1l2.439 5.14 6.561.95-4.244 4.46 1.122 6.54z"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Stats -->
+  <div class="flex space-x-6 mt-4 text-gray-600">
+    <div><span class="font-semibold">335</span> FOLLOWERS</div>
+    <div><span class="font-semibold">10</span> POSTS</div>
+    <div><span class="font-semibold">20</span> REVIEWS</div>
+  </div>
+
+  <!-- Profile Details -->
+  <div class="mt-6 bg-gray-100 p-4 rounded-lg">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+      <div>
+        <h3 class="font-semibold">Bio</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+      </div>
+      <div>
+        <h3 class="font-semibold">Packages</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+      </div>
+      <div>
+        <h3 class="font-semibold">Location</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+      </div>
+      <div>
+        <h3 class="font-semibold">Telephone</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="mt-6 border-b flex space-x-6">
+
+    <button (click)="selectedTab = 'posts'" [class.border-blue-500]="selectedTab === 'posts'" [class.text-sky-500]="selectedTab === 'posts'" class="pb-2 text-gray-600 font-semibold">Posts</button>
+    <button (click)="selectedTab = 'reviews'" [class.border-blue-500]="selectedTab === 'reviews'" [class.text-sky-500]="selectedTab === 'reviews'" class="pb-2 text-gray-600">Reviews</button>
+ 
+  </div>
+
+  <!-- Posts List -->
+  <div *ngIf="selectedTab === 'posts'" class="mt-4 space-y-4">
+    <!-- Add your posts content here -->
+    <p>Posts content goes here...</p>
+  </div>
+
+  <!-- Reviews List -->
+  <div *ngIf="selectedTab === 'reviews'" class="mt-4 space-y-4">
+    <div *ngFor="let review of reviews" class="bg-white shadow p-4 rounded-lg">
+      <div class="flex justify-between">
+        <div> 
+          <h4 class="font-semibold">{{ review.name }}</h4>
+          <p class="text-gray-500 text-sm">{{ review.location }} &bull; {{ review.date }}</p>
+        </div>
+        <div class="flex items-center ">
+          <span class="text-lg font-semibold">{{ review.rating }}</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 15l-5.878 3.09 1.122-6.54L1 7.09l6.561-.95L10 1l2.439 5.14 6.561.95-4.244 4.46 1.122 6.54z"/>
+          </svg>
+        </div>
+      </div>
+      <p class="text-gray-600 mt-2">{{ review.text }}</p>
+    </div>
+  </div>
+</div>
