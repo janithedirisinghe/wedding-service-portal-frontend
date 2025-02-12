@@ -3,7 +3,7 @@
       <!-- Logo SVG -->
       <ng-template pTemplate="start">
         <ng-template pTemplate="items" let-item let-root="root">
-          <a pRipple class="flex align-items-center p-menuitem-link">
+          <a pRipple class="flex align-items-center p-menuitem-link" [routerLink]="item.routerLink">
             <span [class]="item.icon"></span>
             <span class="ml-2">{{ item.label }}</span>
            </a>
@@ -21,4 +21,3 @@
       </ng-template>
     </p-menubar>
   </div>
-  

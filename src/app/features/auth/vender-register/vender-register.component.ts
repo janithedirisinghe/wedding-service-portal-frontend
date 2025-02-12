@@ -6,5 +6,10 @@ import { Component } from '@angular/core';
   styleUrl: './vender-register.component.scss'
 })
 export class VenderRegisterComponent {
+  currentStep: number = 1
+;
 
+  goToNextStep() {
+    this.currentStep++;
+  }
 }

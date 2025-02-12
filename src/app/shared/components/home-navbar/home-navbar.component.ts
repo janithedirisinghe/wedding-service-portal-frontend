@@ -13,15 +13,18 @@ export class HomeNavbarComponent {
         this.items = [
             {
                 label: 'Home',
-                icon: 'pi pi-home'
+                icon: 'pi pi-home',
+                routerLink: '/home'
             },
             {
                 label: 'Service',
-                icon: 'pi pi-star'
+                icon: 'pi pi-star',
+                routerLink: '/home'
             },
             {
                 label: 'Contact',
                 icon: 'pi pi-envelope',
+                routerLink: '/home'
             }
         ];
     }

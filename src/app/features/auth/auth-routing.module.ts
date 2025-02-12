@@ -4,6 +4,7 @@ import { VenderRegisterComponent } from './vender-register/vender-register.compo
 import { AuthPageBodyComponent } from './auth-page-body/auth-page-body.component';
 import { CustomerLoginComponent } from './customer-login/customer-login.component';
 import { CustomerRegisterComponent } from './customer-register/customer-register.component';
+import { VenderLoginComponent } from './vender-login/vender-login.component';
 
 const routes: Routes = [
   {
@@ -13,6 +14,7 @@ const routes: Routes = [
       { path: 'vender-register', component: VenderRegisterComponent },
       { path: 'customer-login', component: CustomerLoginComponent },
       { path: 'customer-register', component: CustomerRegisterComponent },
+      { path: 'vender-login', component: VenderLoginComponent}
     ],
   },
 ];
