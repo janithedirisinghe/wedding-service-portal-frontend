@@ -7,6 +7,7 @@ import { OrganizationChartModule } from 'primeng/organizationchart';
 import { SharedModule } from './shared/shared.module';
 import { HomeModule } from './features/home/home.module';
 import { VenderModule } from './features/vender/vender.module';
+import { AuthModule } from './features/auth/auth.module';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { VenderModule } from './features/vender/vender.module';
     OrganizationChartModule,
     SharedModule,
     HomeModule,
-    VenderModule
+    VenderModule,
+    AuthModule
   ],
   providers: [
     provideClientHydration()
