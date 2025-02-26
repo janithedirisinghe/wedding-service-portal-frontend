@@ -10,6 +10,8 @@ import { CustomerRegisterComponent } from './customer-register/customer-register
 import { RegisterBusinessInfoComponent } from './register-business-info/register-business-info.component';
 import { OtpVerificationComponent } from './otp-verification/otp-verification.component';
 import { RegisterVenderInfoComponent } from './register-vender-info/register-vender-info.component';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 
 @NgModule({
@@ -27,7 +29,10 @@ declarations: [
   imports: [
     CommonModule,
     SharedModule,
-    AuthRoutingModule
+    AuthRoutingModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+
 
 ],
   exports: [

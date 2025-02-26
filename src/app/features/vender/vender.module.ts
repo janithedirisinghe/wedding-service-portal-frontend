@@ -7,6 +7,9 @@ import { VenderSidebarComponent } from '../../shared/components/vender-sidebar/v
 import { VenderPostsPageComponent } from './vender-posts-page/vender-posts-page.component';
 import { VenderCalenderComponent } from './vender-calender/vender-calender.component';
 import { VenderMeetingRequstsComponent } from './vender-meeting-requsts/vender-meeting-requsts.component';
+import { HttpClientModule } from '@angular/common/http';
+import { ReactiveFormsModule } from '@angular/forms';
+import { VenderServiceFormComponent } from './vender-service-form/vender-service-form.component';
 
 @NgModule({
 declarations: [
@@ -14,12 +17,15 @@ declarations: [
     VenderPostsPageComponent,
     VenderCalenderComponent,
     VenderMeetingRequstsComponent,
+    VenderServiceFormComponent
 
   ],
   imports: [
     CommonModule,
     SharedModule,
-    VenderRoutingModule
+    VenderRoutingModule,
+    HttpClientModule,
+    ReactiveFormsModule
 ],
   exports: [
     

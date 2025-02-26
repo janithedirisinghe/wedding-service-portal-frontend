@@ -8,6 +8,8 @@ import { SharedModule } from './shared/shared.module';
 import { HomeModule } from './features/home/home.module';
 import { VenderModule } from './features/vender/vender.module';
 import { AuthModule } from './features/auth/auth.module';
+import { ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -21,7 +23,9 @@ import { AuthModule } from './features/auth/auth.module';
     SharedModule,
     HomeModule,
     VenderModule,
-    AuthModule
+    AuthModule,
+    ReactiveFormsModule,
+    HttpClientModule
   ],
   providers: [
     provideClientHydration()

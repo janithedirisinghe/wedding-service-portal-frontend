@@ -3,7 +3,7 @@
   <div class="flex items-center space-x-4">
     <img src="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" alt="Profile Image" class="w-20 h-20 rounded-full">
     <div>
-      <h2 class="text-2xl font-semibold">Kathryn Murphy</h2>
+      <h2 class="text-2xl font-semibold">{{vendor?.businessName}}</h2>
       <div class="flex items-center text-yellow-500">
         <span class="text-lg font-semibold">4.9</span>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" fill="currentColor" viewBox="0 0 20 20">
@@ -25,19 +25,19 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
       <div>
         <h3 class="font-semibold">Bio</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
-      </div>
-      <div>
-        <h3 class="font-semibold">Packages</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+        <p>{{vendor?.bio}}</p>
       </div>
       <div>
         <h3 class="font-semibold">Location</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+        <p>{{vendor?.location}}</p>
+      </div>
+      <div>
+        <h3 class="font-semibold">Country</h3>
+        <p>{{vendor?.country}}</p>
       </div>
       <div>
         <h3 class="font-semibold">Telephone</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+        <p>{{vendor?.telNo}}</p>
       </div>
     </div>
   </div>
@@ -47,6 +47,7 @@
 
     <button (click)="selectedTab = 'posts'" [class.border-blue-500]="selectedTab === 'posts'" [class.text-sky-500]="selectedTab === 'posts'" class="pb-2 text-gray-600 font-semibold">Posts</button>
     <button (click)="selectedTab = 'reviews'" [class.border-blue-500]="selectedTab === 'reviews'" [class.text-sky-500]="selectedTab === 'reviews'" class="pb-2 text-gray-600">Reviews</button>
+    <button (click)="selectedTab = 'services'" [class.border-blue-500]="selectedTab === 'reviews'" [class.text-sky-500]="selectedTab === 'services'" class="pb-2 text-gray-600">Services</button>
  
   </div>
 
@@ -72,6 +73,17 @@
         </div>
       </div>
       <p class="text-gray-600 mt-2">{{ review.text }}</p>
+    </div>
+  </div>
+
+  <!-- Services List -->
+  <div *ngIf="selectedTab === 'services'" class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div *ngFor="let service of vendor?.services" class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+      <div class="space-y-3">
+        <p class="text-xl font-semibold text-gray-700">{{ service.name || 'Service Name' }}</p>
+        <p class="text-gray-600">{{ service.description || 'No description available.' }}</p>
+        <p class="font-semibold text-gray-800">Rs. {{ service.pricing }}</p>
+      </div>
     </div>
   </div>
 </div>

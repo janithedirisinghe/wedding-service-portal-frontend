@@ -12,30 +12,31 @@
                 <p class="text-sm">Step details here</p>
             </span>
         </li>
-        <li class="flex items-center space-x-2.5 rtl:space-x-reverse"
-            [ngClass]="{'text-blue-600 dark:text-blue-500': currentStep >= 2, 'text-gray-500 dark:text-gray-400': currentStep < 2}">
-            <span class="flex items-center justify-center w-8 h-8 border rounded-full shrink-0"
-                [ngClass]="{'border-blue-600 dark:border-blue-500': currentStep >= 2, 'border-gray-500 dark:border-gray-400': currentStep < 2}">
-                2
-            </span>
-            <span>
-                <h3 class="font-medium leading-tight">Business Info</h3>
-                <p class="text-sm">Step details here</p>
-            </span>
-        </li>
+        
         <li class="flex items-center space-x-2.5 rtl:space-x-reverse"
             [ngClass]="{'text-blue-600 dark:text-blue-500': currentStep >= 3, 'text-gray-500 dark:text-gray-400': currentStep < 3}">
             <span class="flex items-center justify-center w-8 h-8 border rounded-full shrink-0"
-                [ngClass]="{'border-blue-600 dark:border-blue-500': currentStep >= 3, 'border-gray-500 dark:border-gray-400': currentStep < 3}">
-                3
+                [ngClass]="{'border-blue-600 dark:border-blue-500': currentStep >= 2, 'border-gray-500 dark:border-gray-400': currentStep < 3}">
+                2
             </span>
             <span>
                 <h3 class="font-medium leading-tight">OTP Verification</h3>
                 <p class="text-sm">Step details here</p>
             </span>
         </li>
+        <li class="flex items-center space-x-2.5 rtl:space-x-reverse"
+            [ngClass]="{'text-blue-600 dark:text-blue-500': currentStep >= 2, 'text-gray-500 dark:text-gray-400': currentStep < 2}">
+            <span class="flex items-center justify-center w-8 h-8 border rounded-full shrink-0"
+                [ngClass]="{'border-blue-600 dark:border-blue-500': currentStep >= 3, 'border-gray-500 dark:border-gray-400': currentStep < 2}">
+                3
+            </span>
+            <span>
+                <h3 class="font-medium leading-tight">Business Info</h3>
+                <p class="text-sm">Step details here</p>
+            </span>
+        </li>
     </ol>
 </div>
-<app-register-vender-info *ngIf="currentStep === 1"></app-register-vender-info>
-<app-register-business-info *ngIf="currentStep === 2"></app-register-business-info>
-<app-otp-verification *ngIf="currentStep === 3"></app-otp-verification>
+<app-register-vender-info *ngIf="currentStep === 1" (registrationCompleted)="onRegistrationComplete()"></app-register-vender-info>
+<app-register-business-info *ngIf="currentStep === 3"></app-register-business-info>
+<app-otp-verification *ngIf="currentStep === 2"(otpCompleted)="onOtpVerificationComplete()"></app-otp-verification>
