@@ -1,0 +1,66 @@
+<ol class="relative border-s border-gray-200 dark:border-gray-700">
+  <li *ngFor="let event of timelineData" class="mb-10 ms-6">
+    <span
+      class="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -start-3 ring-8 ring-white dark:ring-gray-900 dark:bg-blue-900"
+    >
+      <img class="rounded-full shadow-lg ms-4 mt-2" [src]="event.image" [alt]="event.name + ' image'" />
+    </span>
+
+    <div
+      class="p-4 bg-white border border-gray-200 rounded-lg shadow-xs sm:flex justify-between items-center dark:bg-gray-700 dark:border-gray-600"
+    >
+      <div>
+        <time class="mb-1 text-xs font-normal text-gray-400 sm:order-last sm:mb-0">
+          {{ event.time }}
+        </time>
+
+        <div class="text-sm font-normal text-gray-500 dark:text-gray-300">
+          {{ event.name }} {{ event.action }}
+          <a *ngIf="event.targetUrl" [href]="event.targetUrl" class="font-semibold text-blue-600 dark:text-blue-500 hover:underline">
+            {{ event.target }}
+          </a>
+          <span *ngIf="!event.targetUrl" class="font-semibold text-gray-900 dark:text-white">
+            {{ event.target }}
+          </span>
+          <span *ngIf="event.status" class="text-xs font-normal me-2 px-2.5 py-0.5 rounded-sm bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300">
+            {{ event.status }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Follow/Unfollow Button -->
+      <button
+        class="px-4 py-1 text-sm font-medium rounded-lg shadow"
+        [class.bg-blue-600]="!event.isFollowing"
+        [class.text-white]="!event.isFollowing"
+        [class.bg-gray-300]="event.isFollowing"
+        [class.text-gray-700]="event.isFollowing"
+        (click)="toggleFollow(event)"
+      >
+        {{ event.isFollowing ? 'Unfollow' : 'Follow' }}
+      </button>
+    </div>
+
+    <div *ngIf="event.message" class="p-3 mt-2 text-xs italic font-normal text-gray-500 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-300">
+      {{ event.message }}
+    </div>
+
+    <!-- Image Gallery -->
+    <div *ngIf="event.images && event.images.length" class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+      <ng-container *ngFor="let img of event.images.slice(0, 3); let i = index">
+        <div class="relative">
+          <img
+            [src]="img"
+            class="rounded-lg w-full object-cover"
+            [class.h-48]="event.images.length === 1"
+            [class.h-32]="event.images.length > 1"
+          />
+          <!-- Show "More" overlay for extra images -->
+          <div *ngIf="i === 2 && event.images.length > 3" class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white text-lg font-bold rounded-lg">
+            +{{ event.images.length - 3 }}
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </li>
+</ol>

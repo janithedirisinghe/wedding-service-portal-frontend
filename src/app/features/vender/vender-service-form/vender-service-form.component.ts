@@ -32,8 +32,9 @@ export class VenderServiceFormComponent implements OnInit {
       ...formData
     }
 
-    const venderId = localStorage.getItem('vendorId');
+    const venderId = localStorage.getItem('userId');
     formvalues.vendorId = venderId ? Number(venderId) : 0;
+    // debugger;
 
     this.ServiceServices.createService(formvalues).subscribe(
       (response: any) => {

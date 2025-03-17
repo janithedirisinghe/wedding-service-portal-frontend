@@ -5,6 +5,8 @@ import { error } from 'console';
 import { CustomerService } from '../services/customer.service';
 import { Vender } from '../models/vender.models';
 import { VendorService } from '../services/vender.service';
+import { ToastrService } from 'ngx-toastr';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-register-vender-info',
@@ -20,10 +22,13 @@ export class RegisterVenderInfoComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private vendorService: VendorService,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService,
+    private spinner: NgxSpinnerService
   ) { }
 
   ngOnInit(): void {
+    this.spinner.show();
     this.userForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
@@ -31,6 +36,7 @@ export class RegisterVenderInfoComponent implements OnInit {
       confirmPassword: ['', [Validators.required, Validators.minLength(6)]],
       terms: [false, Validators.requiredTrue]
     }, { validator: this.passwordMatchValidator });
+    this.spinner.hide();
   }
 
   // Passwords should match
@@ -42,9 +48,9 @@ export class RegisterVenderInfoComponent implements OnInit {
 
   // Submit the form and handle the registration process
   onSubmit() {
-    // debugger;
     if (this.isSubmitting) return;
     this.isSubmitting = true;
+    this.spinner.show();
  
       const formData = this.userForm.value;
       const formvalues : Vender= {
@@ -62,13 +68,22 @@ export class RegisterVenderInfoComponent implements OnInit {
             // Navigate to the OTP verification step
             // this.router.navigate(['/otp-verification']);
             this.registrationCompleted.emit();
+            setTimeout(() => {
+              this.toastr.success('Registration successful! and send otp to the Email', 'Success');
+            }, 100);
+            this.spinner.hide();
             this.isSubmitting = false;
           }
         },
         (error: any) => {
           // Handle error if registration fails
           console.error('Registration failed', error);
+          setTimeout(() => {
+          this.toastr.error('Registration failed. Please try again. User name or Email already Used', 'Error');
+        }, 100);
           this.userForm.reset();
+          this.spinner.hide();
+          this.isSubmitting = false;
         }
       );
   }

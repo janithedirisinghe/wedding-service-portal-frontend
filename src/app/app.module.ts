@@ -9,7 +9,13 @@ import { HomeModule } from './features/home/home.module';
 import { VenderModule } from './features/vender/vender.module';
 import { AuthModule } from './features/auth/auth.module';
 import { ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { NgxSpinnerModule } from 'ngx-spinner';
+import { ToastrModule } from 'ngx-toastr';
+import { AuthService } from './shared/services/auth.service';
+import { AuthGuard } from './shared/guards/auth.guard';
+import { AuthInterceptor } from './shared/interceptors/auth.interceptor';
+import { CustomerModule } from './features/customer/customer.module';
 
 @NgModule({
   declarations: [
@@ -23,12 +29,23 @@ import { HttpClientModule } from '@angular/common/http';
     SharedModule,
     HomeModule,
     VenderModule,
+    CustomerModule,
     AuthModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    NgxSpinnerModule,
+    ToastrModule.forRoot(),
+    BrowserAnimationsModule,
   ],
   providers: [
-    provideClientHydration()
+    provideClientHydration(),
+    AuthService,  // Register the AuthService globally
+    AuthGuard,    // Register the AuthGuard globally
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })

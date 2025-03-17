@@ -10,6 +10,7 @@ import { VenderMeetingRequstsComponent } from './vender-meeting-requsts/vender-m
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { VenderServiceFormComponent } from './vender-service-form/vender-service-form.component';
+import { VenderServiceTableComponent } from './vender-service-table/vender-service-table.component';
 
 @NgModule({
 declarations: [
@@ -17,7 +18,8 @@ declarations: [
     VenderPostsPageComponent,
     VenderCalenderComponent,
     VenderMeetingRequstsComponent,
-    VenderServiceFormComponent
+    VenderServiceFormComponent,
+    VenderServiceTableComponent
 
   ],
   imports: [

@@ -15,4 +15,8 @@ export class VenderService {
         return this.http.post<ServiceModel>(`${this.baseUrl}/services`, Service, {
         });
     }
+
+    getServicesByVenderId(venderId: number): Observable<any>{
+      return this.http.get<ServiceModel[]>(`${this.baseUrl}/services/getServiceByVendorId/${venderId}`);
+    }
 }
