@@ -6,6 +6,7 @@ import { Component } from '@angular/core';
   styleUrl: './customer-timeline.component.scss'
 })
 export class CustomerTimelineComponent {
+  vendor: any; // Add this line to define the vendor property
   timelineData = [
     {
       image: 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png',
