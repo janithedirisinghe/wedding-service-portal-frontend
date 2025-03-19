@@ -9,6 +9,7 @@ export class VenderProfileCustomerComponent implements OnInit {
   vendor: any;
   reviews: any[] = [];
   selectedTab: string = 'posts';
+  reviewRating: number = 0;
 
   ngOnInit(): void {
     this.vendor = {
