@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.chat-list {
+  max-height: 400px; /* Adjust the height as needed */
+  overflow-y: auto;
+}
+
+@import "primeicons/primeicons.css";

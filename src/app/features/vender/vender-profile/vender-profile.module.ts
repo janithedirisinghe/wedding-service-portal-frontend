@@ -4,7 +4,7 @@ import { VenderProfileComponent } from './vender-profile.component';
 
 @NgModule({
   declarations: [
-    VenderProfileComponent,
+   
   ],
   imports: [
     CommonModule,

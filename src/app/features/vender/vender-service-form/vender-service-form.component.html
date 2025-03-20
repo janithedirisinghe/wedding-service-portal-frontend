@@ -1,10 +1,11 @@
-<form class="space-y-12 p-2">
+<div>
+<form [formGroup]="serviceForm" (ngSubmit)="onSubmit()" class="space-y-12 p-2">
     <div class="border-b border-gray-900/10 pb-12 p-8">
         <h2 class="text-2xl font-bold text-center text-gray-900">Service Form</h2>
 
         <div class="mb-4">
             <label for="Service-Name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Service Name</label>
-            <input type="text" id="helper-text" aria-describedby="helper-text-explanation"
+            <input type="text" id="helper-text" aria-describedby="helper-text-explanation" formControlName="name" name="name"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="Enter Service name">
             <p id="Enter-Service name-explanation" class="mt-2 text-sm text-gray-500 dark:text-gray-400">Give a name for the service </p>
@@ -12,7 +13,7 @@
 
         <div class="mb-4">
             <label for="Service-Description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Service Description</label>
-            <textarea id="Service-Description" aria-describedby="Service-Description-explanation"
+            <textarea id="Service-Description" aria-describedby="Service-Description-explanation" formControlName="description" name="description"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="Enter Service description"></textarea>
             <p id="Service-Description-explanation" class="mt-2 text-sm text-gray-500 dark:text-gray-400">Provide a detailed description of the service</p>
@@ -20,16 +21,17 @@
 
         <div class="mb-4">
             <label for="Service-Pricing" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Pricing</label>
-            <input type="number" id="Service-Pricing" aria-describedby="Service-Pricing-explanation"
+            <input type="number" id="Service-Pricing" aria-describedby="Service-Pricing-explanation" formControlName="pricing" name="pricing"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="Enter Service pricing">
             <p id="Service-Pricing-explanation" class="mt-2 text-sm text-gray-500 dark:text-gray-400">Specify the pricing for the service</p>
         </div>
 
         <div class="flex justify-end mt-6">
-            <button type="submit" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+            <button type="submit" (click)="onSubmit()" [disabled]="isSubmitting" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
                 Submit
-            </button>
+            </button> 
         </div>
     </div>
 </form>
+</div>

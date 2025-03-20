@@ -6,10 +6,19 @@ import { Component } from '@angular/core';
   styleUrl: './vender-register.component.scss'
 })
 export class VenderRegisterComponent {
-  currentStep: number = 1
-;
+  currentStep: number = 1;
 
   goToNextStep() {
     this.currentStep++;
+  }
+
+  onRegistrationComplete() {
+    // When registration is complete, go to the OTP verification step
+    this.goToNextStep();
+  }
+
+  onOtpVerificationComplete() {
+    // When OTP verification is complete, go to the login page
+    this.goToNextStep();
   }
 }

@@ -1,0 +1,34 @@
+<div class="container mx-auto bg-white">
+  <div class="mb-3 ms-5 p-3 flex justify-between items-center">
+    <button (click)="addNewService()"
+      class="px-4 py-2 bg-green-500 text-green-50 text-sm rounded hover:bg-green-300 focus:outline-none focus:ring-2 focus:ring-green-300">Add
+      New Service</button>
+  </div>
+  <div class=" bg-white p-3 m-3 border rounded-lg shadow-md h-screen">
+  <table class="min-w-full table-auto bg-white">
+    <thead>
+      <tr class="bg-gray-100 border-b">
+        <th class="py-2 px-4 text-left text-sm font-semibold text-gray-700">ServiceId</th>
+        <th class="py-2 px-4 text-left text-sm font-semibold text-gray-700">ServiceName</th>
+        <th class="py-2 px-4 text-left text-sm font-semibold text-gray-700">Description</th>
+        <th class="py-2 px-4 text-left text-sm font-semibold text-gray-700">Pricing</th>
+        <th class="py-2 px-4 text-center text-sm font-semibold text-gray-700">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let service of venderServiceDetails" class="border-b hover:bg-gray-50">
+        <td class="py-2 px-4 text-sm text-gray-600">{{ service.serviceId }}</td>
+        <td class="py-2 px-4 text-sm text-gray-600">{{ service.name }}</td>
+        <td class="py-2 px-4 text-sm text-gray-600">{{ service.description }}</td>
+        <td class="py-2 px-4 text-sm text-gray-600">{{ service.pricing }}</td>
+        <td class="py-2 px-4 text-center">
+          <button (click)="editService()"
+            class="px-4 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">Edit</button>
+          <button (click)="deleteService()"
+            class="ml-2 px-4 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</div>

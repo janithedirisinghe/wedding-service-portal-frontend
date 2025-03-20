@@ -1,0 +1,162 @@
+<div class="mx-auto bg-white shadow-lg rounded-lg p-6">
+    <!-- Profile Header -->
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-4">
+        <img src="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" alt="Profile Image" class="w-20 h-20 rounded-full">
+        <div>
+          <h2 class="text-2xl font-semibold">{{vendor?.businessName}}</h2>
+          <div class="flex items-center text-yellow-500">
+            <span class="text-lg font-semibold">4.9</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 15l-5.878 3.09 1.122-6.54L1 7.09l6.561-.95L10 1l2.439 5.14 6.561.95-4.244 4.46 1.122 6.54z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <!-- New Icon Buttons -->
+      <div class="flex items-center space-x-7 mt-7">
+        <button class="text-blue-600 hover:text-blue-800">
+            <i class="pi pi-comments" style="font-size: 2rem"></i>
+        </button>
+        <button class="text-green-600 hover:text-green-800">
+            <i class="pi pi-heart" style="font-size: 2rem"></i>
+        </button>
+      </div>
+    </div>
+  
+    <!-- Profile Stats -->
+    <div class="flex space-x-6 mt-4 text-gray-600">
+      <div><span class="font-semibold">335</span> FOLLOWERS</div>
+      <div><span class="font-semibold">10</span> POSTS</div>
+      <div><span class="font-semibold">20</span> REVIEWS</div>
+    </div>
+
+    <!-- New Buttons -->
+    <div class="flex space-x-4 mt-4">
+      <button class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600" (click)="selectedTab = 'addAppointment'">Appointment</button>
+      <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" (click)="selectedTab = 'addReview'">Add Review</button>
+    </div>
+  
+    <!-- Profile Details -->
+    <div class="mt-6 bg-gray-100 p-4 rounded-lg">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+        <div>
+          <h3 class="font-semibold">Bio</h3>
+          <p>{{vendor?.bio}}</p>
+        </div>
+        <div>
+          <h3 class="font-semibold">Location</h3>
+          <p>{{vendor?.location}}</p>
+        </div>
+        <div>
+          <h3 class="font-semibold">Country</h3>
+          <p>{{vendor?.country}}</p>
+        </div>
+        <div>
+          <h3 class="font-semibold">Telephone</h3>
+          <p>{{vendor?.telNo}}</p>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Tabs and their content -->
+    <div *ngIf="selectedTab !== 'addReview' && selectedTab !== 'addAppointment'">
+        <!-- Tabs -->
+        <div class="mt-6 border-b flex space-x-6">
+            <button (click)="selectedTab = 'posts'" [class.border-blue-500]="selectedTab === 'posts'" [class.text-sky-500]="selectedTab === 'posts'" class="pb-2 text-gray-600 font-semibold">Posts</button>
+            <button (click)="selectedTab = 'reviews'" [class.border-blue-500]="selectedTab === 'reviews'" [class.text-sky-500]="selectedTab === 'reviews'" class="pb-2 text-gray-600">Reviews</button>
+            <button (click)="selectedTab = 'services'" [class.border-blue-500]="selectedTab === 'services'" [class.text-sky-500]="selectedTab === 'services'" class="pb-2 text-gray-600">Services</button>
+        </div>
+
+        <!-- Posts List -->
+        <div *ngIf="selectedTab === 'posts'" class="mt-4 space-y-4">
+            <app-vender-postlist-customer [vendorId]="vendor?.id"></app-vender-postlist-customer>
+        </div>
+
+        <!-- Reviews List -->
+        <div *ngIf="selectedTab === 'reviews'" class="mt-4 space-y-4">
+            <div *ngFor="let review of reviews" class="bg-white shadow p-4 rounded-lg">
+                <div class="flex justify-between">
+                    <div> 
+                        <h4 class="font-semibold">{{ review.name }}</h4>
+                        <p class="text-gray-500 text-sm">{{ review.location }} &bull; {{ review.date }}</p>
+                    </div>
+                    <div class="flex items-center ">
+                        <span class="text-lg font-semibold">{{ review.rating }}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 15l-5.878 3.09 1.122-6.54L1 7.09l6.561-.95L10 1l2.439 5.14 6.561.95-4.244 4.46 1.122 6.54z"/>
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-gray-600 mt-2">{{ review.text }}</p>
+            </div>
+        </div>
+
+        <!-- Services List -->
+        <div *ngIf="selectedTab === 'services'" class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div *ngFor="let service of vendor?.services" class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <div class="space-y-3">
+                    <p class="text-xl font-semibold text-gray-700">{{ service.name || 'Service Name' }}</p>
+                    <p class="text-gray-600">{{ service.description || 'No description available.' }}</p>
+                    <p class="font-semibold text-gray-800">Rs. {{ service.pricing }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Form -->
+    <div *ngIf="selectedTab === 'addReview'" class="mt-4 bg-gray-100 p-4 rounded-lg">
+        <h3 class="font-semibold text-lg mb-4 justify-center">Add a Review</h3>
+        <form>
+            <div class="mb-4">
+                <label class="block text-gray-700">Name</label>
+                <input type="text" class="w-full p-2 border rounded-lg" placeholder="Your Name">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Rating</label>
+                <div class="flex items-center"> 
+                    <ng-container *ngFor="let star of [1, 2, 3, 4, 5]; let i = index">
+                        <svg (click)="reviewRating = star" [class.text-yellow-300]="reviewRating >= star" [class.text-gray-300]="reviewRating < star" class="w-6 h-6 cursor-pointer" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                            <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                        </svg>
+                    </ng-container> 
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Review</label>
+                <textarea class="w-full p-2 border rounded-lg" rows="4" placeholder="Your Review"></textarea>
+            </div>
+            <div class="flex space-x-4">
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Submit</button>
+                <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600" (click)="selectedTab = 'reviews'">Cancel</button>
+            </div>
+        </form>
+    </div>
+ 
+    <!-- Appointment Form -->
+    <div *ngIf="selectedTab === 'addAppointment'" class="mt-4 bg-gray-100 p-4 rounded-lg">
+        <h3 class="font-semibold text-lg mb-4 justify-center">Book an Appointment</h3>
+        <form>
+            <div class="mb-4">
+                <label class="block text-gray-700">Name</label>
+                <input type="text" class="w-full p-2 border rounded-lg" placeholder="Your Name">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Description</label>
+                <textarea class="w-full p-2 border rounded-lg" rows="4" placeholder="Description"></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Appointment Date and Time</label>
+                <input type="datetime-local" class="w-full p-2 border rounded-lg">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Location</label>
+                <input type="text" class="w-full p-2 border rounded-lg" placeholder="Location">
+            </div>
+            <div class="flex space-x-4">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Submit</button>
+                <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600" (click)="selectedTab = 'services'">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>

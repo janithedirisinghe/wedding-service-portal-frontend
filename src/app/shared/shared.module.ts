@@ -11,10 +11,10 @@ import { MainNavbarComponent } from './components/main-navbar/main-navbar.compon
 import { VenderSidebarComponent } from './components/vender-sidebar/vender-sidebar.component';
 import { PanelMenuModule } from 'primeng/panelmenu';
 import { FileUploaderComponent } from './components/file-uploader/file-uploader.component';
-
+import { AuthService } from './services/auth.service';
+import { CustomerToolbarComponent } from './components/customer-toolbar/customer-toolbar.component';
 
 // Import shared services
-
 
 @NgModule({
   declarations: [
@@ -22,19 +22,26 @@ import { FileUploaderComponent } from './components/file-uploader/file-uploader.
     HomeFooterComponent,
     MainNavbarComponent,
     VenderSidebarComponent,
-    FileUploaderComponent
+    FileUploaderComponent,
+    CustomerToolbarComponent,
   ],
   imports: [
-    CommonModule,MenubarModule, BadgeModule, AvatarModule, InputTextModule, RippleModule,PanelMenuModule,
+    CommonModule,
+    MenubarModule,
+    BadgeModule,
+    AvatarModule,
+    InputTextModule,
+    RippleModule,
+    PanelMenuModule,
   ],
   exports: [
     HomeNavbarComponent,
     HomeFooterComponent,
     MainNavbarComponent,
     VenderSidebarComponent,
-    FileUploaderComponent
+    FileUploaderComponent,
+    CustomerToolbarComponent,
   ],
-  providers: [
-  ]
+  providers: [],
 })
-export class SharedModule { }
+export class SharedModule {}
