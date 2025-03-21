@@ -1,0 +1,15 @@
+{
+  "firstName": "Chowdhury",
+  "lastName": "Musharof",
+  "email": "randomuser.com",
+  "phone": "+09 363 398 46",
+  "bio": "Team Manager",
+  "location": "Arizona, United States",
+  "position": "Team Manager",
+  "socialLinks": {
+    "facebook": "#",
+    "twitter": "#",
+    "linkedin": "#",
+    "instagram": "#"
+  }
+}

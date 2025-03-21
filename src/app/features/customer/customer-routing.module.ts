@@ -4,6 +4,7 @@ import { CustomerBodyPageComponent } from './customer-body-page/customer-body-pa
 import { CustomerTimelineComponent } from './customer-timeline/customer-timeline.component';
 import { VenderProfileCustomerComponent } from './vender-profile-customer/vender-profile-customer.component';
 import { CustomerChatComponent } from './customer-chat/customer-chat.component';
+import { CustomerProfileComponent } from './customer-profile/customer-profile.component';
 
 
 const routes: Routes = [
@@ -12,6 +13,7 @@ const routes: Routes = [
         {path : 'timeline', component: CustomerTimelineComponent},
         {path : 'vender-profile', component: VenderProfileCustomerComponent},
         {path : 'chat', component: CustomerChatComponent},
+        {path : 'customer-profile', component: CustomerProfileComponent}
       ]
     }, 
 ];
