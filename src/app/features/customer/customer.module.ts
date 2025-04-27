@@ -10,6 +10,7 @@ import { VenderProfileCustomerComponent } from './vender-profile-customer/vender
 import { VenderPostlistCustomerComponent } from './vender-postlist-customer/vender-postlist-customer.component';
 import { CustomerChatComponent } from './customer-chat/customer-chat.component';
 import { BrowserModule } from '@angular/platform-browser';
+import { CustomerProfileComponent } from './customer-profile/customer-profile.component';
 
 @NgModule({
 declarations: [
@@ -18,7 +19,8 @@ declarations: [
         CustomerTimelineComponent,
         VenderProfileCustomerComponent,
         VenderPostlistCustomerComponent,
-        CustomerChatComponent
+        CustomerChatComponent,
+        CustomerProfileComponent
   ],
   imports: [
     CommonModule,
