@@ -1,0 +1,99 @@
+<div class="flex flex-col h-full justify-between sidebarbgcolor">
+  <!-- Top section with logo -->
+  <div class="p-4">
+    <div class="logo flex items-center justify-center mb-6">
+      <span class="wed font-bold text-xl">Wed</span>
+      <span class="ease text-xl text-indigo-600">Ease</span>
+    </div>
+    
+    <!-- Navigation Links -->
+    <ul class="mt-4 space-y-2 text-white">
+      <li>
+        <a routerLink="/vender/serviceList" routerLinkActive="bg-gray-200 bg-opacity-20 text-indigo-200" 
+           class="block p-3 rounded hover:bg-gray-200 hover:bg-opacity-20 transition-all duration-200 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          Services
+        </a>
+      </li>
+      <li>
+        <a routerLink="/vender/posts" routerLinkActive="bg-gray-200 bg-opacity-20 text-indigo-200"
+           class="block p-3 rounded hover:bg-gray-200 hover:bg-opacity-20 transition-all duration-200 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+          </svg>
+          Posts
+        </a>
+      </li>
+      <li>
+        <a routerLink="/vender/meetingRequests" routerLinkActive="bg-gray-200 bg-opacity-20 text-indigo-200"
+           class="block p-3 rounded hover:bg-gray-200 hover:bg-opacity-20 transition-all duration-200 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          Meetings
+        </a>
+      </li>
+      <li>
+        <a routerLink="/vender/eventCalender" routerLinkActive="bg-gray-200 bg-opacity-20 text-indigo-200"
+           class="block p-3 rounded hover:bg-gray-200 hover:bg-opacity-20 transition-all duration-200 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          Calendar
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+  <!-- Bottom section with user profile and notification icons -->
+  <div class="mt-auto p-4 border-t border-gray-700 border-opacity-40">
+    <!-- Notification Icon -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="relative">
+        <button (click)="toggleNotifications()" class="text-white p-2 rounded-full hover:bg-gray-200 hover:bg-opacity-20 transition-all duration-200 relative">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+          <div class="absolute -top-1 -right-1 bg-red-500 rounded-full h-4 w-4 flex items-center justify-center text-xs">3</div>
+        </button>
+        <!-- Notification Dropdown -->
+        <div *ngIf="showNotifications" class="absolute bottom-full mb-2 left-0 w-64 bg-white rounded-md shadow-lg py-1 z-10">
+          <div class="p-3 border-b border-gray-200">
+            <h3 class="text-sm font-medium text-gray-700">Notifications</h3>
+          </div>
+          <div class="max-h-60 overflow-y-auto">
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-b border-gray-100">
+              <p class="font-medium">New Meeting Request</p>
+              <p class="text-xs text-gray-500">John Doe requested a meeting</p>
+            </a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-b border-gray-100">
+              <p class="font-medium">New Message</p>
+              <p class="text-xs text-gray-500">Sarah sent you a message</p>
+            </a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              <p class="font-medium">Booking Confirmed</p>
+              <p class="text-xs text-gray-500">Your service was booked</p>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Profile Section -->
+      <a routerLink="/vender/profile" class="flex items-center gap-3 p-2 rounded hover:bg-gray-200 hover:bg-opacity-20 transition-all duration-200">
+        <div class="flex items-center justify-center w-8 h-8 rounded-full overflow-hidden bg-gray-200">
+          <img
+            src="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png"
+            alt="User Avatar"
+            class="w-full h-full object-cover"
+          />
+        </div>
+        <div class="text-white">
+          <p class="text-sm font-medium">Vendor Name</p>
+          <p class="text-xs opacity-70">View Profile</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>

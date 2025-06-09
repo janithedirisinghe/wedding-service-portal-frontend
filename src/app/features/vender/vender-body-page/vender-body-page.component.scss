@@ -3,5 +3,19 @@
 @tailwind utilities;
 
 .sidebarbgcolor {
-    background-color: #426778; /* Yellow color */
+    background: linear-gradient(180deg, #4338ca 0%, #5046e5 100%);  /* Indigo gradient matching sidebar-two */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Add smooth transitions */
+.flex-1 {
+    transition: all 0.3s ease;
+}
+
+/* Content area styling */
+main {
+    border-radius: 0.5rem;
+    margin: 0.5rem;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }

@@ -42,6 +42,12 @@ export class VenderCalenderComponent implements OnInit {
 
     this.weeks = weeks;
   }
+  isToday(day: Date): boolean {
+    const today = new Date();
+    return day.getDate() === today.getDate() && 
+           day.getMonth() === today.getMonth() && 
+           day.getFullYear() === today.getFullYear();
+  }
 
   generateDummyEvents() {
     const eventTitles = ['Wedding', 'Meeting', 'Birthday', 'Anniversary', 'Conference'];

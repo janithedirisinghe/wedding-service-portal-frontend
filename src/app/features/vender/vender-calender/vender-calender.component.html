@@ -1,76 +1,100 @@
-<!-- component -->
-<div class="container mx-auto mt-10">
-  <div class="wrapper bg-white rounded shadow w-full ">
-    <div class="header flex justify-between border-b p-2">
-      <span class="text-lg font-bold">
+<app-vender-header pageTitle="Calendar" subtitle="Manage your schedule and events"></app-vender-header>
+
+<div class="mx-auto bg-white shadow-lg rounded-lg p-2 sm:p-3 md:p-4"><!-- Calendar Controls & Stats -->
+  <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+    <div class="w-full md:w-1/3 mb-4 md:mb-0">
+      <h2 class="text-xl font-semibold text-purple-700">
         {{ currentMonth | date: 'MMMM yyyy' }}
-      </span>
-      <div class="buttons">
-        <button class="p-1" (click)="prevMonth()">
-          <svg width="1em" fill="gray" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-left-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-            <path fill-rule="evenodd" d="M8.354 11.354a.5.5 0 0 0 0-.708L5.707 8l2.647-2.646a.5.5 0 1 0-.708-.708l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708 0z"/>
-            <path fill-rule="evenodd" d="M11.5 8a.5.5 0 0 0-.5-.5H6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 .5-.5z"/>
-          </svg>
-        </button>
-        <button class="p-1" (click)="nextMonth()">
-          <svg width="1em" fill="gray" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-right-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-            <path fill-rule="evenodd" d="M7.646 11.354a.5.5 0 0 1 0-.708L10.293 8 7.646 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0z"/>
-            <path fill-rule="evenodd" d="M4.5 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5z"/>
-          </svg>
-        </button>
-      </div>
+      </h2>
     </div>
-    <table class="w-full">
-      <thead>
-        <tr>
-          <th class="p-2 border-r h-10 xl:w-40 lg:w-30 md:w-30 sm:w-20 w-10 xl:text-sm text-xs">
-            <span class="xl:block lg:block md:block sm:block hidden">Sunday</span>
-            <span class="xl:hidden lg:hidden md:hidden sm:hidden block">Sun</span>
+    <div class="flex flex-wrap gap-2 sm:gap-3">
+      <button class="flex items-center px-3 py-2 sm:px-4 rounded-lg border border-gray-300 hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300" (click)="prevMonth()">
+        <svg width="1.2em" fill="currentColor" height="1.2em" viewBox="0 0 16 16" class="bi bi-arrow-left-circle text-purple-600 mr-1" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+          <path fill-rule="evenodd" d="M8.354 11.354a.5.5 0 0 0 0-.708L5.707 8l2.647-2.646a.5.5 0 1 0-.708-.708l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708 0z"/>
+          <path fill-rule="evenodd" d="M11.5 8a.5.5 0 0 0-.5-.5H6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 .5-.5z"/>
+        </svg>
+        <span class="hidden sm:inline">Previous</span>
+      </button>
+      <button class="flex items-center px-3 py-2 sm:px-4 rounded-lg bg-purple-600 text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300" (click)="nextMonth()">
+        <span class="hidden sm:inline">Next</span>
+        <svg width="1.2em" fill="currentColor" height="1.2em" viewBox="0 0 16 16" class="bi bi-arrow-right-circle text-white ml-1" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+          <path fill-rule="evenodd" d="M7.646 11.354a.5.5 0 0 1 0-.708L10.293 8 7.646 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0z"/>
+          <path fill-rule="evenodd" d="M4.5 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5z"/>
+        </svg>
+      </button>
+    </div>  </div>
+  
+  <!-- Calendar Wrapper -->
+  <div class="wrapper bg-white rounded-lg border border-purple-100 shadow-md overflow-hidden w-full">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-full">
+        <thead>
+          <tr class="bg-purple-50">
+            <th class="p-2 sm:p-3 border-r h-10 w-9 sm:w-16 md:w-24 lg:w-32 xl:w-40 text-xs text-purple-800 font-semibold">
+              <span class="md:block hidden">Sunday</span>
+              <span class="md:hidden block">Sun</span>
+            </th>
+            <th class="p-2 sm:p-3 border-r h-10 w-9 sm:w-16 md:w-24 lg:w-32 xl:w-40 text-xs text-purple-800 font-semibold">
+              <span class="md:block hidden">Monday</span>
+              <span class="md:hidden block">Mon</span>
+            </th>          <th class="p-2 sm:p-3 border-r h-10 w-9 sm:w-16 md:w-24 lg:w-32 xl:w-40 text-xs text-purple-800 font-semibold">
+            <span class="md:block hidden">Tuesday</span>
+            <span class="md:hidden block">Tue</span>
           </th>
-          <th class="p-2 border-r h-10 xl:w-40 lg:w-30 md:w-30 sm:w-20 w-10 xl:text-sm text-xs">
-            <span class="xl:block lg:block md:block sm:block hidden">Monday</span>
-            <span class="xl:hidden lg:hidden md:hidden sm:hidden block">Mon</span>
+          <th class="p-2 sm:p-3 border-r h-10 w-9 sm:w-16 md:w-24 lg:w-32 xl:w-40 text-xs text-purple-800 font-semibold">
+            <span class="md:block hidden">Wednesday</span>
+            <span class="md:hidden block">Wed</span>
           </th>
-          <th class="p-2 border-r h-10 xl:w-40 lg:w-30 md:w-30 sm:w-20 w-10 xl:text-sm text-xs">
-            <span class="xl:block lg:block md:block sm:block hidden">Tuesday</span>
-            <span class="xl:hidden lg:hidden md:hidden sm:hidden block">Tue</span>
+          <th class="p-2 sm:p-3 border-r h-10 w-9 sm:w-16 md:w-24 lg:w-32 xl:w-40 text-xs text-purple-800 font-semibold">
+            <span class="md:block hidden">Thursday</span>
+            <span class="md:hidden block">Thu</span>
           </th>
-          <th class="p-2 border-r h-10 xl:w-40 lg:w-30 md:w-30 sm:w-20 w-10 xl:text-sm text-xs">
-            <span class="xl:block lg:block md:block sm:block hidden">Wednesday</span>
-            <span class="xl:hidden lg:hidden md:hidden sm:hidden block">Wed</span>
+          <th class="p-2 sm:p-3 border-r h-10 w-9 sm:w-16 md:w-24 lg:w-32 xl:w-40 text-xs text-purple-800 font-semibold">
+            <span class="md:block hidden">Friday</span>
+            <span class="md:hidden block">Fri</span>
           </th>
-          <th class="p-2 border-r h-10 xl:w-40 lg:w-30 md:w-30 sm:w-20 w-10 xl:text-sm text-xs">
-            <span class="xl:block lg:block md:block sm:block hidden">Thursday</span>
-            <span class="xl:hidden lg:hidden md:hidden sm:hidden block">Thu</span>
+          <th class="p-2 sm:p-3 border-r h-10 w-9 sm:w-16 md:w-24 lg:w-32 xl:w-40 text-xs text-purple-800 font-semibold">
+            <span class="md:block hidden">Saturday</span>
+            <span class="md:hidden block">Sat</span>
           </th>
-          <th class="p-2 border-r h-10 xl:w-40 lg:w-30 md:w-30 sm:w-20 w-10 xl:text-sm text-xs">
-            <span class="xl:block lg:block md:block sm:block hidden">Friday</span>
-            <span class="xl:hidden lg:hidden md:hidden sm:hidden block">Fri</span>
-          </th>
-          <th class="p-2 border-r h-10 xl:w-40 lg:w-30 md:w-30 sm:w-20 w-10 xl:text-sm text-xs">
-            <span class="xl:block lg:block md:block sm:block hidden">Saturday</span>
-            <span class="xl:hidden lg:hidden md:hidden sm:hidden block">Sat</span>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let week of weeks" class="text-center h-20">
-          <td *ngFor="let day of week" class="border p-1 h-40 xl:w-40 lg:w-30 md:w-30 sm:w-20 w-10 overflow-auto transition cursor-pointer duration-500 ease hover:bg-gray-300">
-            <div class="flex flex-col h-40 mx-auto xl:w-40 lg:w-30 md:w-30 sm:w-full w-10 mx-auto overflow-hidden">
-              <div class="top h-5 w-full">
-                <span class="text-gray-500">{{ day.getDate() }}</span>
-              </div>
-              <div class="bottom flex-grow h-30 py-1 w-full cursor-pointer">
-                <div *ngIf="events[day.toISOString().split('T')[0]]">
-                  <span *ngFor="let event of events[day.toISOString().split('T')[0]]" class="text-xs bg-blue-200 rounded p-1 m-1">{{ event }}</span>
+        </tr>      </thead>
+        <tbody>
+          <tr *ngFor="let week of weeks" class="text-center">
+            <td *ngFor="let day of week" class="border border-purple-100 p-1 sm:p-2 h-20 sm:h-28 md:h-32 lg:h-36 xl:h-40 w-9 sm:w-16 md:w-24 lg:w-32 xl:w-40 overflow-auto transition cursor-pointer duration-500 ease hover:bg-purple-50 relative">
+              <div class="flex flex-col h-full w-full overflow-hidden">
+                <div class="top h-5 sm:h-6 w-full flex justify-between items-start">
+                  <span [class.text-purple-600]="isToday(day)" [class.font-semibold]="isToday(day)" [class.text-gray-600]="!isToday(day)" class="text-xs sm:text-sm md:text-md font-medium">
+                    {{ day.getDate() }}
+                  </span>
+                  <!-- Current day indicator -->
+                  <div *ngIf="isToday(day)" class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-purple-500 rounded-full"></div>
+                </div>
+                <div class="bottom flex-grow py-0.5 sm:py-1 w-full cursor-pointer overflow-y-auto">
+                  <div *ngIf="events[day.toISOString().split('T')[0]]" class="flex flex-col gap-0.5 sm:gap-1">
+                    <span *ngFor="let event of events[day.toISOString().split('T')[0]]" class="text-[10px] sm:text-xs bg-purple-100 text-purple-800 rounded-md px-1 sm:px-2 py-0.5 border border-purple-200 shadow-sm truncate hover:bg-purple-200 transition-all duration-200">{{ event }}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+          </tr>      </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Calendar Legend -->
+  <div class="mt-4 sm:mt-6 border-t border-purple-100 pt-3 sm:pt-4">
+    <h3 class="text-base sm:text-lg font-medium text-purple-700 mb-2 sm:mb-3">Event Legend</h3>
+    <div class="flex flex-wrap gap-2 sm:gap-3">
+      <div class="flex items-center">
+        <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1.5 sm:mr-2 bg-purple-100 border border-purple-200 rounded-full"></div>
+        <span class="text-xs sm:text-sm text-gray-600">Regular Event</span>
+      </div>
+      <div class="flex items-center">
+        <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1.5 sm:mr-2 bg-purple-500 border border-purple-400 rounded-full"></div>
+        <span class="text-xs sm:text-sm text-gray-600">Today</span>
+      </div>
+    </div>
   </div>
 </div>

@@ -1,0 +1,66 @@
+/* Navbar styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:host {
+  display: block;
+}
+
+header {
+  /* Subtle animation for hover states */
+  button, a {
+    transition: all 0.2s ease;
+  }
+  
+  /* Smooth shadow transition */
+  transition: box-shadow 0.3s ease;
+  
+  /* Add shadow when scrolled - can be controlled via JavaScript */
+  &.scrolled {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* Notification dropdown animation */
+.notification-dropdown {
+  transform-origin: top right;
+  animation: dropdown 0.2s ease-out;
+}
+
+@keyframes dropdown {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Notification badge pulse effect */
+.notification-badge {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(220, 38, 38, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+  }
+}
+
+/* Search input focus effect */
+input {
+  transition: all 0.3s ease;
+  
+  &:focus {
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+  }
+}

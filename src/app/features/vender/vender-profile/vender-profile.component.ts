@@ -2,12 +2,13 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { venderDetails } from '../models/vender.model';
 import { VendorProfileService } from '../services/venderProfile.service';
+import { VenderHeaderComponent } from '../../../shared/components/vender-header/vender-header.component';
 
 @Component({
   selector: 'app-vender-profile',
   templateUrl: './vender-profile.component.html',
   standalone: true,
-  imports: [CommonModule], // Import CommonModule here
+  imports: [CommonModule, VenderHeaderComponent], // Import CommonModule and VenderHeaderComponent
   styleUrls: ['./vender-profile.component.css']
 })
 export class VenderProfileComponent implements OnInit {

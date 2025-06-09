@@ -1,0 +1,35 @@
+// Sidebar styling
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:host {
+  display: block;
+  height: 100%;
+}
+
+.sidebarbgcolor {
+  background: linear-gradient(180deg, #4338ca 0%, #5046e5 100%);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.logo {
+  .wed {
+    color: white;
+  }
+  .ease {
+    color: #d8b4fe;
+  }
+}
+
+a {
+  transition: all 0.2s ease-in-out;
+  &:hover {
+    transform: translateX(2px);
+  }
+}
+
+// Active link styling
+.active-link {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-left: 3px solid #d8b4fe;
+}
