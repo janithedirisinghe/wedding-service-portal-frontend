@@ -13,13 +13,12 @@ export class CustomerProfileComponent implements OnInit {
   ngOnInit(): void {
     this.loadDummyData();
   }
-
   loadDummyData(): void {
     this.profile = {
       firstName: 'John',
       lastName: 'Doe',
       position: 'Client',
-      location: 'New York',
+      location: 'New York, NY',
       socialLinks: {
         facebook: 'https://facebook.com/johndoe',
         twitter: 'https://twitter.com/johndoe',
@@ -27,8 +26,8 @@ export class CustomerProfileComponent implements OnInit {
         instagram: 'https://instagram.com/johndoe'
       },
       email: 'john.doe@example.com',
-      phone: '+1 234 567 890',
-      bio: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+      phone: '+1 (234) 567-890',
+      bio: 'Passionate about creating memorable wedding experiences. I enjoy working with talented vendors to bring dream weddings to life.'
     };
   }
 }

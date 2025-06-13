@@ -7,6 +7,7 @@ const routes: Routes = [
   { path: 'vender', loadChildren: () => import('../app/features/vender/vender.module').then(m => m.VenderModule) },
   { path: 'auth', loadChildren: () => import('../app/features/auth/auth.module').then(m => m.AuthModule) },
   { path: 'customer', loadChildren: () => import('../app/features/customer/customer.module').then(m => m.CustomerModule) },
+  { path: 'admin', loadChildren: () => import('../app/features/admin/admin.module').then(m => m.AdminModule) },
 ];
 
 @NgModule({

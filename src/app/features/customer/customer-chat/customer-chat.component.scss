@@ -1,10 +1,163 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import "primeicons/primeicons.css";
 
 .chat-list {
-  max-height: 400px; /* Adjust the height as needed */
+  max-height: calc(100vh - 280px);
   overflow-y: auto;
 }
 
-@import "primeicons/primeicons.css";
+// Custom scrollbar for chat list
+.chat-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chat-list::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.chat-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+.chat-list::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+// Animation for message appearance
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-enter {
+  animation: messageSlideIn 0.3s ease-out;
+}
+
+// Pulse animation for online status
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.online-indicator {
+  animation: pulse 2s infinite;
+}
+
+// Hover effect for chat items
+.chat-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.chat-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.chat-item:hover::before {
+  left: 100%;
+}
+
+// Typing indicator animation
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-10px);
+  }
+}
+
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+}
+
+.typing-indicator span {
+  height: 8px;
+  width: 8px;
+  background: #94a3b8;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 4px;
+  animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+// Message bubble styles
+.message-bubble {
+  position: relative;
+  word-wrap: break-word;
+  max-width: 70%;
+}
+
+.message-bubble.sent {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+}
+
+.message-bubble.received {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+}
+
+// Popup animation
+.popup-enter {
+  animation: popupSlideIn 0.3s ease-out;
+}
+
+@keyframes popupSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+// Responsive improvements
+@media (max-width: 640px) {
+  .chat-list {
+    max-height: calc(100vh - 300px);
+  }
+}
+
+@media (min-width: 768px) {
+  .message-bubble {
+    max-width: 60%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .message-bubble {
+    max-width: 50%;
+  }
+}

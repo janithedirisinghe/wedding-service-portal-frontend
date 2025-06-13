@@ -1,14 +1,16 @@
 <div class="flex h-screen">  
+    <!-- Sidebar -->
+    <app-customer-toolbar></app-customer-toolbar>
+    
     <!-- Main Content -->
-    <div class="flex flex-col flex-1">
+    <div class="flex flex-col flex-1 md:ml-20">
       <!-- Navbar -->
       <app-main-navbar></app-main-navbar>
   
       <!-- Content Area -->
-      <main class="flex-1 bg-gray-100 p-2 overflow-y-auto">
+      <main class="flex-1 bg-gray-100 p-2 overflow-y-auto mb-20 md:mb-0">
         <!-- Dynamic Content Here -->
         <div class="text-gray-800">
-            <app-customer-toolbar></app-customer-toolbar>
           <router-outlet></router-outlet>
         </div>
       </main>

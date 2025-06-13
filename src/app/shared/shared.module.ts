@@ -16,11 +16,13 @@ import { FileUploaderComponent } from './components/file-uploader/file-uploader.
 import { AuthService } from './services/auth.service';
 import { CustomerToolbarComponent } from './components/customer-toolbar/customer-toolbar.component';
 import { VenderHeaderComponent } from './components/vender-header/vender-header.component';
+import { CustomerHeaderComponent } from './components/customer-header/customer-header.component';
 import { NavbartwoComponent } from './components/navbartwo/navbartwo.component';
 
 // Import shared services
 
-@NgModule({  declarations: [
+@NgModule({
+  declarations: [
     HomeNavbarComponent,
     HomeFooterComponent,
     MainNavbarComponent,
@@ -29,7 +31,8 @@ import { NavbartwoComponent } from './components/navbartwo/navbartwo.component';
     CustomerToolbarComponent,
     SidebarTwoComponent,
     NavbartwoComponent,
-  ],imports: [
+  ],
+  imports: [
     CommonModule,
     FormsModule,
     MenubarModule,
@@ -39,7 +42,9 @@ import { NavbartwoComponent } from './components/navbartwo/navbartwo.component';
     RippleModule,
     PanelMenuModule,
     VenderHeaderComponent,
-  ],exports: [
+    CustomerHeaderComponent,
+  ],
+  exports: [
     HomeNavbarComponent,
     HomeFooterComponent,
     MainNavbarComponent,
@@ -49,6 +54,7 @@ import { NavbartwoComponent } from './components/navbartwo/navbartwo.component';
     FileUploaderComponent,
     CustomerToolbarComponent,
     VenderHeaderComponent,
+    CustomerHeaderComponent,
   ],
   providers: [],
 })

@@ -16,6 +16,7 @@ import { AuthService } from './shared/services/auth.service';
 import { AuthGuard } from './shared/guards/auth.guard';
 import { AuthInterceptor } from './shared/interceptors/auth.interceptor';
 import { CustomerModule } from './features/customer/customer.module';
+import { AdminModule } from './features/admin/admin.module';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { CustomerModule } from './features/customer/customer.module';
     NgxSpinnerModule,
     ToastrModule.forRoot(),
     BrowserAnimationsModule,
+    AdminModule
   ],
   providers: [
     provideClientHydration(),
