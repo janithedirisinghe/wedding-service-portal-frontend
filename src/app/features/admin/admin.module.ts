@@ -5,12 +5,14 @@ import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AdminRoutingModule } from './admin-routing.module';
 import { AdminBodyPageComponent } from './admin-body-page/admin-body-page.component';
+import { VendorManagementComponent } from './vendor-management/vendor-management.component';
+import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+
 @NgModule({
 declarations: [
-
-
-  
-    AdminBodyPageComponent
+    AdminBodyPageComponent,
+    VendorManagementComponent,
+    AdminDashboardComponent
   ],
   imports: [
     CommonModule,

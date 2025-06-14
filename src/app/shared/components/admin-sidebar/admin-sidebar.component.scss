@@ -1,0 +1,54 @@
+// Admin Sidebar styling
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+.sidebarbgcolor {
+  background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%); // Red gradient for admin theme
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.logo {
+  .wed {
+    color: white;
+  }
+  .ease {
+    color: #fca5a5; // Light red for accent
+  }
+}
+
+a {
+  transition: all 0.2s ease-in-out;
+  &:hover {
+    transform: translateX(2px);
+  }
+}
+
+// Active link styling
+.active-link {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-left: 3px solid #fca5a5;
+}
+
+/* Notification dropdown animation */
+.notification-dropdown {
+  transform-origin: bottom left;
+  animation: dropdown 0.2s ease-out;
+  z-index: 1000;
+}
+
+@keyframes dropdown {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+.vendor-management-container {
+  max-width: 100%;
+  
+  .table-container {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  // Smooth transitions for better UX
+  button {
+    transition: all 0.2s ease-in-out;
+    
+    &:hover {
+      transform: translateY(-1px);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  // Custom table styling
+  table {
+    th {
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+    
+    tr {
+      &:hover {
+        background-color: #f9fafb;
+      }
+    }
+  }
+
+  // Loading animation
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  // Status badges
+  .status-badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    
+    &.pending {
+      background-color: #fef3c7;
+      color: #d97706;
+    }
+    
+    &.approved {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    
+    &.rejected {
+      background-color: #fee2e2;
+      color: #dc2626;
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    .flex-wrap {
+      flex-direction: column;
+    }
+    
+    .overflow-x-auto {
+      overflow-x: scroll;
+    }
+    
+    table {
+      min-width: 800px;
+    }
+  }
+}

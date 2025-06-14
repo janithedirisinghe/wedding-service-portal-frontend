@@ -1,1 +1,18 @@
-<p>admin-body-page works!</p>
+<div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 sidebarbgcolor flex flex-col">
+      <!-- Sidebar content -->
+      <div class="h-full">
+        <app-admin-sidebar></app-admin-sidebar>
+      </div>
+    </aside>
+    <!-- Main Content -->
+    <div class="flex flex-col flex-1">
+      <!-- Navbar -->
+      <app-admin-navbar></app-admin-navbar>      <!-- Content Area -->
+      <main class="flex-1 bg-gray-50 p-6 overflow-y-auto">
+        <!-- Router outlet for nested routes -->
+        <router-outlet></router-outlet>
+      </main>
+    </div>
+  </div>

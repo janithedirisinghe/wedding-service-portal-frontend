@@ -18,11 +18,12 @@ import { CustomerToolbarComponent } from './components/customer-toolbar/customer
 import { VenderHeaderComponent } from './components/vender-header/vender-header.component';
 import { CustomerHeaderComponent } from './components/customer-header/customer-header.component';
 import { NavbartwoComponent } from './components/navbartwo/navbartwo.component';
+import { AdminSidebarComponent } from './components/admin-sidebar/admin-sidebar.component';
+import { AdminNavbarComponent } from './components/admin-navbar/admin-navbar.component';
 
 // Import shared services
 
-@NgModule({
-  declarations: [
+@NgModule({  declarations: [
     HomeNavbarComponent,
     HomeFooterComponent,
     MainNavbarComponent,
@@ -31,6 +32,8 @@ import { NavbartwoComponent } from './components/navbartwo/navbartwo.component';
     CustomerToolbarComponent,
     SidebarTwoComponent,
     NavbartwoComponent,
+    AdminSidebarComponent,
+    AdminNavbarComponent,
   ],
   imports: [
     CommonModule,
@@ -43,8 +46,7 @@ import { NavbartwoComponent } from './components/navbartwo/navbartwo.component';
     PanelMenuModule,
     VenderHeaderComponent,
     CustomerHeaderComponent,
-  ],
-  exports: [
+  ],  exports: [
     HomeNavbarComponent,
     HomeFooterComponent,
     MainNavbarComponent,
@@ -55,6 +57,8 @@ import { NavbartwoComponent } from './components/navbartwo/navbartwo.component';
     CustomerToolbarComponent,
     VenderHeaderComponent,
     CustomerHeaderComponent,
+    AdminSidebarComponent,
+    AdminNavbarComponent,
   ],
   providers: [],
 })

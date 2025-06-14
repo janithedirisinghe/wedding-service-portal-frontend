@@ -1,0 +1,76 @@
+/* Admin Navbar styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:host {
+  display: block;
+}
+
+header {
+  /* Subtle animation for hover states */
+  button, a {
+    transition: all 0.2s ease;
+  }
+  
+  /* Smooth shadow transition */
+  transition: box-shadow 0.3s ease;
+  
+  /* Add shadow when scrolled - can be controlled via JavaScript */
+  &.scrolled {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* Notification dropdown animation */
+.notification-dropdown {
+  transform-origin: top right;
+  animation: dropdown 0.2s ease-out;
+}
+
+@keyframes dropdown {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Custom scrollbar for notifications */
+.notification-dropdown .max-h-64::-webkit-scrollbar {
+  width: 4px;
+}
+
+.notification-dropdown .max-h-64::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 2px;
+}
+
+.notification-dropdown .max-h-64::-webkit-scrollbar-thumb {
+  background: #dc2626;
+  border-radius: 2px;
+}
+
+.notification-dropdown .max-h-64::-webkit-scrollbar-thumb:hover {
+  background: #b91c1c;
+}
+
+/* Search input focus states */
+input:focus {
+  transform: scale(1.02);
+  transition: transform 0.2s ease;
+}
+
+/* Button hover effects */
+button:hover {
+  transform: translateY(-1px);
+}
+
+/* Profile image hover effect */
+.h-10.w-10.rounded-full:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+}
