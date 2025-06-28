@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HomeNavbarComponent } from './components/home-navbar/home-navbar.component';
 import { MenubarModule } from 'primeng/menubar';
 import { BadgeModule } from 'primeng/badge';
@@ -38,6 +38,7 @@ import { AdminNavbarComponent } from './components/admin-navbar/admin-navbar.com
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     MenubarModule,
     BadgeModule,
     AvatarModule,

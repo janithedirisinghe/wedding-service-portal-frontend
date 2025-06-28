@@ -3,6 +3,7 @@ import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { venderDetails } from '../models/vender.model';
 import { VendorProfileService } from '../services/venderProfile.service';
 import { VenderHeaderComponent } from '../../../shared/components/vender-header/vender-header.component';
+import { AuthService } from '../../../shared/services/auth.service';
 
 @Component({
   selector: 'app-vender-profile',
@@ -12,34 +13,29 @@ import { VenderHeaderComponent } from '../../../shared/components/vender-header/
   styleUrls: ['./vender-profile.component.css']
 })
 export class VenderProfileComponent implements OnInit {
-  vendor: venderDetails | null = null;  // Variable to hold the vendor data
-  error: string = '';  // For error handling
-  showMore: boolean = false;  // Property to show more details
-  // showAllServices: boolean = false;
-
-  constructor(private vendorProfileService: VendorProfileService, @Inject(PLATFORM_ID) private platformId: Object) {}
+  vendor: venderDetails | null = null; 
+  error: string = ''; 
+  showMore: boolean = false; 
+  constructor(private vendorProfileService: VendorProfileService, @Inject(PLATFORM_ID) private platformId: Object, private authService: AuthService) {}
 
   ngOnInit(): void {
-    
-    // Initialization logic here
-    this.getvenderDetails();
+    const userId = Number(this.authService.getUserId());
+    this.getvenderDetails(userId);
   }
   selectedTab: string = 'posts';
+   getVenderProfileDetails(venderId: number){
+   }
 
-  getvenderDetails() {
-    // Check if the code is running in the browser
-    if (isPlatformBrowser(this.platformId)) {
-      const venderId = localStorage.getItem('vendorId');
-      
-      // Check if venderId is not null and is a valid number
+  getvenderDetails(venderId: number) {
+    if (isPlatformBrowser(this.platformId)) {    
       if (venderId && !isNaN(Number(venderId))) {
         this.vendorProfileService.getVendorProfileDetails(Number(venderId)).subscribe(
           (data) => {
-            this.vendor = data;  // Assign fetched data to the vendor variable
+            this.vendor = data;
             console.log(data);
           },
           (error) => {
-            this.error = 'Failed to load vendor data';  // Handle error
+            this.error = 'Failed to load vendor data';
             console.error(error);
           }
         );

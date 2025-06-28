@@ -3,84 +3,62 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { Login } from '../Models/login.model';
-import { default as jwtDecode } from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/auth'; // Change this to your backend URL
+  private apiUrl = 'http://localhost:8080/auth'; // Spring Boot backend
+
+  private userData: {
+    role: string;
+    userId: number;
+    username: string;
+  } | null = null;
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  // Login function
   login(login: Login): Observable<any> {
-    return this.http.post<{ role: string; userId: number; token: string; username: string }>(
-      `${this.apiUrl}/login`, 
-      login
+    return this.http.post<{ role: string; userId: number; username: string }>(
+      `${this.apiUrl}/login`,
+      login,
+      { withCredentials: true } // Send/receive HttpOnly cookie
     ).pipe(
-      tap((response) => {
-        this.storeUserData(response);
+      tap(response => {
+        this.userData = {
+          role: response.role,
+          userId: response.userId,
+          username: response.username
+        };
         this.redirectUser(response.role);
       })
     );
   }
 
-  // Store user data in localStorage
-  private storeUserData(response: {
-    role: string;
-    userId: number;
-    token: string;
-    username: string;
-  }) {
-    localStorage.setItem('token', response.token);
-    localStorage.setItem('role', response.role);
-    localStorage.setItem('userId', response.userId.toString());
-    localStorage.setItem('username', response.username);
+  logout(): void {
+    this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true }).subscribe(() => {
+      this.userData = null;
+      this.router.navigate(['/login']);
+    });
   }
 
-  // Logout function
-  logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('username');
-    this.router.navigate(['/login']);
-  }
-
-  // Check if the user is logged in
   isLoggedIn(): boolean {
-    const token = localStorage.getItem('token');
-    return !!token;
+    return !!this.userData;
   }
 
-  // Get the token
-  getToken(): string | null {
-    if (typeof localStorage !== 'undefined') {
-      console.log('localStorage is available', localStorage);
-      return localStorage.getItem('token'); 
-    } else {
-      console.warn('localStorage is not available');
-      return null;
-    }
-  }
-
-  // Get the role of the logged-in user
   getUserRole(): string | null {
-    return localStorage.getItem('role');
+    return this.userData?.role || null;
   }
 
-  // isTokenExpired(): boolean {
-  //   const token = this.getToken();
-  //   if (!token) return true;
-  
-  //   // const decodedToken: any = jwtDecode(token.replace('Bearer, ', ''));
-  //   // const exp = decodedToken.exp * 1000;
-  //   // return Date.now() > exp;
-  // }
+  getUserId(): number | null {
+    return this.userData?.userId || null;
+  }
 
-  // Redirect user based on role
-  redirectUser(role: string) {
+  getUserName(): string | null {
+    return this.userData?.username || null;
+  }
+
+  redirectUser(role: string): void {
     switch (role) {
       case 'ADMIN':
         this.router.navigate(['/admin/dashboard']);

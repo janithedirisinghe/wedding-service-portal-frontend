@@ -12,8 +12,9 @@ import { venderDetails } from "../models/vender.model";
 
     constructor(private http: HttpClient) {}
 
-    // Method to fetch vendor details
    getVendorProfileDetails(vendorId: number): Observable<venderDetails> {
-    return this.http.get<venderDetails>(`${this.apiUrl}getvendor/${vendorId}`);  // Make GET request
+    return this.http.get<venderDetails>(`${this.apiUrl}getvendor/${vendorId}`,{
+      withCredentials: true
+    });
   }
   }
