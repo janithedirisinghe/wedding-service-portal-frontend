@@ -6,4 +6,6 @@ export interface PostModel {
     date: string;
 
     vendorId: number;
+
+    itemUrls: string[];
 }

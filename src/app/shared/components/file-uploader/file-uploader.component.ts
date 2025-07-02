@@ -36,39 +36,47 @@ export class FileUploaderComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.postForm.invalid || this.isSubmitting) {
-      return;
-    }
-
-    this.isSubmitting = true;
-    
-    const vendorId = this.authService.getUserId();
-    if (!vendorId) {
-      console.error('Vendor ID not found');
-      this.isSubmitting = false;
-      return;
-    }
-
-    const postData: PostModel = {
-      ...this.postForm.value,
-      vendorId: vendorId
-    };
-
-    this.postService.createPost(postData).subscribe({
-      next: (response: any) => {
-        console.log('Post created successfully:', response);
-        this.postForm.reset();
-        this.selectedFiles = [];
-        this.isSubmitting = false;
-        // TODO: Add success notification
-      },
-      error: (error: any) => {
-        console.error('Error creating post:', error);
-        this.isSubmitting = false;
-        // TODO: Add error notification
-      }
-    });
+  if (this.postForm.invalid || this.isSubmitting) {
+    return;
   }
+
+  this.isSubmitting = true;
+
+  const vendorId = this.authService.getUserId();
+  if (!vendorId) {
+    console.error('Vendor ID not found');
+    this.isSubmitting = false;
+    return;
+  }
+
+  const postData = {
+    ...this.postForm.value,
+    vendorId: vendorId
+  };
+
+  const formData = new FormData();
+  formData.append('post', new Blob([JSON.stringify(postData)], { type: 'application/json' }));
+
+  this.selectedFiles.forEach(file => {
+    formData.append('images', file);
+  });
+
+  this.postService.createPost(formData).subscribe({
+    next: (response: any) => {
+      console.log('Post created successfully:', response);
+      this.postForm.reset();
+      this.selectedFiles = [];
+      this.isSubmitting = false;
+      // TODO: Add success notification
+    },
+    error: (error: any) => {
+      console.error('Error creating post:', error);
+      this.isSubmitting = false;
+      // TODO: Add error notification
+    }
+  });
+}
+
 
   removeFile(index: number): void {
     this.selectedFiles.splice(index, 1);

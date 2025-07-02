@@ -11,9 +11,10 @@ export class PostService {
 
     constructor(private http: HttpClient){}
 
-    createPost(post: PostModel): Observable<any> {
-            return this.http.post<PostModel>(`${this.baseUrl}/posts`, post, {
-              withCredentials: true
-            });
-        }
+    createPost(postFormData: FormData): Observable<any> {
+    return this.http.post(`${this.baseUrl}/posts`, postFormData, {
+      withCredentials: true
+    });
+}
+
 }
