@@ -17,4 +17,10 @@ export class PostService {
     });
 }
 
+getPostsByVendorId(vendorId: number): Observable<PostModel[]> {
+    return this.http.get<PostModel[]>(`${this.baseUrl}/posts/vendor/${vendorId}`, {
+      withCredentials: true
+    });
+}
+
 }

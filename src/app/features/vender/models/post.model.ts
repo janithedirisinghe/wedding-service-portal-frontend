@@ -1,4 +1,6 @@
 export interface PostModel {
+    postId?: number;
+    
     content : string;
 
     location: string;

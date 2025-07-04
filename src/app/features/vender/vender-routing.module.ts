@@ -11,12 +11,14 @@ import { VenderServiceTableComponent } from './vender-service-table/vender-servi
 const routes: Routes = [
     { path: '', component: VenderBodyPageComponent, 
       children: [
+        { path: '', redirectTo: 'posts', pathMatch: 'full' }, // Default route
         { path: 'posts', component: VenderPostsPageComponent},
         { path: 'createService', component: VenderServiceFormComponent},
         { path: 'eventCalender', component: VenderCalenderComponent},
         { path: 'meetingRequests', component: VenderMeetingRequstsComponent},
         { path: 'profile', component: VenderProfileComponent },
-        { path: 'serviceList', component: VenderServiceTableComponent}
+        { path: 'serviceList', component: VenderServiceTableComponent},
+        { path: '**', redirectTo: 'posts' } // Wildcard route for invalid vendor routes
       ]
     }, 
 ];
