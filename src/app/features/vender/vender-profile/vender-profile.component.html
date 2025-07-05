@@ -163,56 +163,56 @@
         New Post
       </button>
     </div>
-    <!-- Sample Posts -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div class="bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300">
-        <div class="h-48 overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Wedding decoration" class="w-full h-full object-cover">
-        </div>
-        <div class="p-4">
-          <h4 class="text-lg font-semibold text-gray-800 mb-2">Elegant Wedding Decorations</h4>
-          <p class="text-gray-600 text-sm mb-3 line-clamp-2">Our latest wedding decoration setup featuring elegant floral arrangements and ambient lighting perfect for your special day.</p>
-          <div class="flex justify-between items-center text-sm">
-            <span class="text-gray-500">May 20, 2025</span>
-            <div class="flex items-center space-x-2">
-              <span class="flex items-center text-gray-500">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-                24
-              </span>
-              <span class="flex items-center text-gray-500">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-                8
-              </span>
-            </div>
-          </div>
-        </div>
+
+    <!-- Loading State -->
+    <div *ngIf="postsLoading" class="flex justify-center items-center py-8">
+      <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
+      <span class="ml-2 text-gray-600">Loading posts...</span>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="postsError" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+      {{ postsError }}
+      <button (click)="fetchPosts(+(authService.getUserId() || 0))" class="ml-2 text-red-800 hover:text-red-900 underline">
+        Retry
+      </button>
+    </div>
+
+    <!-- No Posts State -->
+    <div *ngIf="!postsLoading && !postsError && posts.length === 0" class="text-center py-8">
+      <div class="bg-gray-50 rounded-lg p-8">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+        <p class="text-gray-500">No posts found. Create your first post to get started!</p>
       </div>
-      
-      <div class="bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300">
+    </div>
+
+    <!-- Posts Grid -->
+    <div *ngIf="!postsLoading && !postsError && posts.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div *ngFor="let post of posts" class="bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300">
         <div class="h-48 overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80" alt="Wedding cake" class="w-full h-full object-cover">
+          <img [src]="post.itemUrls && post.itemUrls.length > 0 ? post.itemUrls[0] : 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'" 
+               [alt]="'Post ' + post.postId" 
+               class="w-full h-full object-cover">
         </div>
         <div class="p-4">
-          <h4 class="text-lg font-semibold text-gray-800 mb-2">Wedding Cake Trends 2025</h4>
-          <p class="text-gray-600 text-sm mb-3 line-clamp-2">Explore our latest wedding cake designs that are trending this season. From minimalist to extravagant, we have it all.</p>
+          <h4 class="text-lg font-semibold text-gray-800 mb-2">{{ post.content || 'Post Content' }}</h4>
+          <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ post.location || 'Location not specified' }}</p>
           <div class="flex justify-between items-center text-sm">
-            <span class="text-gray-500">May 15, 2025</span>
+            <span class="text-gray-500">{{ formatDate(post.date) }}</span>
             <div class="flex items-center space-x-2">
-              <span class="flex items-center text-gray-500">
+              <span class="flex items-center text-gray-500" *ngIf="post.itemUrls && post.itemUrls.length > 1">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                32
+                {{ post.itemUrls.length }}
               </span>
               <span class="flex items-center text-gray-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
-                15
+                0
               </span>
             </div>
           </div>
@@ -220,7 +220,7 @@
       </div>
     </div>
     
-    <div class="mt-6 text-center">
+    <div *ngIf="!postsLoading && !postsError && posts.length > 0" class="mt-6 text-center">
       <button class="text-purple-600 hover:text-purple-700 font-medium hover:underline flex items-center justify-center mx-auto">
         View All Posts
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

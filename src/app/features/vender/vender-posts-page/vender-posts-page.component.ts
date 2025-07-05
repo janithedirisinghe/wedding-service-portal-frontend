@@ -11,6 +11,9 @@ export class VenderPostsPageComponent implements OnInit {
   posts: PostModel[] = [];
   loading: boolean = false;
   error: string | null = null;
+  
+  // Track the current main image index for each post
+  postMainImageIndexes: { [postId: number]: number } = {};
 
   // For demo purposes - in real app, this would come from auth service
   vendorId: number = 1;
@@ -27,7 +30,6 @@ export class VenderPostsPageComponent implements OnInit {
     
     this.postService.getPostsByVendorId(this.vendorId).subscribe({
       next: (posts) => {
-        // Sort posts by date (newest first) and postId (highest first) as secondary sort
         this.posts = posts.sort((a, b) => {
           // First sort by date
           const dateA = new Date(a.date);
@@ -39,6 +41,13 @@ export class VenderPostsPageComponent implements OnInit {
           
           // If dates are equal, sort by postId (highest first)
           return (b.postId || 0) - (a.postId || 0);
+        });
+        
+        // Initialize main image indexes for each post (default to 0)
+        this.posts.forEach(post => {
+          if (post.postId) {
+            this.postMainImageIndexes[post.postId] = 0;
+          }
         });
         
         this.loading = false;
@@ -67,16 +76,45 @@ export class VenderPostsPageComponent implements OnInit {
 
   // Method to set the main image for a specific post
   setPostMainImage(postIndex: number, imageIndex: number): void {
-    // This method can be used to handle main image setting for individual posts
-    // Currently not implemented as each post manages its own main image display
-    console.log(`Setting main image for post ${postIndex}, image ${imageIndex}`);
+    const post = this.posts[postIndex];
+    if (post && post.postId && post.itemUrls && post.itemUrls[imageIndex]) {
+      this.postMainImageIndexes[post.postId] = imageIndex;
+    }
   }
 
-  // Helper method to get the first image of a post or a default
+  // Helper method to get the current main image for a post
   getPostMainImage(post: PostModel): string {
-    return post.itemUrls && post.itemUrls.length > 0 
-      ? post.itemUrls[0] 
-      : 'https://untgtsclbjlgemwljimq.supabase.co/storage/v1/object/public/Wedding%20Vender%20managment%20System//bw4a0212.jpg';
+    if (!post.itemUrls || post.itemUrls.length === 0) {
+      return 'https://untgtsclbjlgemwljimq.supabase.co/storage/v1/object/public/Wedding%20Vender%20managment%20System//bw4a0212.jpg';
+    }
+    
+    const currentIndex = post.postId ? (this.postMainImageIndexes[post.postId] || 0) : 0;
+    return post.itemUrls[currentIndex] || post.itemUrls[0];
+  }
+
+  // Helper method to check if a thumbnail is currently selected
+  isImageSelected(post: PostModel, imageIndex: number): boolean {
+    if (!post.postId) return imageIndex === 0;
+    const currentIndex = this.postMainImageIndexes[post.postId] || 0;
+    return currentIndex === imageIndex;
+  }
+
+  // Navigate to next image
+  nextImage(post: PostModel): void {
+    if (!post.postId || !post.itemUrls || post.itemUrls.length <= 1) return;
+    
+    const currentIndex = this.postMainImageIndexes[post.postId] || 0;
+    const nextIndex = (currentIndex + 1) % post.itemUrls.length;
+    this.postMainImageIndexes[post.postId] = nextIndex;
+  }
+
+  // Navigate to previous image
+  previousImage(post: PostModel): void {
+    if (!post.postId || !post.itemUrls || post.itemUrls.length <= 1) return;
+    
+    const currentIndex = this.postMainImageIndexes[post.postId] || 0;
+    const prevIndex = currentIndex === 0 ? post.itemUrls.length - 1 : currentIndex - 1;
+    this.postMainImageIndexes[post.postId] = prevIndex;
   }
 
   // Helper method to format date
