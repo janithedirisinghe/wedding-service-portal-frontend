@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HomeNavbarComponent } from './components/home-navbar/home-navbar.component';
 import { MenubarModule } from 'primeng/menubar';
 import { BadgeModule } from 'primeng/badge';
@@ -20,6 +20,7 @@ import { CustomerHeaderComponent } from './components/customer-header/customer-h
 import { NavbartwoComponent } from './components/navbartwo/navbartwo.component';
 import { AdminSidebarComponent } from './components/admin-sidebar/admin-sidebar.component';
 import { AdminNavbarComponent } from './components/admin-navbar/admin-navbar.component';
+import { PreventDefaultDirective } from './directives/prevent-default.directive';
 
 // Import shared services
 
@@ -34,10 +35,12 @@ import { AdminNavbarComponent } from './components/admin-navbar/admin-navbar.com
     NavbartwoComponent,
     AdminSidebarComponent,
     AdminNavbarComponent,
+    PreventDefaultDirective,
   ],
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     MenubarModule,
     BadgeModule,
     AvatarModule,
@@ -59,6 +62,7 @@ import { AdminNavbarComponent } from './components/admin-navbar/admin-navbar.com
     CustomerHeaderComponent,
     AdminSidebarComponent,
     AdminNavbarComponent,
+    PreventDefaultDirective,
   ],
   providers: [],
 })

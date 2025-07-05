@@ -17,6 +17,8 @@ import { AuthGuard } from './shared/guards/auth.guard';
 import { AuthInterceptor } from './shared/interceptors/auth.interceptor';
 import { CustomerModule } from './features/customer/customer.module';
 import { AdminModule } from './features/admin/admin.module';
+import { ErrorHandler } from '@angular/core';
+import { GlobalErrorHandler } from './core/global-error-handler';
 
 @NgModule({
   declarations: [
@@ -47,6 +49,10 @@ import { AdminModule } from './features/admin/admin.module';
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true
+    },
+    {
+      provide: ErrorHandler,
+      useClass: GlobalErrorHandler
     }
   ],
   bootstrap: [AppComponent]

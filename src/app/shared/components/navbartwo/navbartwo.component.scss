@@ -64,3 +64,74 @@ input {
     box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
   }
 }
+
+/* Animation for dropdown */
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth transitions */
+.transition-all {
+  transition: all 0.3s ease;
+}
+
+/* Profile dropdown styles */
+.profile-dropdown {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Hover effects for menu items */
+.menu-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: linear-gradient(to bottom, #8b5cf6, #a855f7);
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+}
+
+.menu-item:hover::before {
+  transform: scaleY(1);
+}
+
+/* Logout button special styling */
+.logout-button {
+  position: relative;
+}
+
+.logout-button:hover {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+}
+
+/* Online status indicator pulse animation */
+.status-online {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}

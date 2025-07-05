@@ -8,6 +8,7 @@ const routes: Routes = [
   { path: 'auth', loadChildren: () => import('../app/features/auth/auth.module').then(m => m.AuthModule) },
   { path: 'customer', loadChildren: () => import('../app/features/customer/customer.module').then(m => m.CustomerModule) },
   { path: 'admin', loadChildren: () => import('../app/features/admin/admin.module').then(m => m.AdminModule) },
+  { path: '**', redirectTo: '/home' } // Wildcard route for handling invalid URLs
 ];
 
 @NgModule({
