@@ -11,6 +11,7 @@ import { VenderProfileCustomerComponent } from './vender-profile-customer/vender
 import { VenderPostlistCustomerComponent } from './vender-postlist-customer/vender-postlist-customer.component';
 import { CustomerChatComponent } from './customer-chat/customer-chat.component';
 import { CustomerProfileComponent } from './customer-profile/customer-profile.component';
+import { VendorFollowButtonComponent } from './components/vendor-follow-button/vendor-follow-button.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { CustomerProfileComponent } from './customer-profile/customer-profile.co
     VenderProfileCustomerComponent,
     VenderPostlistCustomerComponent,
     CustomerChatComponent,
-    CustomerProfileComponent
+    CustomerProfileComponent,
+    VendorFollowButtonComponent
   ],
   imports: [
     CommonModule,
@@ -31,7 +33,7 @@ import { CustomerProfileComponent } from './customer-profile/customer-profile.co
     FormsModule
   ], 
   exports: [
-    
+    VendorFollowButtonComponent
   ]
 })
 export class CustomerModule { }

@@ -67,7 +67,7 @@ export class AuthService {
         this.router.navigate(['/vender']);
         break;
       case 'CUSTOMER':
-        this.router.navigate(['/customer/home']);
+        this.router.navigate(['/customer']);
         break;
       default:
         this.router.navigate(['/login']);

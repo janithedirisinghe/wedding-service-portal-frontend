@@ -4,3 +4,8 @@ export interface Customer {
   password: string;
   role: string;
 }
+
+export interface CustomerOTP {
+  otp: string;
+  email: string;
+}
