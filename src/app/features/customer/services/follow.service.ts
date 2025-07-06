@@ -14,7 +14,7 @@ export class FollowService {
 
   /**
    * Follow a vendor
-   * @param customerId - Customer ID
+   * @param userId - User ID (Customer ID)
    * @param vendorId - Vendor ID to follow
    * @returns Observable containing follow response
    */
@@ -24,14 +24,12 @@ export class FollowService {
       vendorId
     };
 
-    return this.http.post<FollowResponse>(`${this.apiUrl}/follow`, followRequest, {
-      withCredentials: true
-    });
+    return this.http.post<FollowResponse>(`${this.apiUrl}/follow`, followRequest);
   }
 
   /**
    * Unfollow a vendor
-   * @param customerId - Customer ID
+   * @param userId - User ID (Customer ID)
    * @param vendorId - Vendor ID to unfollow
    * @returns Observable containing unfollow response
    */
@@ -41,51 +39,83 @@ export class FollowService {
       vendorId
     };
 
-    return this.http.post<FollowResponse>(`${this.apiUrl}/unfollow`, followRequest, {
-      withCredentials: true
-    });
+    return this.http.post<FollowResponse>(`${this.apiUrl}/unfollow`, followRequest);
   }
 
   /**
    * Toggle follow status for a vendor
-   * @param customerId - Customer ID
+   * @param userId - User ID (Customer ID)
    * @param vendorId - Vendor ID
    * @param isCurrentlyFollowing - Current follow status
    * @returns Observable containing response
    */
-  toggleFollow(customerId: number, vendorId: number, isCurrentlyFollowing: boolean): Observable<FollowResponse> {
+  toggleFollow(userId: number, vendorId: number, isCurrentlyFollowing: boolean): Observable<FollowResponse> {
     if (isCurrentlyFollowing) {
-      return this.unfollowVendor(customerId, vendorId);
+      return this.unfollowVendor(userId, vendorId);
     } else {
-      return this.followVendor(customerId, vendorId);
+      return this.followVendor(userId, vendorId);
     }
   }
 
   /**
-   * Check if customer is following specific vendors
-   * @param customerId - Customer ID
+   * Check if user is following a specific vendor
+   * @param userId - User ID (Customer ID)
+   * @param vendorId - Vendor ID to check
+   * @returns Observable containing follow status response
+   */
+  checkFollowStatus(userId: number, vendorId: number): Observable<{success: boolean, isFollowing: boolean}> {
+    return this.http.get<{success: boolean, isFollowing: boolean}>(`${this.apiUrl}/check/${userId}/${vendorId}`);
+  }
+
+  /**
+   * Check follow status for multiple vendors
+   * @param userId - User ID (Customer ID)
    * @param vendorIds - Array of vendor IDs to check
    * @returns Observable containing follow status for each vendor
    */
-  checkFollowStatus(customerId: number, vendorIds: number[]): Observable<{[vendorId: number]: boolean}> {
-    const params = new HttpParams()
-      .set('customerId', customerId.toString())
-      .set('vendorIds', vendorIds.join(','));
+  checkMultipleFollowStatus(userId: number, vendorIds: number[]): Observable<{[vendorId: number]: boolean}> {
+    return new Observable(observer => {
+      if (vendorIds.length === 0) {
+        observer.next({});
+        observer.complete();
+        return;
+      }
 
-    return this.http.get<{[vendorId: number]: boolean}>(`${this.apiUrl}/status`, {
-      params,
-      withCredentials: true
+      const followStatus: {[vendorId: number]: boolean} = {};
+      let completed = 0;
+
+      vendorIds.forEach(vendorId => {
+        this.checkFollowStatus(userId, vendorId).subscribe({
+          next: (response) => {
+            followStatus[vendorId] = response.success ? response.isFollowing : false;
+            completed++;
+            
+            if (completed === vendorIds.length) {
+              observer.next(followStatus);
+              observer.complete();
+            }
+          },
+          error: (error) => {
+            console.error(`Error checking follow status for vendor ${vendorId}:`, error);
+            followStatus[vendorId] = false;
+            completed++;
+            
+            if (completed === vendorIds.length) {
+              observer.next(followStatus);
+              observer.complete();
+            }
+          }
+        });
+      });
     });
   }
 
   /**
-   * Get all vendors followed by a customer
-   * @param customerId - Customer ID
+   * Get all vendors followed by a user
+   * @param userId - User ID (Customer ID)
    * @returns Observable containing array of followed vendor IDs
    */
-  getFollowedVendors(customerId: number): Observable<number[]> {
-    return this.http.get<number[]>(`${this.apiUrl}/customer/${customerId}/following`, {
-      withCredentials: true
-    });
+  getFollowedVendors(userId: number): Observable<number[]> {
+    return this.http.get<number[]>(`${this.apiUrl}/customer/${userId}/following`);
   }
 }

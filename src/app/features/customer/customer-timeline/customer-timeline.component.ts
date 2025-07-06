@@ -116,7 +116,7 @@ export class CustomerTimelineComponent implements OnInit, OnDestroy {
 
     const vendorIds = this.timelineData.map(post => post.vendorId);
     
-    this.followService.checkFollowStatus(this.currentCustomerId, vendorIds)
+    this.followService.checkMultipleFollowStatus(this.currentCustomerId, vendorIds)
       .pipe(
         takeUntil(this.destroy$),
         catchError(error => {
