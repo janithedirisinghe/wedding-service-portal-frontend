@@ -179,20 +179,68 @@
 
         <!-- Reviews List -->
         <div *ngIf="selectedTab === 'reviews'" class="mt-4 space-y-4">
-            <div *ngFor="let review of reviews" class="bg-white shadow p-4 rounded-lg">
-                <div class="flex justify-between">
-                    <div> 
-                        <h4 class="font-semibold">{{ review.name }}</h4>
-                        <p class="text-gray-500 text-sm">{{ review.location }} &bull; {{ review.date }}</p>
-                    </div>
-                    <div class="flex items-center ">
-                        <span class="text-lg font-semibold">{{ review.rating }}</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 15l-5.878 3.09 1.122-6.54L1 7.09l6.561-.95L10 1l2.439 5.14 6.561.95-4.244 4.46 1.122 6.54z"/>
-                        </svg>
+            <!-- Loading State -->
+            <div *ngIf="reviewsLoading" class="flex justify-center items-center py-8">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <span class="ml-2 text-gray-600">Loading reviews...</span>
+            </div>
+
+            <!-- Error State -->
+            <div *ngIf="reviewsError" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-4">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <p class="font-medium">Error Loading Reviews</p>
+                        <p class="text-sm mt-1">{{ reviewsError }}</p>
+                        <div class="mt-3">
+                            <button (click)="loadVendorReviews()" 
+                                    class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-sm">
+                                Retry
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <p class="text-gray-600 mt-2">{{ review.text }}</p>
+            </div>
+
+            <!-- No Reviews State -->
+            <div *ngIf="!reviewsLoading && !reviewsError && reviews.length === 0" class="text-center py-8">
+                <div class="text-gray-500">
+                    <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10m0 0V6a2 2 0 00-2-2H9a2 2 0 00-2 2v2m0 0v8a2 2 0 002 2h6a2 2 0 002-2V8M9 12h6"/>
+                    </svg>
+                    <p class="text-lg">No reviews yet</p>
+                    <p class="text-sm">Be the first to review this vendor!</p>
+                </div>
+            </div>
+
+            <!-- Reviews List -->
+            <div *ngIf="!reviewsLoading && !reviewsError && reviews.length > 0">
+                <div *ngFor="let review of reviews" class="bg-white shadow-md p-6 rounded-lg hover:shadow-lg transition-shadow duration-300">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex-1"> 
+                            <div class="flex items-center mb-2">
+                                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
+                                    {{ getCustomerInitials(review.customerId) }}
+                                </div>
+                                <div class="ml-3">
+                                    <h4 class="font-semibold text-gray-800">{{ getCustomerDisplayName(review.customerId) }}</h4>
+                                    <p class="text-gray-500 text-sm">{{ formatDate(review.createdAt || '') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <span class="text-lg font-semibold text-gray-800">{{ review.rating }}</span>
+                            <div class="flex">
+                                <svg *ngFor="let star of [1, 2, 3, 4, 5]" 
+                                     [class.text-yellow-500]="star <= review.rating"
+                                     [class.text-gray-300]="star > review.rating"
+                                     class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 15l-5.878 3.09 1.122-6.54L1 7.09l6.561-.95L10 1l2.439 5.14 6.561.95-4.244 4.46 1.122 6.54z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 leading-relaxed">{{ review.comment }}</p>
+                </div>
             </div>
         </div>
 
@@ -209,30 +257,91 @@
     </div>
 
     <!-- Review Form -->
-    <div *ngIf="selectedTab === 'addReview'" class="mt-4 bg-gray-100 p-4 rounded-lg">
-        <h3 class="font-semibold text-lg mb-4 justify-center">Add a Review</h3>
-        <form>
-            <div class="mb-4">
-                <label class="block text-gray-700">Name</label>
-                <input type="text" class="w-full p-2 border rounded-lg" placeholder="Your Name">
+    <div *ngIf="selectedTab === 'addReview'" class="mt-4 bg-gray-50 p-6 rounded-lg border border-gray-200">
+        <h3 class="font-semibold text-xl mb-6 text-center text-gray-800">Add a Review</h3>
+        
+        <!-- Login check -->
+        <div *ngIf="!isLoggedIn()" class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
+            <p class="text-center">You must be logged in to submit a review.</p>
+        </div>
+
+        <!-- Review form for logged-in users -->
+        <form *ngIf="isLoggedIn()" [formGroup]="reviewForm" (ngSubmit)="submitReview()">
+            <!-- Success message -->
+            <div *ngIf="reviewSuccess" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                <p class="text-center">{{ reviewSuccess }}</p>
             </div>
-            <div class="mb-4">
-                <label class="block text-gray-700">Rating</label>
-                <div class="flex items-center"> 
+
+            <!-- Error message -->
+            <div *ngIf="reviewError" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                <p class="text-center">{{ reviewError }}</p>
+            </div>
+
+            <!-- Rating Section -->
+            <div class="mb-6">
+                <label class="block text-gray-700 font-medium mb-3">Rating *</label>
+                <div class="flex items-center space-x-1"> 
                     <ng-container *ngFor="let star of [1, 2, 3, 4, 5]; let i = index">
-                        <svg (click)="reviewRating = star" [class.text-yellow-300]="reviewRating >= star" [class.text-gray-300]="reviewRating < star" class="w-6 h-6 cursor-pointer" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                        <svg (click)="setRating(star)" 
+                             [class.text-yellow-400]="reviewRating >= star" 
+                             [class.text-gray-300]="reviewRating < star" 
+                             class="w-8 h-8 cursor-pointer hover:scale-110 transition-transform duration-200" 
+                             aria-hidden="true" 
+                             xmlns="http://www.w3.org/2000/svg" 
+                             fill="currentColor" 
+                             viewBox="0 0 22 20">
                             <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
                         </svg>
-                    </ng-container> 
+                    </ng-container>
+                </div>
+                <div *ngIf="reviewForm.get('rating')?.invalid && reviewForm.get('rating')?.touched" class="text-red-500 text-sm mt-1">
+                    Please select a rating
                 </div>
             </div>
-            <div class="mb-4">
-                <label class="block text-gray-700">Review</label>
-                <textarea class="w-full p-2 border rounded-lg" rows="4" placeholder="Your Review"></textarea>
+
+            <!-- Comment Section -->
+            <div class="mb-6">
+                <label for="reviewComment" class="block text-gray-700 font-medium mb-2">Review Comment *</label>
+                <textarea 
+                    id="reviewComment"
+                    formControlName="comment"
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none" 
+                    rows="4" 
+                    placeholder="Share your experience with this vendor... (minimum 10 characters)"></textarea>
+                <div class="flex justify-between mt-1">
+                    <div *ngIf="reviewForm.get('comment')?.invalid && reviewForm.get('comment')?.touched" class="text-red-500 text-sm">
+                        <span *ngIf="reviewForm.get('comment')?.errors?.['required']">Please enter a review comment</span>
+                        <span *ngIf="reviewForm.get('comment')?.errors?.['minlength']">Comment must be at least 10 characters</span>
+                        <span *ngIf="reviewForm.get('comment')?.errors?.['maxlength']">Comment cannot exceed 500 characters</span>
+                    </div>
+                    <div class="text-sm text-gray-500">
+                        {{ reviewForm.get('comment')?.value?.length || 0 }}/500
+                    </div>
+                </div>
             </div>
+
+            <!-- Action Buttons -->
             <div class="flex space-x-4">
-                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Submit</button>
-                <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600" (click)="selectedTab = 'reviews'">Cancel</button>
+                <button 
+                    type="submit" 
+                    [disabled]="reviewForm.invalid || isSubmittingReview"
+                    class="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span *ngIf="!isSubmittingReview">Submit Review</span>
+                    <span *ngIf="isSubmittingReview" class="flex items-center justify-center">
+                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Submitting...
+                    </span>
+                </button>
+                <button 
+                    type="button" 
+                    (click)="cancelReview()" 
+                    [disabled]="isSubmittingReview"
+                    class="flex-1 bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                    Cancel
+                </button>
             </div>
         </form>
     </div>

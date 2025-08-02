@@ -12,6 +12,7 @@ export class CustomerProfileComponent implements OnInit {
   profile: CustomerDetails | null = null;
   loading: boolean = false;
   error: string | null = null;
+  isEditModalOpen: boolean = false;
 
   constructor(private customerService: CustomerService, private authService: AuthService) { }
 
@@ -68,5 +69,27 @@ export class CustomerProfileComponent implements OnInit {
       preferredVendorTypes: ['Photography', 'Catering', 'Venue', 'Decoration'],
       userName: 'johndoe'
     };
+  }
+
+  /**
+   * Open the edit profile modal
+   */
+  openEditModal(): void {
+    this.isEditModalOpen = true;
+  }
+
+  /**
+   * Close the edit profile modal
+   */
+  closeEditModal(): void {
+    this.isEditModalOpen = false;
+  }
+
+  /**
+   * Handle profile update from modal
+   */
+  onProfileUpdated(updatedProfile: CustomerDetails): void {
+    this.profile = updatedProfile;
+    this.closeEditModal();
   }
 }
