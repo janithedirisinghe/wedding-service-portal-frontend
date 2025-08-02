@@ -1,67 +1,79 @@
-<ol class="relative border-s border-gray-200 dark:border-gray-700">
-    <li *ngFor="let event of timelineData" class="mb-10 ms-6">
-      <span
-        class="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -start-3 ring-8 ring-white dark:ring-gray-900 dark:bg-blue-900"
-      >
-        <img class="rounded-full shadow-lg ms-4 mt-2" [src]="event.image" [alt]="event.name + ' image'" />
-      </span>
-  
-      <div
-        class="p-4 bg-white border border-gray-200 rounded-lg shadow-xs sm:flex justify-between items-center dark:bg-gray-700 dark:border-gray-600"
-      >
-        <div>
-          <time class="mb-1 text-xs font-normal text-gray-400 sm:order-last sm:mb-0">
-            {{ event.time }}
-          </time>
-  
-          <div class="text-sm font-normal text-gray-500 dark:text-gray-300">
-            {{ event.name }} {{ event.action }}
-            <a *ngIf="event.targetUrl" [href]="event.targetUrl" class="font-semibold text-blue-600 dark:text-blue-500 hover:underline">
-              {{ event.target }}
-            </a>
-            <span *ngIf="!event.targetUrl" class="font-semibold text-gray-900 dark:text-white">
-              {{ event.target }}
-            </span>
-            <span *ngIf="event.status" class="text-xs font-normal me-2 px-2.5 py-0.5 rounded-sm bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300">
-              {{ event.status }}
-            </span>
-          </div>
-        </div>
-  
-        <!-- Follow/Unfollow Button -->
-        <button
-          class="px-4 py-1 text-sm font-medium rounded-lg shadow"
-          [class.bg-blue-600]="!event.isFollowing"
-          [class.text-white]="!event.isFollowing"
-          [class.bg-gray-300]="event.isFollowing"
-          [class.text-gray-700]="event.isFollowing"
-          (click)="toggleFollow(event)"
-        >
-          {{ event.isFollowing ? 'Unfollow' : 'Follow' }}
-        </button>
-      </div>
-  
-      <div *ngIf="event.message" class="p-3 mt-2 text-xs italic font-normal text-gray-500 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-300">
-        {{ event.message }}
-      </div>
-  
-      <!-- Image Gallery -->
-      <div *ngIf="event.images && event.images.length" class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-        <ng-container *ngFor="let img of event.images.slice(0, 3); let i = index">
-          <div class="relative">
-            <img
-              [src]="img"
-              class="rounded-lg w-full object-cover"
-              [class.h-48]="event.images.length === 1"
-              [class.h-32]="event.images.length > 1"
-            />
-            <!-- Show "More" overlay for extra images -->
-            <div *ngIf="i === 2 && event.images.length > 3" class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white text-lg font-bold rounded-lg">
-              +{{ event.images.length - 3 }}
+<!-- Loading State -->
+<div *ngIf="loading" class="flex justify-center items-center py-8">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    <span class="ml-2 text-gray-600">Loading posts...</span>
+</div>
+
+<!-- Error State -->
+<div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-4">
+    <div class="flex items-start justify-between">
+        <div class="flex-1">
+            <p class="font-medium">Error Loading Posts</p>
+            <p class="text-sm mt-1">{{ error }}</p>
+            <div class="mt-3">
+                <button (click)="vendorId && fetchVendorPosts(vendorId)" 
+                        class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-sm">
+                    Retry
+                </button>
             </div>
-          </div>
-        </ng-container>
-      </div>
+        </div>
+    </div>
+</div>
+
+<!-- No Posts State -->
+<div *ngIf="!loading && !error && posts.length === 0" class="text-center py-8">
+    <p class="text-gray-500">No posts available from this vendor.</p>
+</div>
+
+<!-- Posts Timeline -->
+<ol class="relative border-l border-gray-200 dark:border-gray-700" *ngIf="!loading && !error && posts.length > 0">
+    <!-- Timeline Item for each post -->
+    <li *ngFor="let post of posts; let postIndex = index" class="mb-10 ml-6">
+        <!-- User Avatar -->
+        <span class="absolute flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full -left-5 ring-8 ring-white dark:ring-gray-900 dark:bg-blue-900">
+            <img class="rounded-full shadow-lg" src="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" alt="Vendor image" />
+        </span>
+
+        <!-- Post Container -->
+        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-700 dark:border-gray-600">
+            <!-- Post Header -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                <div class="text-sm font-normal text-gray-500 dark:text-gray-300">
+                    <span class="font-semibold text-gray-900 dark:text-white">Vendor</span> posted in
+                    <span class="font-semibold text-gray-900 dark:text-white">{{ post.location }}</span>
+                </div>
+                <time class="text-xs font-normal text-gray-400 dark:text-gray-500 mt-2 md:mt-0">
+                    {{ formatDate(post.date) }}
+                </time>
+            </div>
+
+            <!-- Post Content -->
+            <div class="p-3 text-sm italic font-normal text-gray-500 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-300">
+                {{ post.content }}
+            </div>
+
+            <!-- Gallery Section -->
+            <div class="mt-4" *ngIf="post.itemUrls && post.itemUrls.length > 0">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" *ngIf="post.itemUrls.length <= 4; else moreImages">
+                    <div *ngFor="let imageUrl of post.itemUrls" class="relative">
+                        <img [src]="imageUrl" [alt]="'Post image'" class="w-full h-48 object-cover rounded-lg" />
+                    </div>
+                </div>
+                
+                <ng-template #moreImages>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div *ngFor="let imageUrl of post.itemUrls.slice(0, 3)" class="relative">
+                            <img [src]="imageUrl" [alt]="'Post image'" class="w-full h-32 object-cover rounded-lg" />
+                        </div>
+                        <div class="relative" *ngIf="post.itemUrls.length > 3">
+                            <img [src]="post.itemUrls[3]" [alt]="'Post image'" class="w-full h-32 object-cover rounded-lg" />
+                            <div *ngIf="post.itemUrls.length > 4" class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white text-lg font-bold rounded-lg">
+                                +{{ post.itemUrls.length - 4 }}
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
     </li>
-  </ol>
-  
+</ol>  

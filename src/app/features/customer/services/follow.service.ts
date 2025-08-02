@@ -1,8 +1,10 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { FollowRequest, FollowResponse } from '../models/follow.model';
+import { FollowingResponse } from '../models/vendor.model';
 
 @Injectable({
   providedIn: 'root'
@@ -111,11 +113,21 @@ export class FollowService {
   }
 
   /**
-   * Get all vendors followed by a user
-   * @param userId - User ID (Customer ID)
-   * @returns Observable containing array of followed vendor IDs
+   * Get all vendors followed by a customer with full vendor details
+   * @param userId - Customer user ID
+   * @returns Observable containing following response with vendor details
    */
-  getFollowedVendors(userId: number): Observable<number[]> {
-    return this.http.get<number[]>(`${this.apiUrl}/customer/${userId}/following`);
+  getCustomerFollowing(userId: number): Observable<FollowingResponse> {
+    return this.http.get<FollowingResponse>(`${this.apiUrl}/customer/${userId}/following`).pipe(
+      catchError((error) => {
+        console.error('Error fetching customer following:', error);
+        return of({
+          success: false,
+          followingCount: 0,
+          following: [],
+          message: 'Failed to load favorites'
+        });
+      })
+    );
   }
 }

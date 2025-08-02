@@ -10,6 +10,7 @@ import { environment } from "../../../../environments/environment";
 export class CustomerService {
 
     private apiUrl = `${environment.apiUrl}/customers/`; 
+    private vendorApiUrl = `${environment.apiUrl}/vendors/`;
 
     constructor(private http: HttpClient) {}
 
@@ -42,6 +43,17 @@ export class CustomerService {
      */
     getCurrentCustomerProfile(): Observable<CustomerDetails> {
         return this.http.get<CustomerDetails>(`${this.apiUrl}profile`, {
+            withCredentials: true
+        });
+    }
+
+    /**
+     * Get vendor details by vendor ID
+     * @param vendorId - The ID of the vendor to fetch
+     * @returns Observable containing vendor details
+     */
+    getVendorDetails(vendorId: number): Observable<any> {
+        return this.http.get<any>(`${this.vendorApiUrl}getvendor/${vendorId}`, {
             withCredentials: true
         });
     }
