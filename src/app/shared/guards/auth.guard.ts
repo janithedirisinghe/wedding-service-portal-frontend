@@ -10,7 +10,7 @@ export class AuthGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot): boolean {
     if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/auth/customer-login']);
       return false;
     }
 
@@ -18,11 +18,10 @@ export class AuthGuard implements CanActivate {
     const userRole = this.authService.getUserRole()?.toLowerCase();
 
     if (requiredRole && requiredRole !== userRole) {
-      this.router.navigate(['/login']); // Redirect unauthorized users
+      this.router.navigate(['/auth/customer-login']);
       return false;
     }
 
     return true;
   }
-  
 }

@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, catchError, of } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 import { Login } from '../Models/login.model';
 
 @Injectable({
@@ -16,7 +17,31 @@ export class AuthService {
     username: string;
   } | null = null;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient, 
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    // Initialize auth state from localStorage on service creation
+    this.initializeAuthState();
+  }
+
+  private initializeAuthState(): void {
+    // Only access localStorage in browser environment
+    if (isPlatformBrowser(this.platformId)) {
+      // Try to restore from localStorage
+      const storedUser = localStorage.getItem('userSession');
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          this.userData = parsedUser; 
+        } catch (e) {
+          // If parsing fails, remove invalid data
+          localStorage.removeItem('userSession');
+        }
+      }
+    } 
+  }
 
   login(login: Login): Observable<any> {
     return this.http.post<{ role: string; userId: number; username: string }>(
@@ -30,16 +55,41 @@ export class AuthService {
           userId: response.userId,
           username: response.username
         };
+        // Store session info in localStorage for persistence across refreshes
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.setItem('userSession', JSON.stringify(this.userData));
+        }
         this.redirectUser(response.role);
       })
     );
   }
 
+  // Method to validate current session with backend (optional)
+  validateSession(): Observable<boolean> {
+    // This method can be called periodically to validate the session
+    // For now, it just checks if localStorage has session data
+    return of(this.isLoggedIn());
+  }
+
   logout(): void {
-    this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true }).subscribe(() => {
-      this.userData = null;
-      this.router.navigate(['/login']);
+    this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true }).subscribe({
+      next: () => {
+        this.clearAuthState();
+        this.router.navigate(['/auth/customer-login']);
+      },
+      error: () => {
+        // Even if logout request fails, clear local state
+        this.clearAuthState();
+        this.router.navigate(['/auth/customer-login']);
+      }
     });
+  }
+
+  private clearAuthState(): void {
+    this.userData = null;
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('userSession');
+    }
   }
 
   isLoggedIn(): boolean {
@@ -70,7 +120,7 @@ export class AuthService {
         this.router.navigate(['/customer']);
         break;
       default:
-        this.router.navigate(['/login']);
+        this.router.navigate(['/auth/customer-login']);
         break;
     }
   }

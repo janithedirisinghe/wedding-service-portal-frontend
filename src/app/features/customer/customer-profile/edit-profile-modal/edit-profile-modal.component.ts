@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, OnChanges, Output, HostListener
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CustomerDetails } from '../../models/customer.model';
 import { CustomerService } from '../../services/customer.service';
+import { AuthService } from '../../../../shared/services/auth.service';
 
 @Component({
   selector: 'app-edit-profile-modal',
@@ -18,6 +19,7 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
   isLoading: boolean = false;
   errorMessage: string = '';
   successMessage: string = '';
+  userId: number | null = null;
 
   budgetOptions = [
     'Under $5,000',
@@ -43,7 +45,8 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
 
   constructor(
     private fb: FormBuilder,
-    private customerService: CustomerService
+    private customerService: CustomerService,
+    private authService: AuthService
   ) {
     this.editForm = this.createForm();
   }
@@ -139,8 +142,8 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
         ...formData,
         weddingDate: formData.weddingDate ? new Date(formData.weddingDate) : undefined
       };
-
-      this.customerService.updateCustomerProfile(this.profile.customerId, updateData).subscribe({
+      this.userId = this.authService.getUserId()
+      this.customerService.updateCustomerProfile(this.userId, updateData).subscribe({
         next: (updatedProfile: CustomerDetails) => {
           this.isLoading = false;
           this.successMessage = 'Profile updated successfully!';

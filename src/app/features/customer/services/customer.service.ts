@@ -31,8 +31,8 @@ export class CustomerService {
      * @param customerData - The updated customer data
      * @returns Observable containing updated customer details
      */
-    updateCustomerProfile(customerId: number, customerData: Partial<CustomerDetails>): Observable<CustomerDetails> {
-        return this.http.put<CustomerDetails>(`${this.apiUrl}${customerId}`, customerData, {
+    updateCustomerProfile(userId: number | null, customerDTO: Partial<CustomerDetails>): Observable<CustomerDetails> {
+        return this.http.put<CustomerDetails>(`${this.apiUrl}editCustomer/${userId}`, customerDTO, {
             withCredentials: true
         });
     }
