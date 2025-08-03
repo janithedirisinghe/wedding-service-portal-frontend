@@ -20,6 +20,8 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
   errorMessage: string = '';
   successMessage: string = '';
   userId: number | null = null;
+  selectedProfileImage: File | null = null;
+  profileImagePreview: string | null = null;
 
   budgetOptions = [
     'Under $5,000',
@@ -108,7 +110,48 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
         budget: this.profile.budget || '',
         preferredVendorTypes: this.profile.preferredVendorTypes || []
       });
+      
+      // Set profile image preview if exists
+      if (this.profile.profileImageUrl) {
+        this.profileImagePreview = this.profile.profileImageUrl;
+      }
     }
+  }
+
+  onProfileImageSelect(event: any): void {
+    const file = event.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        this.errorMessage = 'Profile image size should not exceed 5MB';
+        return;
+      }
+
+      this.selectedProfileImage = file;
+      this.errorMessage = '';
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.profileImagePreview = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removeProfileImage(): void {
+    this.selectedProfileImage = null;
+    this.profileImagePreview = this.profile?.profileImageUrl || null;
+    
+    // Reset file input
+    const fileInput = document.getElementById('profileImageInput') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  }
+
+  hasProfileImageChanged(): boolean {
+    return this.selectedProfileImage !== null;
   }
 
   onVendorTypeChange(event: any, vendorType: string): void {
@@ -142,8 +185,15 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
         ...formData,
         weddingDate: formData.weddingDate ? new Date(formData.weddingDate) : undefined
       };
-      this.userId = this.authService.getUserId()
-      this.customerService.updateCustomerProfile(this.userId, updateData).subscribe({
+      
+      this.userId = this.authService.getUserId();
+
+      // Choose service method based on whether image is selected
+      const updateObservable = this.selectedProfileImage 
+        ? this.customerService.updateCustomerProfileWithImage(this.userId, updateData, this.selectedProfileImage)
+        : this.customerService.updateCustomerProfile(this.userId, updateData);
+
+      updateObservable.subscribe({
         next: (updatedProfile: CustomerDetails) => {
           this.isLoading = false;
           this.successMessage = 'Profile updated successfully!';
@@ -235,6 +285,8 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
     this.errorMessage = '';
     this.successMessage = '';
     this.isLoading = false;
+    this.selectedProfileImage = null;
+    this.profileImagePreview = null;
     this.editForm.reset();
     this.closeModal.emit();
   }

@@ -7,6 +7,7 @@ export interface CustomerDetails {
   dateOfBirth?: Date;
   phoneNumber: string;
   bio?: string;
+  profileImageUrl?: string; // Profile image URL
 
   // Address Information
   address?: string;

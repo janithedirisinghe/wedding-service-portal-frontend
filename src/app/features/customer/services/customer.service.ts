@@ -38,6 +38,23 @@ export class CustomerService {
     }
 
     /**
+     * Update customer profile with image
+     * @param userId - The ID of the customer to update
+     * @param customerData - The updated customer data
+     * @param profileImage - The profile image file
+     * @returns Observable containing updated customer details
+     */
+    updateCustomerProfileWithImage(userId: number | null, customerDTO: Partial<CustomerDetails>, profileImage: File): Observable<CustomerDetails> {
+        const formData = new FormData();
+        formData.append('customer', new Blob([JSON.stringify(customerDTO)], { type: 'application/json' }));
+        formData.append('profileImage', profileImage);
+        
+        return this.http.put<CustomerDetails>(`${this.apiUrl}editCustomer/${userId}`, formData, {
+            withCredentials: true
+        });
+    }
+
+    /**
      * Get current customer profile (authenticated user)
      * @returns Observable containing current customer details
      */
