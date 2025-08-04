@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { HomeNavbarComponent } from './components/home-navbar/home-navbar.component';
 import { MenubarModule } from 'primeng/menubar';
 import { BadgeModule } from 'primeng/badge';
@@ -41,6 +42,7 @@ import { PreventDefaultDirective } from './directives/prevent-default.directive'
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    RouterModule,
     MenubarModule,
     BadgeModule,
     AvatarModule,

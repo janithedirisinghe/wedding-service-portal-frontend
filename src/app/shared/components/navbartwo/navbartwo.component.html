@@ -137,10 +137,17 @@
         </div>
         <div class="h-10 w-10 rounded-full overflow-hidden border-2 border-purple-300 hover:border-purple-400 transition-colors duration-200">
           <img
-            src="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png"
-            alt="User Avatar"
+            *ngIf="vendor?.profileImageUrl && !imageError"
+            [src]="vendor?.profileImageUrl"
+            [alt]="vendor?.businessName || 'Vendor Profile'"
             class="h-full w-full object-cover"
+            (error)="onImageError($event)"
           />
+          <div 
+            *ngIf="!vendor?.profileImageUrl || imageError"
+            class="h-full w-full bg-purple-600 flex items-center justify-center text-white font-semibold text-sm">
+            {{ getVendorInitials() }}
+          </div>
         </div>
         <!-- Dropdown Arrow -->
         <svg 
@@ -163,10 +170,17 @@
           <div class="flex items-center space-x-3">
             <div class="h-12 w-12 rounded-full overflow-hidden border-2 border-purple-300">
               <img
-                src="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png"
-                alt="User Avatar"
+                *ngIf="vendor?.profileImageUrl && !imageError"
+                [src]="vendor?.profileImageUrl"
+                [alt]="vendor?.businessName || 'Vendor Profile'"
                 class="h-full w-full object-cover"
+                (error)="onImageError($event)"
               />
+              <div 
+                *ngIf="!vendor?.profileImageUrl || imageError"
+                class="h-full w-full bg-purple-600 flex items-center justify-center text-white font-semibold text-sm">
+                {{ getVendorInitials() }}
+              </div>
             </div>
             <div class="flex-1">
               <p class="text-sm font-semibold text-gray-800">{{ userName }}</p>

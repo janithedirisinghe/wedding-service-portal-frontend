@@ -33,100 +33,200 @@
     </div>
 
     <!-- Posts Timeline -->
-    <ol class="relative border-l border-gray-200 dark:border-gray-700 mt-6" *ngIf="!loading && !error && posts.length > 0">
+    <div class="mt-6" *ngIf="!loading && !error && posts.length > 0">
+        <!-- Desktop Timeline -->
+        <ol class="relative border-l border-gray-200 dark:border-gray-700 hidden md:block">
+            <!-- Timeline Item for each post -->
+            <li *ngFor="let post of posts; let postIndex = index" 
+                class="mb-10 ml-6">
+                <!-- User Avatar -->
+                <span
+                    class="absolute flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full -left-5 ring-8 ring-white dark:ring-gray-900 dark:bg-blue-900">
+                    <img class="rounded-full shadow-lg w-10 h-10 object-cover"
+                        [src]="post.vendorProfileImage || 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png'" 
+                        [alt]="(post.vendorName || 'Vendor') + ' profile image'" />
+                </span>
 
-        <!-- Timeline Item for each post -->
-        <li *ngFor="let post of posts; let postIndex = index" 
-            class="mb-10 ml-6 md:ml-0">
-            <!-- User Avatar -->
-            <span
-                class="absolute flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full -left-5 ring-8 ring-white dark:ring-gray-900 dark:bg-blue-900">
-                <img class="rounded-full shadow-lg"
-                    src="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" alt="User image" />
-            </span>
-
-            <!-- Post Container -->
-            <div
-                class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-700 dark:border-gray-600">
-                <!-- Post Header -->
-                <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
-                    <div class="text-sm font-normal text-gray-500 dark:text-gray-300">
-                        <span class="font-semibold text-gray-900 dark:text-white">Vendor</span> posted in
-                        <span class="font-semibold text-gray-900 dark:text-white">{{ post.location }}</span>
-                    </div>
-                    <time class="text-xs font-normal text-gray-400 dark:text-gray-500 mt-2 md:mt-0">
-                        {{ formatDate(post.date) }}
-                    </time>
-                </div>
-
-                <!-- Post Content -->
+                <!-- Post Container -->
                 <div
-                    class="p-3 text-sm italic font-normal text-gray-500 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-300">
-                    {{ post.content }}
-                </div>
+                    class="p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-700 dark:border-gray-600">
+                    <!-- Post Header -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4">
+                        <div class="text-sm font-normal text-gray-500 dark:text-gray-300">
+                            <span class="font-semibold text-gray-900 dark:text-white">{{ post.vendorName || 'Vendor' }}</span> posted in
+                            <span class="font-semibold text-gray-900 dark:text-white">{{ post.location }}</span>
+                        </div>
+                        <time class="text-xs font-normal text-gray-400 dark:text-gray-500 mt-2 sm:mt-0">
+                            {{ formatDate(post.date) }}
+                        </time>
+                    </div>
 
-                <!-- Gallery Section -->
-                <div class="mt-4" *ngIf="post.itemUrls && post.itemUrls.length > 0">
-                    <!-- Main Image with Image Counter and Navigation -->
-                    <div class="relative group">
-                        <img [src]="getPostMainImage(post)" [alt]="'Post ' + post.postId + ' main image'"
-                            class="w-full rounded-lg mb-2 transition-all duration-500 ease-in-out" />
-                        
-                        <!-- Image Counter (only show if more than 1 image) -->
-                        <div *ngIf="post.itemUrls.length > 1" 
-                             class="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-xs">
-                            {{ (postMainImageIndexes[post.postId!] || 0) + 1 }} / {{ post.itemUrls.length }}
+                    <!-- Post Content -->
+                    <div
+                        class="p-3 text-sm italic font-normal text-gray-500 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-300">
+                        {{ post.content }}
+                    </div>
+
+                    <!-- Gallery Section -->
+                    <div class="mt-4" *ngIf="post.itemUrls && post.itemUrls.length > 0">
+                        <!-- Main Image with Image Counter and Navigation -->
+                        <div class="relative group">
+                            <img [src]="getPostMainImage(post)" [alt]="'Post ' + post.postId + ' main image'"
+                                class="w-full rounded-lg mb-2 transition-all duration-500 ease-in-out" />
+                            
+                            <!-- Image Counter (only show if more than 1 image) -->
+                            <div *ngIf="post.itemUrls.length > 1" 
+                                 class="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-xs">
+                                {{ (postMainImageIndexes[post.postId!] || 0) + 1 }} / {{ post.itemUrls.length }}
+                            </div>
+
+                            <!-- Navigation Arrows (only show if more than 1 image) -->
+                            <div *ngIf="post.itemUrls.length > 1">
+                                <!-- Previous Button -->
+                                <button (click)="previousImage(post)" 
+                                        class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-200 opacity-0 group-hover:opacity-100">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                    </svg>
+                                </button>
+
+                                <!-- Next Button -->
+                                <button (click)="nextImage(post)" 
+                                        class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-200 opacity-0 group-hover:opacity-100">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
 
-                        <!-- Navigation Arrows (only show if more than 1 image) -->
-                        <div *ngIf="post.itemUrls.length > 1">
-                            <!-- Previous Button -->
-                            <button (click)="previousImage(post)" 
-                                    class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-200 opacity-0 group-hover:opacity-100">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                                </svg>
-                            </button>
-
-                            <!-- Next Button -->
-                            <button (click)="nextImage(post)" 
-                                    class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-200 opacity-0 group-hover:opacity-100">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                </svg>
-                            </button>
+                        <!-- Thumbnails -->
+                        <div class="flex justify-center gap-2 overflow-x-auto py-2" *ngIf="post.itemUrls.length > 1">
+                            <img *ngFor="let imageUrl of post.itemUrls; let i = index" 
+                                 [src]="imageUrl" 
+                                 (click)="setPostMainImage(postIndex, i)"
+                                 [alt]="'Post ' + post.postId + ' thumbnail ' + (i+1)"
+                                 class="w-16 h-16 rounded-md cursor-pointer hover:opacity-75 transition-all duration-200 object-cover border-2 flex-shrink-0"
+                                 [class.border-blue-500]="isImageSelected(post, i)"
+                                 [class.border-gray-300]="!isImageSelected(post, i)"
+                                 [class.opacity-100]="isImageSelected(post, i)"
+                                 [class.opacity-60]="!isImageSelected(post, i)" />
                         </div>
                     </div>
 
-                    <!-- Thumbnails -->
-                    <div class="flex justify-center gap-2 overflow-x-auto py-2" *ngIf="post.itemUrls.length > 1">
-                        <img *ngFor="let imageUrl of post.itemUrls; let i = index" 
-                             [src]="imageUrl" 
-                             (click)="setPostMainImage(postIndex, i)"
-                             [alt]="'Post ' + post.postId + ' thumbnail ' + (i+1)"
-                             class="w-16 h-16 rounded-md cursor-pointer hover:opacity-75 transition-all duration-200 object-cover border-2"
-                             [class.border-blue-500]="isImageSelected(post, i)"
-                             [class.border-gray-300]="!isImageSelected(post, i)"
-                             [class.opacity-100]="isImageSelected(post, i)"
-                             [class.opacity-60]="!isImageSelected(post, i)" />
+                    <!-- Post Actions -->
+                    <div class="mt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+                        <div class="text-xs text-gray-500 order-2 sm:order-1">
+                            Post ID: {{ post.postId }}
+                        </div>
+                        <div class="flex gap-2 order-1 sm:order-2">
+                            <button class="px-3 py-1 text-xs bg-blue-100 text-blue-800 rounded-full hover:bg-blue-200 transition-colors">
+                                Edit
+                            </button>
+                            <button class="px-3 py-1 text-xs bg-red-100 text-red-800 rounded-full hover:bg-red-200 transition-colors">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ol>
+
+        <!-- Mobile Timeline -->
+        <div class="block md:hidden space-y-6">
+            <!-- Mobile Post Item -->
+            <div *ngFor="let post of posts; let postIndex = index" 
+                 class="bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-700 dark:border-gray-600">
+                
+                <!-- Mobile Post Header with Avatar -->
+                <div class="p-4 border-b border-gray-200 dark:border-gray-600">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <img class="rounded-full w-12 h-12 object-cover"
+                            [src]="post.vendorProfileImage || 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png'" 
+                            [alt]="(post.vendorName || 'Vendor') + ' profile image'" />
+                        <div class="flex-1 min-w-0">
+                            <div class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                {{ post.vendorName || 'Vendor' }}
+                            </div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                {{ post.location }}
+                            </div>
+                        </div>
+                        <time class="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">
+                            {{ formatDate(post.date) }}
+                        </time>
                     </div>
                 </div>
 
-                <!-- Post Actions -->
-                <div class="mt-4 flex justify-between items-center">
-                    <div class="text-xs text-gray-500">
-                        Post ID: {{ post.postId }}
+                <!-- Mobile Post Content -->
+                <div class="p-4">
+                    <div class="p-3 text-sm italic font-normal text-gray-500 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-300 mb-4">
+                        {{ post.content }}
                     </div>
-                    <div class="flex gap-2">
-                        <button class="px-3 py-1 text-xs bg-blue-100 text-blue-800 rounded-full hover:bg-blue-200 transition-colors">
-                            Edit
-                        </button>
-                        <button class="px-3 py-1 text-xs bg-red-100 text-red-800 rounded-full hover:bg-red-200 transition-colors">
-                            Delete
-                        </button>
+
+                    <!-- Mobile Gallery Section -->
+                    <div *ngIf="post.itemUrls && post.itemUrls.length > 0" class="mb-4">
+                        <!-- Main Image with Image Counter and Navigation -->
+                        <div class="relative group">
+                            <img [src]="getPostMainImage(post)" [alt]="'Post ' + post.postId + ' main image'"
+                                class="w-full rounded-lg mb-2 transition-all duration-500 ease-in-out" />
+                            
+                            <!-- Image Counter (only show if more than 1 image) -->
+                            <div *ngIf="post.itemUrls.length > 1" 
+                                 class="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-xs">
+                                {{ (postMainImageIndexes[post.postId!] || 0) + 1 }} / {{ post.itemUrls.length }}
+                            </div>
+
+                            <!-- Navigation Arrows (only show if more than 1 image) -->
+                            <div *ngIf="post.itemUrls.length > 1">
+                                <!-- Previous Button -->
+                                <button (click)="previousImage(post)" 
+                                        class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-200">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                    </svg>
+                                </button>
+
+                                <!-- Next Button -->
+                                <button (click)="nextImage(post)" 
+                                        class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-200">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Thumbnails -->
+                        <div class="flex justify-start gap-2 overflow-x-auto py-2" *ngIf="post.itemUrls.length > 1">
+                            <img *ngFor="let imageUrl of post.itemUrls; let i = index" 
+                                 [src]="imageUrl" 
+                                 (click)="setPostMainImage(postIndex, i)"
+                                 [alt]="'Post ' + post.postId + ' thumbnail ' + (i+1)"
+                                 class="w-16 h-16 rounded-md cursor-pointer hover:opacity-75 transition-all duration-200 object-cover border-2 flex-shrink-0"
+                                 [class.border-blue-500]="isImageSelected(post, i)"
+                                 [class.border-gray-300]="!isImageSelected(post, i)"
+                                 [class.opacity-100]="isImageSelected(post, i)"
+                                 [class.opacity-60]="!isImageSelected(post, i)" />
+                        </div>
+                    </div>
+
+                    <!-- Mobile Post Actions -->
+                    <div class="flex flex-col gap-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                        <div class="flex gap-2">
+                            <button class="flex-1 px-3 py-2 text-sm bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition-colors text-center">
+                                Edit
+                            </button>
+                            <button class="flex-1 px-3 py-2 text-sm bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition-colors text-center">
+                                Delete
+                            </button>
+                        </div>
+                        <div class="text-xs text-gray-500 text-center">
+                            Post ID: {{ post.postId }}
+                        </div>
                     </div>
                 </div>
             </div>
-        </li>
-    </ol>
+        </div>
+    </div>
 </div>

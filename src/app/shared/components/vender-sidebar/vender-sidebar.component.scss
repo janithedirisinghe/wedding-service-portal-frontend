@@ -9,6 +9,32 @@
     color: #000000; /* Black color */
   }
 
+.vendor-profile-section {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+}
+
+.profile-image-container {
+  position: relative;
+  
+  img {
+    transition: transform 0.2s ease;
+    
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+}
+
+.vendor-info {
+  h3, p {
+    transition: color 0.2s ease;
+  }
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

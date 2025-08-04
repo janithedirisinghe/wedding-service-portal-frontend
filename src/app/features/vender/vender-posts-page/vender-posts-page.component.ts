@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PostService } from '../services/post.service';
 import { PostModel } from '../models/post.model';
+import { AuthService } from '../../../shared/services/auth.service';
 
 @Component({
   selector: 'app-vender-posts-page',
@@ -16,9 +17,9 @@ export class VenderPostsPageComponent implements OnInit {
   postMainImageIndexes: { [postId: number]: number } = {};
 
   // For demo purposes - in real app, this would come from auth service
-  vendorId: number = 1;
+  userId: number = 1;
 
-  constructor(private postService: PostService) {}
+  constructor(private postService: PostService, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.fetchPosts();
@@ -27,8 +28,8 @@ export class VenderPostsPageComponent implements OnInit {
   fetchPosts(): void {
     this.loading = true;
     this.error = null;
-    
-    this.postService.getPostsByVendorId(this.vendorId).subscribe({
+    this.userId = this.authService.getUserId() || 1; // Fallback to 1 for demo purposes
+    this.postService.getPostsByVendorId(this.userId).subscribe({
       next: (posts) => {
         this.posts = posts.sort((a, b) => {
           // First sort by date

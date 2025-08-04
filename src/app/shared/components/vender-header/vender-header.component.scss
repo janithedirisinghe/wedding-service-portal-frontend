@@ -30,3 +30,21 @@ h1 {
     width: 100%;
   }
 }
+
+.profile-image-container {
+  position: relative;
+  
+  img {
+    transition: transform 0.2s ease;
+    
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+}
+
+.vendor-info {
+  p {
+    transition: color 0.2s ease;
+  }
+}

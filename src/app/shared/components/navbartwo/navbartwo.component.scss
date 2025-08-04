@@ -56,6 +56,19 @@ header {
   }
 }
 
+/* Profile image styles */
+.profile-image-container {
+  position: relative;
+  
+  img {
+    transition: transform 0.2s ease;
+    
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+}
+
 /* Search input focus effect */
 input {
   transition: all 0.3s ease;

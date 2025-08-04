@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { VendorProfileService } from '../../../features/vender/services/venderProfile.service';
+import { venderDetails } from '../../../features/vender/models/vender.model';
 
 @Component({
   selector: 'app-navbartwo',
@@ -18,25 +20,36 @@ export class NavbartwoComponent implements OnInit {
   userName: string = '';
   userRole: string = '';
   
+  // Vendor data
+  vendor: venderDetails | null = null;
+  defaultProfileImage = 'assets/placeholder-vendor.jpg';
+  imageError = false;
+  
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private vendorProfileService: VendorProfileService
   ) {}
   ngOnInit() {
     this.loadUserData();
+    this.loadVendorDetails();
     
     // Listen for route changes to refresh user data
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
       this.loadUserData();
+      this.loadVendorDetails();
     });
     
     // Refresh data every 10 seconds to catch login state changes
     setInterval(() => {
       this.loadUserData();
+      this.loadVendorDetails();
     }, 10000);
-  }  loadUserData() {
+  }
+
+  loadUserData() {
     try {
       // Get user data through AuthService which handles storage fallbacks
       const username = this.authService.getUserName();
@@ -48,6 +61,36 @@ export class NavbartwoComponent implements OnInit {
       this.userName = 'Guest User';
       this.userRole = 'User';
     }
+  }
+
+  private loadVendorDetails(): void {
+    const userId = this.authService.getUserId();
+    if (userId) {
+      this.vendorProfileService.getVendorProfileDetails(userId).subscribe({
+        next: (vendor) => {
+          this.vendor = vendor;
+          this.imageError = false;
+          // Update userName with vendor business name if available
+          this.userName = vendor.businessName || this.userName;
+        },
+        error: (error) => {
+          console.error('Error loading vendor details:', error);
+        }
+      });
+    }
+  }
+
+  onImageError(event: Event): void {
+    this.imageError = true;
+  }
+
+  getVendorInitials(): string {
+    if (!this.vendor?.businessName) return 'V';
+    return this.vendor.businessName.split(' ')
+      .map(word => word.charAt(0))
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
   }
 
   formatRole(role: string): string {

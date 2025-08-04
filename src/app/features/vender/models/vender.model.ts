@@ -9,7 +9,8 @@ export interface venderDetails{
   location: string;
   country: string;
   brn: string;
-  venType: string;
+  VenType: string;
+  profileImageUrl?: string; // Optional profile image URL
 }
 
 export interface Service {
