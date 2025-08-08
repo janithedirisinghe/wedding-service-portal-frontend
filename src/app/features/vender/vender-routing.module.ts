@@ -7,6 +7,7 @@ import { VenderCalenderComponent } from './vender-calender/vender-calender.compo
 import { VenderMeetingRequstsComponent } from './vender-meeting-requsts/vender-meeting-requsts.component';
 import { VenderProfileComponent } from './vender-profile/vender-profile.component';
 import { VenderServiceTableComponent } from './vender-service-table/vender-service-table.component';
+import { VenderChatComponent } from './vender-chat/vender-chat.component';
 
 const routes: Routes = [
     { path: '', component: VenderBodyPageComponent, 
@@ -18,6 +19,7 @@ const routes: Routes = [
         { path: 'meetingRequests', component: VenderMeetingRequstsComponent},
         { path: 'profile', component: VenderProfileComponent },
         { path: 'serviceList', component: VenderServiceTableComponent},
+  { path: 'chat', component: VenderChatComponent },
         { path: '**', redirectTo: 'posts' } // Wildcard route for invalid vendor routes
       ]
     }, 
