@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChatService, ChatRoomDTO, ChatMessageDTO } from '../../../shared/services/chat.service';
+import { ChatWebsocketService } from '../../../shared/services/chat-websocket.service';
+import { AuthService } from '../../../shared/services/auth.service';
 
 // Interfaces
 interface Message {
@@ -33,47 +36,19 @@ interface User {
   templateUrl: './vender-chat.component.html',
   styleUrls: ['./vender-chat.component.scss']
 })
-export class VenderChatComponent implements OnInit {
+export class VenderChatComponent implements OnInit, OnDestroy {
   // Treat these as customer conversations from the vendor perspective
   chats: Chat[] = [
     {
-      id: 1,
-      name: 'Emma Johnson',
-      profileImage: 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png',
-      category: 'Customer',
-      messages: [
-        {
-          user: 'Emma Johnson',
-          text: 'Hi! I love your work. Are you available on July 21st?',
-          timestamp: new Date('2024-06-09T10:30:00')
-        }
-      ],
-      lastMessage: 'Hi! I love your work. Are you available on July 21st?',
-      lastMessageTime: new Date('2024-06-09T10:30:00'),
-      unreadCount: 1,
-      isOnline: true
-    },
-    {
-      id: 2,
-      name: 'Liam Williams',
-      profileImage: 'https://primefaces.org/cdn/primeng/images/demo/avatar/annafali.png',
-      category: 'Customer',
+      id: 0,
+      name: 'Loading…',
+      profileImage: 'assets/placeholder-vendor.jpg',
+      category: '—',
       messages: [],
       lastMessage: null,
       lastMessageTime: null,
       unreadCount: 0,
       isOnline: true
-    },
-    {
-      id: 3,
-      name: 'Ava Martinez',
-      profileImage: 'https://primefaces.org/cdn/primeng/images/demo/avatar/asiyajavayant.png',
-      category: 'Customer',
-      messages: [],
-      lastMessage: null,
-      lastMessageTime: null,
-      unreadCount: 0,
-      isOnline: false
     }
   ];
 
@@ -95,61 +70,92 @@ export class VenderChatComponent implements OnInit {
 
   isTyping = false;
   typingTimeout: any;
+  private currentRoomId?: number;
+
+  constructor(
+    private chatApi: ChatService,
+    private ws: ChatWebsocketService,
+    private auth: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.filteredUsers = this.allUsers;
-    this.sortChatsByLastMessage();
+    this.username = this.auth.getUserName() || 'You';
+    this.loadRooms();
+    this.ws.connect();
+  }
+
+  ngOnDestroy(): void {
+    if (this.currentRoomId) this.ws.unsubscribe(`/topic/chat/${this.currentRoomId}`);
+    this.ws.disconnect();
+  }
+
+  private loadRooms(): void {
+    this.chatApi.getUserChatRooms().subscribe({
+      next: rooms => {
+        const uid = this.auth.getUserId() || undefined;
+        this.chats = rooms.map(r => ({
+          id: this.chatApi.getRoomId(r),
+          name: this.chatApi.deriveRoomDisplayName(r, uid),
+          profileImage: 'assets/placeholder-vendor.jpg',
+          category: r['category'] || 'Chat',
+          messages: [],
+          lastMessage: r.lastMessage || null,
+          lastMessageTime: r.lastMessageTime ? new Date(r.lastMessageTime) : null,
+          unreadCount: r.unreadCount || 0,
+          isOnline: true
+        }));
+        if (this.chats.length > 0) {
+          this.selectedChat = this.chats[0];
+          this.onChatSelectedSetup(this.selectedChat);
+        }
+        this.sortChatsByLastMessage();
+      }
+    });
   }
 
   selectChat(chat: Chat): void {
     this.selectedChat = chat;
     this.selectedChat.unreadCount = 0;
+    this.onChatSelectedSetup(chat);
+  }
+
+  private onChatSelectedSetup(chat: Chat): void {
+    if (this.currentRoomId) {
+      this.ws.unsubscribe(`/topic/chat/${this.currentRoomId}`);
+      this.ws.leaveRoom(this.currentRoomId);
+    }
+    this.currentRoomId = chat.id;
+    this.chatApi.getChatMessages(chat.id, 0, 50).subscribe({
+      next: msgs => {
+        chat.messages = msgs.map(m => this.fromDtoToMessage(m));
+        this.sortChatsByLastMessage();
+      }
+    });
+    this.chatApi.markMessagesAsRead(chat.id).subscribe();
+    this.ws.subscribe(`/topic/chat/${chat.id}`, (payload: ChatMessageDTO) => {
+      const msg = this.fromDtoToMessage(payload);
+      chat.messages.push(msg);
+      chat.lastMessage = msg.text;
+      chat.lastMessageTime = msg.timestamp;
+      this.sortChatsByLastMessage();
+    });
+    this.ws.joinRoom(chat.id);
   }
 
   sendMessage(): void {
-    if (this.newMessage.trim()) {
-      const message: Message = {
-        user: this.username,
-        text: this.newMessage.trim(),
-        timestamp: new Date()
-      };
-
-      this.selectedChat.messages.push(message);
-      this.selectedChat.lastMessage = message.text;
-      this.selectedChat.lastMessageTime = message.timestamp;
-
-      this.newMessage = '';
-
-      // Simulate customer response after 2 seconds
-      this.simulateCustomerResponse();
-
-      this.sortChatsByLastMessage();
-    }
+    const text = this.newMessage.trim();
+    if (!text || !this.selectedChat) return;
+    const roomId = this.selectedChat.id;
+    this.ws.send(`/app/chat/${roomId}`, { chatRoomId: roomId, content: text });
+    this.newMessage = '';
   }
 
-  private simulateCustomerResponse(): void {
-    setTimeout(() => {
-      const responses = [
-        'Thanks for the quick response! Could you share pricing?',
-        'Great! What packages do you offer?',
-        'We are flexible on timings. Any suggestions?',
-        'Do you have availability for a rehearsal?',
-        'Awesome, could we schedule a quick call?'
-      ];
-
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      const customerMessage: Message = {
-        user: this.selectedChat.name,
-        text: randomResponse,
-        timestamp: new Date()
-      };
-
-      this.selectedChat.messages.push(customerMessage);
-      this.selectedChat.lastMessage = customerMessage.text;
-      this.selectedChat.lastMessageTime = customerMessage.timestamp;
-
-      this.sortChatsByLastMessage();
-    }, 2000);
+  private fromDtoToMessage(dto: ChatMessageDTO): Message {
+    const myId = this.auth.getUserId();
+    const ts = this.chatApi.getMessageTimestamp(dto) || new Date();
+    const senderName = dto.senderId && myId && dto.senderId === myId ? (this.username || 'You') : (dto.senderName || 'User');
+    return { user: senderName, text: dto.content, timestamp: ts };
   }
 
   private sortChatsByLastMessage(): void {
