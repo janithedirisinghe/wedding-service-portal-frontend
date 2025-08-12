@@ -1,35 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ChatService, ChatRoomDTO, ChatMessageDTO } from '../../../shared/services/chat.service';
+import { ChatService } from '../../../shared/services/chat.service';
 import { ChatWebsocketService } from '../../../shared/services/chat-websocket.service';
 import { AuthService } from '../../../shared/services/auth.service';
-
-// Interfaces
-interface Message {
-  user: string;
-  text: string;
-  timestamp: Date;
-}
-
-interface Chat {
-  id: number;
-  name: string;
-  profileImage: string;
-  category: string;
-  messages: Message[];
-  lastMessage: string | null;
-  lastMessageTime: Date | null;
-  unreadCount: number;
-  isOnline: boolean;
-}
-
-interface User {
-  id: number;
-  name: string;
-  profileImage: string;
-  email: string;
-  category: string;
-  isOnline: boolean;
-}
+import { ChatRoomDTO, ChatMessageDTO, Message, Chat, User } from '../models';
 
 @Component({
   selector: 'app-customer-chat',
@@ -97,27 +70,31 @@ export class CustomerChatComponent implements OnInit, OnDestroy {
   }
 
   private loadRooms(): void {
-    this.chatApi.getUserChatRooms().subscribe({
+    this.chatApi.getUserChatRooms().subscribe({ 
       next: rooms => {
+        console.log('Loaded chat rooms:', rooms); // Debug log
         const uid = this.auth.getUserId() || undefined;
         this.chats = rooms.map(r => ({
           id: this.chatApi.getRoomId(r),
           name: this.chatApi.deriveRoomDisplayName(r, uid),
           profileImage: 'assets/placeholder-vendor.jpg',
-          category: r['category'] || 'Chat',
+          category: r.vendorBusinessName || 'Chat',
           messages: [],
-          lastMessage: r.lastMessage || null,
-          lastMessageTime: r.lastMessageTime ? new Date(r.lastMessageTime) : null,
+          lastMessage: r.recentMessages && r.recentMessages.length > 0 ? r.recentMessages[r.recentMessages.length - 1].content : null,
+          lastMessageTime: r.lastMessageAt ? new Date(r.lastMessageAt) : null,
           unreadCount: r.unreadCount || 0,
           isOnline: true
         }));
+        
+        // Remove the placeholder loading chat if we have real data
         if (this.chats.length > 0) {
           this.selectedChat = this.chats[0];
           this.onChatSelectedSetup(this.selectedChat);
         }
         this.sortChatsByLastMessage();
       },
-      error: () => {
+      error: (error) => {
+        console.error('Failed to load chat rooms:', error);
         // keep placeholder chats if backend not reachable
       }
     });
@@ -227,10 +204,10 @@ export class CustomerChatComponent implements OnInit, OnDestroy {
           id: this.chatApi.getRoomId(room),
           name: this.chatApi.deriveRoomDisplayName(room, this.auth.getUserId() || undefined) || user.name,
           profileImage: user.profileImage,
-          category: user.category || 'Chat',
+          category: room.vendorBusinessName || user.category || 'Chat',
           messages: [],
-          lastMessage: room.lastMessage || null,
-          lastMessageTime: room.lastMessageTime ? new Date(room.lastMessageTime) : null,
+          lastMessage: room.recentMessages && room.recentMessages.length > 0 ? room.recentMessages[room.recentMessages.length - 1].content : null,
+          lastMessageTime: room.lastMessageAt ? new Date(room.lastMessageAt) : null,
           unreadCount: room.unreadCount || 0,
           isOnline: user.isOnline
         };

@@ -98,10 +98,10 @@ export class VenderChatComponent implements OnInit, OnDestroy {
           id: this.chatApi.getRoomId(r),
           name: this.chatApi.deriveRoomDisplayName(r, uid),
           profileImage: 'assets/placeholder-vendor.jpg',
-          category: r['category'] || 'Chat',
+          category: r.vendorBusinessName || 'Chat',
           messages: [],
-          lastMessage: r.lastMessage || null,
-          lastMessageTime: r.lastMessageTime ? new Date(r.lastMessageTime) : null,
+          lastMessage: r.recentMessages && r.recentMessages.length > 0 ? r.recentMessages[r.recentMessages.length - 1].content : null,
+          lastMessageTime: r.lastMessageAt ? new Date(r.lastMessageAt) : null,
           unreadCount: r.unreadCount || 0,
           isOnline: true
         }));
@@ -237,7 +237,7 @@ export class VenderChatComponent implements OnInit, OnDestroy {
     const diffInHours = Math.floor(diffInMinutes / 60);
     if (diffInHours < 24) {
       return `${diffInHours}h ago`;
-    }
+    } 
 
     const diffInDays = Math.floor(diffInHours / 24);
     if (diffInDays < 7) {

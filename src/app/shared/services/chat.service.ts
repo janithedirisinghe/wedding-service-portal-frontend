@@ -2,41 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { ChatRoomDTO, ChatMessageDTO, StartChatRequest, SendMessageRequest } from '../../features/customer/models';
 
-// Backend DTO contracts (flexible)
-export interface StartChatRequest {
-  vendorId: number;
-  initialMessage?: string;
-}
-
-export interface SendMessageRequest {
-  chatRoomId: number;
-  content: string;
-}
-
-export interface ChatRoomDTO {
-  id?: number;
-  chatRoomId?: number;
-  vendorId?: number;
-  customerId?: number;
-  vendorName?: string;
-  customerName?: string;
-  lastMessage?: string;
-  unreadCount?: number;
-  lastMessageTime?: string;
-  [key: string]: any;
-}
-
-export interface ChatMessageDTO {
-  id?: number;
-  chatRoomId: number;
-  content: string;
-  senderId?: number;
-  senderName?: string;
-  senderType?: string;
-  timestamp?: string;
-  [key: string]: any;
-}
+// Re-export types for easier importing
+export { ChatRoomDTO, ChatMessageDTO, StartChatRequest, SendMessageRequest } from '../../features/customer/models';
 
 @Injectable({ providedIn: 'root' })
 export class ChatService {
@@ -50,12 +19,12 @@ export class ChatService {
 
   sendMessage(payload: SendMessageRequest): Observable<ChatMessageDTO> {
     return this.http.post<ChatMessageDTO>(`${this.baseUrl}/message`, payload);
-  }
+  } 
 
   getUserChatRooms(): Observable<ChatRoomDTO[]> {
     return this.http.get<ChatRoomDTO[]>(`${this.baseUrl}/rooms`);
   }
-
+ 
   getChatMessages(chatRoomId: number, page = 0, size = 50): Observable<ChatMessageDTO[]> {
     const params = new HttpParams().set('page', page).set('size', size);
     return this.http.get<ChatMessageDTO[]>(`${this.baseUrl}/room/${chatRoomId}/messages`, { params });
@@ -66,21 +35,25 @@ export class ChatService {
   }
 
   deriveRoomDisplayName(room: ChatRoomDTO, currentUserId?: number): string {
-    if (room['otherUserName']) return String(room['otherUserName']);
-    if (room['counterpartName']) return String(room['counterpartName']);
-    if (currentUserId) {
-      if (room.vendorId && room.vendorId !== currentUserId && room.vendorName) return String(room.vendorName);
-      if (room.customerId && room.customerId !== currentUserId && room.customerName) return String(room.customerName);
+    // Use roomName if available, otherwise derive from vendor business name or vendor name
+    if (room.roomName) return room.roomName;
+    
+    // For customers, show vendor business name or vendor name
+    if (currentUserId && room.customerId === currentUserId) {
+      return room.vendorBusinessName || room.vendorName || `Chat #${room.chatRoomId}`;
     }
-    if (room.vendorName && room.customerName) return `${room.vendorName} ↔ ${room.customerName}`;
-    if (room.vendorName) return String(room.vendorName);
-    if (room.customerName) return String(room.customerName);
-    const id = room.chatRoomId ?? room.id ?? '?';
-    return `Chat #${id}`;
+    
+    // For vendors, show customer name
+    if (currentUserId && room.vendorId === currentUserId) {
+      return room.customerName || `Chat #${room.chatRoomId}`;
+    }
+    
+    // Default fallback
+    return room.vendorBusinessName || room.vendorName || room.customerName || `Chat #${room.chatRoomId}`;
   }
 
   getRoomId(room: ChatRoomDTO): number {
-    return Number(room.chatRoomId ?? room.id);
+    return room.chatRoomId;
   }
 
   getMessageTimestamp(msg: ChatMessageDTO): Date | null {
