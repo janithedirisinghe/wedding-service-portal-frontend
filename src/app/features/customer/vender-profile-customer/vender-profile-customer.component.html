@@ -347,28 +347,119 @@
     </div>
  
     <!-- Appointment Form -->
-    <div *ngIf="selectedTab === 'addAppointment'" class="mt-4 bg-gray-100 p-4 rounded-lg">
-        <h3 class="font-semibold text-lg mb-4 justify-center">Book an Appointment</h3>
-        <form>
-            <div class="mb-4">
-                <label class="block text-gray-700">Name</label>
-                <input type="text" class="w-full p-2 border rounded-lg" placeholder="Your Name">
+    <div *ngIf="selectedTab === 'addAppointment'" class="mt-4 bg-gray-50 p-6 rounded-lg border border-gray-200">
+        <h3 class="font-semibold text-xl mb-6 text-center text-gray-800">Book an Appointment</h3>
+        
+        <!-- Login check -->
+        <div *ngIf="!isLoggedIn()" class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
+            <p class="text-center">You must be logged in to book an appointment.</p>
+        </div>
+
+        <!-- Appointment form for logged-in users -->
+        <form *ngIf="isLoggedIn()" [formGroup]="appointmentForm" (ngSubmit)="submitAppointment()">
+            <!-- Success message -->
+            <div *ngIf="appointmentSuccess" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                <p class="text-center">{{ appointmentSuccess }}</p>
             </div>
-            <div class="mb-4">
-                <label class="block text-gray-700">Description</label>
-                <textarea class="w-full p-2 border rounded-lg" rows="4" placeholder="Description"></textarea>
+
+            <!-- Error message -->
+            <div *ngIf="appointmentError" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                <p class="text-center">{{ appointmentError }}</p>
             </div>
-            <div class="mb-4">
-                <label class="block text-gray-700">Appointment Date and Time</label>
-                <input type="datetime-local" class="w-full p-2 border rounded-lg">
+ 
+            <!-- Meeting Date and Time -->
+            <div class="mb-6">
+                <label for="meetingDateTime" class="block text-gray-700 font-medium mb-2">Meeting Date and Time *</label>
+                <input 
+                    type="datetime-local" 
+                    id="meetingDateTime"
+                    formControlName="meetingDateTime"
+                    [min]="getMinDateTime()"
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <div *ngIf="appointmentForm.get('meetingDateTime')?.invalid && appointmentForm.get('meetingDateTime')?.touched" class="text-red-500 text-sm mt-1">
+                    <span *ngIf="appointmentForm.get('meetingDateTime')?.errors?.['required']">Please select a meeting date and time</span>
+                    <span *ngIf="appointmentForm.get('meetingDateTime')?.errors?.['pastDate']">Meeting date and time must be in the future</span>
+                </div>
             </div>
-            <div class="mb-4">
-                <label class="block text-gray-700">Location</label>
-                <input type="text" class="w-full p-2 border rounded-lg" placeholder="Location">
+
+            <!-- Meeting Mode -->
+            <div class="mb-6">
+                <label class="block text-gray-700 font-medium mb-2">Meeting Mode *</label>
+                <div class="space-y-2">
+                    <div *ngFor="let option of meetingMoodOptions" class="flex items-center">
+                        <input 
+                            type="radio" 
+                            [id]="'meeting-mode-' + option.value"
+                            [value]="option.value"
+                            formControlName="meetingMood"
+                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                        <label [for]="'meeting-mode-' + option.value" class="ml-2 text-gray-700">
+                            {{ option.label }}
+                        </label>
+                    </div>
+                </div>
+                <div *ngIf="appointmentForm.get('meetingMood')?.invalid && appointmentForm.get('meetingMood')?.touched" class="text-red-500 text-sm mt-1">
+                    Please select a meeting mode
+                </div>
             </div>
+
+            <!-- Location -->
+            <div class="mb-6">
+                <label for="location" class="block text-gray-700 font-medium mb-2">Location *</label>
+                <input 
+                    type="text" 
+                    id="location"
+                    formControlName="location"
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                    placeholder="Enter meeting location (e.g., Zoom link, address, etc.)">
+                <div *ngIf="appointmentForm.get('location')?.invalid && appointmentForm.get('location')?.touched" class="text-red-500 text-sm mt-1">
+                    <span *ngIf="appointmentForm.get('location')?.errors?.['required']">Please enter a location</span>
+                    <span *ngIf="appointmentForm.get('location')?.errors?.['minlength']">Location must be at least 3 characters</span>
+                    <span *ngIf="appointmentForm.get('location')?.errors?.['maxlength']">Location cannot exceed 200 characters</span>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="mb-6">
+                <label for="notes" class="block text-gray-700 font-medium mb-2">Additional Notes</label>
+                <textarea 
+                    id="notes"
+                    formControlName="notes"
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none" 
+                    rows="4" 
+                    placeholder="Add any special requests or details about the meeting..."></textarea>
+                <div class="flex justify-between mt-1">
+                    <div *ngIf="appointmentForm.get('notes')?.invalid && appointmentForm.get('notes')?.touched" class="text-red-500 text-sm">
+                        <span *ngIf="appointmentForm.get('notes')?.errors?.['maxlength']">Notes cannot exceed 500 characters</span>
+                    </div>
+                    <div class="text-sm text-gray-500">
+                        {{ appointmentForm.get('notes')?.value?.length || 0 }}/500
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
             <div class="flex space-x-4">
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Submit</button>
-                <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600" (click)="selectedTab = 'services'">Cancel</button>
+                <button 
+                    type="submit" 
+                    [disabled]="appointmentForm.invalid || isSubmittingAppointment"
+                    class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span *ngIf="!isSubmittingAppointment">Book Appointment</span>
+                    <span *ngIf="isSubmittingAppointment" class="flex items-center justify-center">
+                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Submitting...
+                    </span>
+                </button>
+                <button 
+                    type="button" 
+                    (click)="cancelAppointment()" 
+                    [disabled]="isSubmittingAppointment"
+                    class="flex-1 bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                    Cancel
+                </button>
             </div>
         </form>
     </div>

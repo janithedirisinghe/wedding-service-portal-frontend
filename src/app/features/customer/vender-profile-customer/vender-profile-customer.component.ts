@@ -5,6 +5,8 @@ import { PostService } from '../../vender/services/post.service';
 import { PostModel } from '../../vender/models/post.model';
 import { ReviewService } from '../services/review.service';
 import { ReviewModel, CreateReviewRequest } from '../models/review.model';
+import { MeetingService } from '../services/meeting.service';
+import { CreateMeetingRequest, MeetingMood } from '../models/meeting.model';
 import { AuthService } from '../../../shared/services/auth.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -37,17 +39,36 @@ export class VenderProfileCustomerComponent implements OnInit {
   reviewsLoading: boolean = false;
   reviewsError: string | null = null;
 
+  // Appointment form
+  appointmentForm: FormGroup;
+  isSubmittingAppointment: boolean = false;
+  appointmentError: string | null = null;
+  appointmentSuccess: string | null = null;
+  meetingMoodOptions = [
+    { label: 'Virtual Meeting', value: MeetingMood.VIRTUAL },
+    { label: 'Phone Call', value: MeetingMood.PHONE_CALL },
+    { label: 'In-Person Meeting', value: MeetingMood.IN_PERSON }
+  ];
+
   constructor(
     private route: ActivatedRoute,
     private customerService: CustomerService,
     private postService: PostService,
     private reviewService: ReviewService,
+    private meetingService: MeetingService,
     private authService: AuthService,
     private fb: FormBuilder
   ) {
     this.reviewForm = this.fb.group({
       rating: [0, [Validators.required, Validators.min(1), Validators.max(5)]],
       comment: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]]
+    });
+
+    this.appointmentForm = this.fb.group({
+      meetingDateTime: ['', [Validators.required, this.futureDateValidator.bind(this)]],
+      meetingMood: [MeetingMood.VIRTUAL, [Validators.required]],
+      location: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
+      notes: ['', [Validators.maxLength(500)]]
     });
   }
 
@@ -314,5 +335,118 @@ export class VenderProfileCustomerComponent implements OnInit {
   // Get current user role
   getUserRole(): string | null {
     return this.authService.getUserRole();
+  }
+
+  // Custom validator for future dates
+  futureDateValidator(control: any): { [key: string]: any } | null {
+    if (!control.value) {
+      return null; // Don't validate empty values
+    }
+    
+    const selectedDate = new Date(control.value);
+    const now = new Date();
+    
+    return selectedDate > now ? null : { 'pastDate': { value: control.value } };
+  }
+
+  // Submit appointment
+  submitAppointment(): void {
+    if (this.appointmentForm.invalid) {
+      this.appointmentError = 'Please fill out all required fields correctly.';
+      return;
+    }
+
+    if (!this.vendorId) {
+      this.appointmentError = 'Vendor ID not found.';
+      return;
+    }
+
+    const customerId = this.authService.getUserId();
+    if (!customerId) {
+      this.appointmentError = 'You must be logged in to book an appointment.';
+      return;
+    }
+
+    this.isSubmittingAppointment = true;
+    this.appointmentError = null;
+    this.appointmentSuccess = null;
+
+    // Format the datetime for the backend (yyyy-MM-dd HH:mm:ss format)
+    const selectedDateTime = new Date(this.appointmentForm.value.meetingDateTime);
+    const formattedDateTime = this.formatDateTimeForBackend(selectedDateTime);
+
+    const appointmentData: CreateMeetingRequest = {
+      meetingDateTime: formattedDateTime,
+      meetingMood: this.appointmentForm.value.meetingMood,
+      location: this.appointmentForm.value.location,
+      vendorId: this.vendorId,
+      notes: this.appointmentForm.value.notes
+    };
+
+    this.meetingService.createMeetingRequest(customerId, appointmentData).subscribe({
+      next: (response) => {
+        this.appointmentSuccess = 'Appointment request submitted successfully! The vendor will respond soon.';
+        this.appointmentForm.reset();
+        this.appointmentForm.patchValue({
+          meetingMood: MeetingMood.VIRTUAL
+        });
+        
+        // Auto-switch to posts tab after successful submission
+        setTimeout(() => {
+          this.selectedTab = 'posts';
+          this.appointmentSuccess = null;
+        }, 3000);
+        
+        this.isSubmittingAppointment = false;
+      },
+      error: (error) => {
+        console.error('Error submitting appointment:', error);
+        
+        let errorMessage = 'Failed to submit appointment request. ';
+        if (error.message) {
+          errorMessage += error.message;
+        } else {
+          errorMessage += 'Please try again later.';
+        }
+        
+        this.appointmentError = errorMessage;
+        this.isSubmittingAppointment = false;
+      }
+    });
+  }
+
+  // Cancel appointment form
+  cancelAppointment(): void {
+    this.appointmentForm.reset();
+    this.appointmentForm.patchValue({
+      meetingMood: MeetingMood.VIRTUAL
+    });
+    this.appointmentError = null;
+    this.appointmentSuccess = null;
+    this.selectedTab = 'posts';
+  }
+
+  // Format date time for backend (yyyy-MM-dd HH:mm:ss)
+  private formatDateTimeForBackend(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
+
+  // Get minimum datetime for input (current datetime)
+  getMinDateTime(): string {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
   }
 }
