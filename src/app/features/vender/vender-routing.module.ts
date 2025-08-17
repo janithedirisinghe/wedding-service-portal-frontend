@@ -5,6 +5,7 @@ import { VenderPostsPageComponent } from './vender-posts-page/vender-posts-page.
 import { VenderServiceFormComponent } from './vender-service-form/vender-service-form.component';
 import { VenderCalenderComponent } from './vender-calender/vender-calender.component';
 import { VenderMeetingRequstsComponent } from './vender-meeting-requsts/vender-meeting-requsts.component';
+import { VenderBookingRequestsComponent } from './vender-booking-requests/vender-booking-requests.component';
 import { VenderProfileComponent } from './vender-profile/vender-profile.component';
 import { VenderServiceTableComponent } from './vender-service-table/vender-service-table.component';
 import { VenderChatComponent } from './vender-chat/vender-chat.component';
@@ -17,6 +18,7 @@ const routes: Routes = [
         { path: 'createService', component: VenderServiceFormComponent},
         { path: 'eventCalender', component: VenderCalenderComponent},
         { path: 'meetingRequests', component: VenderMeetingRequstsComponent},
+        { path: 'bookingRequests', component: VenderBookingRequestsComponent},
         { path: 'profile', component: VenderProfileComponent },
         { path: 'serviceList', component: VenderServiceTableComponent},
   { path: 'chat', component: VenderChatComponent },

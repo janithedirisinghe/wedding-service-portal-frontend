@@ -6,6 +6,7 @@ import { VenderRoutingModule } from './vender-routing.module';
 import { VenderPostsPageComponent } from './vender-posts-page/vender-posts-page.component';
 import { VenderCalenderComponent } from './vender-calender/vender-calender.component';
 import { VenderMeetingRequstsComponent } from './vender-meeting-requsts/vender-meeting-requsts.component';
+import { VenderBookingRequestsComponent } from './vender-booking-requests/vender-booking-requests.component';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { VenderServiceFormComponent } from './vender-service-form/vender-service-form.component';
@@ -18,6 +19,7 @@ declarations: [
     VenderPostsPageComponent,
     VenderCalenderComponent,
     VenderMeetingRequstsComponent,
+    VenderBookingRequestsComponent,
     VenderServiceFormComponent,
   VenderServiceTableComponent,
   VenderChatComponent
