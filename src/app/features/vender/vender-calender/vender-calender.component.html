@@ -1,7 +1,29 @@
 <app-vender-header pageTitle="Calendar" subtitle="Manage your schedule and events"></app-vender-header>
 
-<div class="mx-auto bg-white shadow-lg rounded-lg p-2 sm:p-3 md:p-4"><!-- Calendar Controls & Stats -->
-  <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+<div class="mx-auto bg-white shadow-lg rounded-lg p-2 sm:p-3 md:p-4">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex justify-center items-center py-8">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+    <span class="ml-3 text-purple-600">Loading meetings...</span>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+      </div>
+      <div class="ml-3">
+        <h3 class="text-sm font-medium text-red-800">Error</h3>
+        <div class="mt-2 text-sm text-red-700">{{ error }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendar Controls & Stats -->
+  <div class="flex flex-col md:flex-row justify-between items-center mb-6" *ngIf="!isLoading">
     <div class="w-full md:w-1/3 mb-4 md:mb-0">
       <h2 class="text-xl font-semibold text-purple-700">
         {{ currentMonth | date: 'MMMM yyyy' }}
@@ -24,10 +46,18 @@
           <path fill-rule="evenodd" d="M4.5 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5z"/>
         </svg>
       </button>
-    </div>  </div>
+      <button class="flex items-center px-3 py-2 sm:px-4 rounded-lg border border-gray-300 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-300" (click)="refreshCalendar()" [disabled]="isLoading">
+        <svg width="1.2em" fill="currentColor" height="1.2em" viewBox="0 0 16 16" class="text-green-600 mr-1" [class.animate-spin]="isLoading" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+          <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+        </svg>
+        <span class="hidden sm:inline">{{ isLoading ? 'Loading...' : 'Refresh' }}</span>
+      </button>
+    </div>  
+  </div>
   
   <!-- Calendar Wrapper -->
-  <div class="wrapper bg-white rounded-lg border border-purple-100 shadow-md overflow-hidden w-full">
+  <div class="wrapper bg-white rounded-lg border border-purple-100 shadow-md overflow-hidden w-full" *ngIf="!isLoading">
     <div class="overflow-x-auto">
       <table class="w-full min-w-full">
         <thead>
@@ -39,27 +69,29 @@
             <th class="p-2 sm:p-3 border-r h-10 w-9 sm:w-16 md:w-24 lg:w-32 xl:w-40 text-xs text-purple-800 font-semibold">
               <span class="md:block hidden">Monday</span>
               <span class="md:hidden block">Mon</span>
-            </th>          <th class="p-2 sm:p-3 border-r h-10 w-9 sm:w-16 md:w-24 lg:w-32 xl:w-40 text-xs text-purple-800 font-semibold">
-            <span class="md:block hidden">Tuesday</span>
-            <span class="md:hidden block">Tue</span>
-          </th>
-          <th class="p-2 sm:p-3 border-r h-10 w-9 sm:w-16 md:w-24 lg:w-32 xl:w-40 text-xs text-purple-800 font-semibold">
-            <span class="md:block hidden">Wednesday</span>
-            <span class="md:hidden block">Wed</span>
-          </th>
-          <th class="p-2 sm:p-3 border-r h-10 w-9 sm:w-16 md:w-24 lg:w-32 xl:w-40 text-xs text-purple-800 font-semibold">
-            <span class="md:block hidden">Thursday</span>
-            <span class="md:hidden block">Thu</span>
-          </th>
-          <th class="p-2 sm:p-3 border-r h-10 w-9 sm:w-16 md:w-24 lg:w-32 xl:w-40 text-xs text-purple-800 font-semibold">
-            <span class="md:block hidden">Friday</span>
-            <span class="md:hidden block">Fri</span>
-          </th>
-          <th class="p-2 sm:p-3 border-r h-10 w-9 sm:w-16 md:w-24 lg:w-32 xl:w-40 text-xs text-purple-800 font-semibold">
-            <span class="md:block hidden">Saturday</span>
-            <span class="md:hidden block">Sat</span>
-          </th>
-        </tr>      </thead>
+            </th>          
+            <th class="p-2 sm:p-3 border-r h-10 w-9 sm:w-16 md:w-24 lg:w-32 xl:w-40 text-xs text-purple-800 font-semibold">
+              <span class="md:block hidden">Tuesday</span>
+              <span class="md:hidden block">Tue</span>
+            </th>
+            <th class="p-2 sm:p-3 border-r h-10 w-9 sm:w-16 md:w-24 lg:w-32 xl:w-40 text-xs text-purple-800 font-semibold">
+              <span class="md:block hidden">Wednesday</span>
+              <span class="md:hidden block">Wed</span>
+            </th>
+            <th class="p-2 sm:p-3 border-r h-10 w-9 sm:w-16 md:w-24 lg:w-32 xl:w-40 text-xs text-purple-800 font-semibold">
+              <span class="md:block hidden">Thursday</span>
+              <span class="md:hidden block">Thu</span>
+            </th>
+            <th class="p-2 sm:p-3 border-r h-10 w-9 sm:w-16 md:w-24 lg:w-32 xl:w-40 text-xs text-purple-800 font-semibold">
+              <span class="md:block hidden">Friday</span>
+              <span class="md:hidden block">Fri</span>
+            </th>
+            <th class="p-2 sm:p-3 border-r h-10 w-9 sm:w-16 md:w-24 lg:w-32 xl:w-40 text-xs text-purple-800 font-semibold">
+              <span class="md:block hidden">Saturday</span>
+              <span class="md:hidden block">Sat</span>
+            </th>
+          </tr>      
+        </thead>
         <tbody>
           <tr *ngFor="let week of weeks" class="text-center">
             <td *ngFor="let day of week" class="border border-purple-100 p-1 sm:p-2 h-20 sm:h-28 md:h-32 lg:h-36 xl:h-40 w-9 sm:w-16 md:w-24 lg:w-32 xl:w-40 overflow-auto transition cursor-pointer duration-500 ease hover:bg-purple-50 relative">
@@ -73,28 +105,125 @@
                 </div>
                 <div class="bottom flex-grow py-0.5 sm:py-1 w-full cursor-pointer overflow-y-auto">
                   <div *ngIf="events[day.toISOString().split('T')[0]]" class="flex flex-col gap-0.5 sm:gap-1">
-                    <span *ngFor="let event of events[day.toISOString().split('T')[0]]" class="text-[10px] sm:text-xs bg-purple-100 text-purple-800 rounded-md px-1 sm:px-2 py-0.5 border border-purple-200 shadow-sm truncate hover:bg-purple-200 transition-all duration-200">{{ event }}</span>
+                    <div *ngFor="let event of events[day.toISOString().split('T')[0]]" 
+                         class="calendar-event text-[10px] sm:text-xs rounded-md px-1 sm:px-2 py-0.5 border shadow-sm truncate cursor-pointer"
+                         [ngClass]="{
+                           'bg-green-100 text-green-800 border-green-200': event.status === 'CONFIRMED',
+                           'bg-yellow-100 text-yellow-800 border-yellow-200': event.status === 'PENDING',
+                           'bg-blue-100 text-blue-800 border-blue-200': event.status === 'COMPLETED',
+                           'bg-gray-100 text-gray-800 border-gray-200': event.status === 'CANCELLED'
+                         }"
+                         (mouseenter)="showEventPopup(event, $event)"
+                         (mouseleave)="hideEventPopup()">
+                      <div class="font-medium">{{ event.customerName }}</div>
+                      <div class="text-[8px] sm:text-[10px] opacity-75">{{ event.time }}</div>
+                    </div>
                   </div>
                 </div>
               </div>
             </td>
-          </tr>      </tbody>
+          </tr>      
+        </tbody>
       </table>
     </div>
   </div>
 
   <!-- Calendar Legend -->
-  <div class="mt-4 sm:mt-6 border-t border-purple-100 pt-3 sm:pt-4">
-    <h3 class="text-base sm:text-lg font-medium text-purple-700 mb-2 sm:mb-3">Event Legend</h3>
+  <div class="mt-4 sm:mt-6 border-t border-purple-100 pt-3 sm:pt-4" *ngIf="!isLoading">
+    <h3 class="text-base sm:text-lg font-medium text-purple-700 mb-2 sm:mb-3">Meeting Status Legend</h3>
     <div class="flex flex-wrap gap-2 sm:gap-3">
       <div class="flex items-center">
-        <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1.5 sm:mr-2 bg-purple-100 border border-purple-200 rounded-full"></div>
-        <span class="text-xs sm:text-sm text-gray-600">Regular Event</span>
+        <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1.5 sm:mr-2 bg-green-100 border border-green-200 rounded-full"></div>
+        <span class="text-xs sm:text-sm text-gray-600">Confirmed</span>
+      </div>
+      <div class="flex items-center">
+        <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1.5 sm:mr-2 bg-yellow-100 border border-yellow-200 rounded-full"></div>
+        <span class="text-xs sm:text-sm text-gray-600">Pending</span>
+      </div>
+      <div class="flex items-center">
+        <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1.5 sm:mr-2 bg-blue-100 border border-blue-200 rounded-full"></div>
+        <span class="text-xs sm:text-sm text-gray-600">Completed</span>
+      </div>
+      <div class="flex items-center">
+        <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1.5 sm:mr-2 bg-gray-100 border border-gray-200 rounded-full"></div>
+        <span class="text-xs sm:text-sm text-gray-600">Cancelled</span>
       </div>
       <div class="flex items-center">
         <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1.5 sm:mr-2 bg-purple-500 border border-purple-400 rounded-full"></div>
         <span class="text-xs sm:text-sm text-gray-600">Today</span>
       </div>
     </div>
+  </div>
+
+  <!-- Meeting Details Popup -->
+  <div *ngIf="hoveredEvent" 
+       class="meeting-popup fixed z-50 bg-white border border-gray-300 rounded-lg shadow-xl p-4 max-w-sm pointer-events-none"
+       [style.left.px]="popupPosition.x"
+       [style.top.px]="popupPosition.y">
+    
+    <!-- Popup Header -->
+    <div class="flex items-center justify-between mb-3">
+      <h4 class="text-sm font-semibold text-gray-800">Meeting Details</h4>
+      <span class="text-xs px-2 py-1 rounded-full border font-medium"
+            [ngClass]="getStatusBadgeClass(hoveredEvent.status)">
+        {{ getStatusDisplayText(hoveredEvent.status) }}
+      </span>
+    </div>
+
+    <!-- Meeting Information -->
+    <div class="space-y-2 text-xs">
+      <!-- Customer Info -->
+      <div class="flex items-start">
+        <svg class="w-3 h-3 mt-0.5 mr-2 text-gray-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+        </svg>
+        <div>
+          <span class="font-medium text-gray-700">Customer:</span>
+          <br>
+          <span class="text-gray-600">{{ hoveredEvent.customerName }}</span>
+        </div>
+      </div>
+
+      <!-- Date & Time -->
+      <div class="flex items-start">
+        <svg class="w-3 h-3 mt-0.5 mr-2 text-gray-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+        </svg>
+        <div>
+          <span class="font-medium text-gray-700">Date & Time:</span>
+          <br>
+          <span class="text-gray-600">{{ hoveredEvent.meetingDateTime | date:'MMM dd, yyyy' }}</span>
+          <br>
+          <span class="text-gray-600">{{ hoveredEvent.time }}</span>
+        </div>
+      </div>
+
+      <!-- Location -->
+      <div class="flex items-start">
+        <svg class="w-3 h-3 mt-0.5 mr-2 text-gray-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+        </svg>
+        <div>
+          <span class="font-medium text-gray-700">Location:</span>
+          <br>
+          <span class="text-gray-600">{{ hoveredEvent.location }}</span>
+        </div>
+      </div>
+
+      <!-- Meeting Type -->
+      <div class="flex items-start">
+        <svg class="w-3 h-3 mt-0.5 mr-2 text-gray-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" clip-rule="evenodd"/>
+        </svg>
+        <div>
+          <span class="font-medium text-gray-700">Meeting Type:</span>
+          <br>
+          <span class="text-gray-600">{{ getMoodDisplayText(hoveredEvent.mood) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Popup Arrow -->
+    <div class="absolute -left-1 top-4 w-2 h-2 bg-white border-l border-b border-gray-300 transform rotate-45"></div>
   </div>
 </div>

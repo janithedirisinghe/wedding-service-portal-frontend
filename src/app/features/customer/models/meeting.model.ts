@@ -28,6 +28,7 @@ export enum MeetingMood {
 export enum MeetingStatus {
   PENDING = 'PENDING',
   CONFIRMED = 'CONFIRMED',
+  REJECTED = 'REJECTED',
   CANCELLED = 'CANCELLED',
   COMPLETED = 'COMPLETED'
 }
@@ -38,4 +39,32 @@ export interface CreateMeetingRequest {
   location: string;
   vendorId: number;
   notes?: string;
+}
+
+// Customer Meeting DTOs for the customer meeting requests section
+export interface CustomerMeetingDTO {
+  meetingId: number;
+  meetingDateTime: string;
+  meetingMood: MeetingMood;
+  location: string;
+  status: MeetingStatus;
+  notes?: string;
+  rejectionReason?: string;
+  requestedAt: string;
+  confirmedAt?: string;
+  
+  // Customer and Vendor information
+  customerId: number;
+  customerName: string;
+  customerEmail: string;
+  
+  vendorId: number;
+  vendorBusinessName: string;
+  vendorEmail: string;
+}
+
+export interface CustomerMeetingResponse {
+  success: boolean;
+  message?: string;
+  meetings: CustomerMeetingDTO[];
 }
