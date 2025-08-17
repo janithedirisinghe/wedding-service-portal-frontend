@@ -5,3 +5,4 @@ export * from './chat-room.model';
 export * from './meeting.model';
 export * from './review.model';
 export * from './vendor.model';
+export * from './booking.model';

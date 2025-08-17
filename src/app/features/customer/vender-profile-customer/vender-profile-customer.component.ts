@@ -7,6 +7,8 @@ import { ReviewService } from '../services/review.service';
 import { ReviewModel, CreateReviewRequest } from '../models/review.model';
 import { MeetingService } from '../services/meeting.service';
 import { CreateMeetingRequest, MeetingMood } from '../models/meeting.model';
+import { BookingService } from '../services/booking.service';
+import { BookingRequest } from '../models/booking.model';
 import { AuthService } from '../../../shared/services/auth.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -39,8 +41,20 @@ export class VenderProfileCustomerComponent implements OnInit {
   reviewsLoading: boolean = false;
   reviewsError: string | null = null;
 
+  // Services loading
+  servicesLoading: boolean = false;
+  servicesError: string | null = null;
+
+  // Service booking modal
+  showServiceBookingModal: boolean = false;
+  selectedService: any = null;
+  serviceBookingForm: FormGroup;
+  isSubmittingServiceBooking: boolean = false;
+  serviceBookingError: string | null = null;
+  serviceBookingSuccess: string | null = null;
+
   // Appointment form
-  appointmentForm: FormGroup;
+  appointmentForm: FormGroup; 
   isSubmittingAppointment: boolean = false;
   appointmentError: string | null = null;
   appointmentSuccess: string | null = null;
@@ -56,6 +70,7 @@ export class VenderProfileCustomerComponent implements OnInit {
     private postService: PostService,
     private reviewService: ReviewService,
     private meetingService: MeetingService,
+    private bookingService: BookingService,
     private authService: AuthService,
     private fb: FormBuilder
   ) {
@@ -69,6 +84,13 @@ export class VenderProfileCustomerComponent implements OnInit {
       meetingMood: [MeetingMood.VIRTUAL, [Validators.required]],
       location: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
       notes: ['', [Validators.maxLength(500)]]
+    });
+
+    this.serviceBookingForm = this.fb.group({
+      eventDate: ['', [Validators.required, this.futureDateValidator.bind(this)]],
+      eventLocation: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
+      specialRequirements: ['', [Validators.maxLength(1000)]],
+      proposedPrice: ['', [Validators.required, Validators.min(0)]]
     });
   }
 
@@ -448,5 +470,183 @@ export class VenderProfileCustomerComponent implements OnInit {
     const minutes = String(now.getMinutes()).padStart(2, '0');
     
     return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
+  // Services-related methods
+  loadVendorServices(): void {
+    // Services are loaded as part of vendor details, so we can just reset error state
+    this.servicesError = null;
+    this.loadVendorDetails();
+  }
+
+  requestServiceBooking(service: any): void {
+    if (!this.isLoggedIn()) {
+      this.serviceBookingError = 'Please log in to request a booking.';
+      return;
+    }
+    
+    // Set the selected service and show modal
+    this.selectedService = service;
+    this.showServiceBookingModal = true;
+    this.serviceBookingError = null;
+    this.serviceBookingSuccess = null;
+    
+    // Reset the form
+    this.serviceBookingForm.reset();
+    
+    // Scroll to top of modal content and setup scroll listener
+    setTimeout(() => {
+      this.scrollModalToTop();
+      this.setupScrollListener();
+    }, 100);
+  }
+
+  closeServiceBookingModal(): void {
+    this.showServiceBookingModal = false;
+    this.selectedService = null;
+    this.serviceBookingError = null;
+    this.serviceBookingSuccess = null;
+    this.serviceBookingForm.reset();
+  }
+
+  submitServiceBooking(): void {
+    console.log('Submit button clicked');
+    console.log('Form valid:', this.serviceBookingForm.valid);
+    console.log('Form value:', this.serviceBookingForm.value);
+    console.log('Form errors:', this.serviceBookingForm.errors);
+    
+    // Check individual field validations
+    Object.keys(this.serviceBookingForm.controls).forEach(key => {
+      const control = this.serviceBookingForm.get(key);
+      if (control && control.invalid) {
+        console.log(`${key} is invalid:`, control.errors);
+      }
+    });
+
+    if (this.serviceBookingForm.invalid) {
+      this.serviceBookingError = 'Please fill out all required fields correctly.';
+      // Scroll to error message
+      this.scrollToElementInModal('.bg-red-100');
+      return; 
+    } 
+
+    if (!this.selectedService || !this.vendorId) {
+      this.serviceBookingError = 'Service or vendor information not found.';
+      this.scrollToElementInModal('.bg-red-100');
+      return;
+    }
+
+    const customerId = this.authService.getUserId();
+    if (!customerId) {
+      this.serviceBookingError = 'You must be logged in to submit a service booking.';
+      this.scrollToElementInModal('.bg-red-100');
+      return;
+    }
+
+    this.isSubmittingServiceBooking = true;
+    this.serviceBookingError = null;
+    this.serviceBookingSuccess = null;
+
+    const eventDate = new Date(this.serviceBookingForm.value.eventDate);
+    const bookingRequest: BookingRequest = {
+      serviceId: this.selectedService.serviceId,
+      eventDate: eventDate.toISOString(),
+      eventLocation: this.serviceBookingForm.value.eventLocation,
+      specialRequirements: this.serviceBookingForm.value.specialRequirements || undefined,
+      proposedPrice: parseFloat(this.serviceBookingForm.value.proposedPrice)
+    };
+
+    this.bookingService.createBookingRequest(bookingRequest).subscribe({
+      next: (response) => {
+        this.serviceBookingSuccess = 'Service booking request submitted successfully! The vendor will contact you soon.';
+        this.isSubmittingServiceBooking = false;
+        
+        // Scroll to success message
+        this.scrollToElementInModal('.bg-green-100');
+        
+        // Auto-close modal after 3 seconds
+        setTimeout(() => {
+          this.closeServiceBookingModal();
+        }, 3000);
+      },
+      error: (error) => {
+        console.error('Error submitting service booking:', error);
+        this.serviceBookingError = 'Failed to submit service booking. Please try again.';
+        this.isSubmittingServiceBooking = false;
+        // Scroll to error message
+        this.scrollToElementInModal('.bg-red-100');
+      }
+    });
+  }
+
+  getMinDate(): string {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  // Helper method to scroll modal content to top
+  private scrollModalToTop(): void {
+    setTimeout(() => {
+      const modalContent = document.querySelector('.service-booking-modal .flex-1.overflow-y-auto');
+      if (modalContent) {
+        modalContent.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      }
+    }, 100);
+  }
+
+  // Helper method to scroll to element within modal
+  private scrollToElementInModal(selector: string): void {
+    setTimeout(() => {
+      const modalContent = document.querySelector('.service-booking-modal .flex-1.overflow-y-auto');
+      const element = document.querySelector(selector);
+      if (modalContent && element) {
+        const elementRect = element.getBoundingClientRect();
+        const modalRect = modalContent.getBoundingClientRect();
+        const scrollTop = elementRect.top - modalRect.top + modalContent.scrollTop - 20;
+        
+        modalContent.scrollTo({
+          top: scrollTop,
+          behavior: 'smooth'
+        });
+      }
+    }, 100);
+  }
+
+  // Setup scroll listener for visual indicators
+  private setupScrollListener(): void {
+    const modalContent = document.querySelector('.service-booking-modal .flex-1.overflow-y-auto');
+    if (modalContent) {
+      modalContent.addEventListener('scroll', () => {
+        const scrollTop = modalContent.scrollTop;
+        const scrollShadow = document.querySelector('.scroll-shadow-top');
+        
+        if (scrollShadow) {
+          if (scrollTop > 10) {
+            modalContent.classList.add('scrolled');
+          } else {
+            modalContent.classList.remove('scrolled');
+          }
+        }
+      });
+    }
+  }
+
+  toggleServiceFavorite(service: any): void {
+    if (!this.isLoggedIn()) {
+      return;
+    }
+    
+    // Here you would implement the favorite functionality
+    // For now, just show a message
+    console.log('Toggling favorite for service:', service.name);
+    
+    // You could add a toast notification here
+    // this.toastr.success('Service added to favorites!');
   }
 }
