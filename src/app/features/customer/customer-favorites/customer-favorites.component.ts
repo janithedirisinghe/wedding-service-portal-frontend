@@ -5,6 +5,7 @@ import { FollowService } from '../services/follow.service';
 import { AuthService } from '../../../shared/services/auth.service';
 import { CustomerMeetingService } from '../services/customer-meeting.service';
 import { CustomerBookingService, BookingResponseDto, BookingStatus } from '../services/customer-booking.service';
+import { PaymentService } from '../services/payment.service';
 import { convertToFrontendVendor } from '../models/vendor.model';
 import { CustomerMeetingDTO, MeetingMood, MeetingStatus } from '../models/meeting.model';
 
@@ -39,6 +40,8 @@ export class CustomerFavoritesComponent implements OnInit {
   bookingSearchTerm: string = '';
   selectedBooking: BookingResponseDto | null = null;
   showBookingModal: boolean = false;
+  showPaymentModal: boolean = false;
+  bookingForPayment: BookingResponseDto | null = null;
   
   // Pagination properties for bookings
   currentPage: number = 1;
@@ -60,7 +63,8 @@ export class CustomerFavoritesComponent implements OnInit {
     private followService: FollowService,
     private authService: AuthService,
     private customerMeetingService: CustomerMeetingService,
-    private customerBookingService: CustomerBookingService
+    private customerBookingService: CustomerBookingService,
+    private paymentService: PaymentService
   ) {}
 
   ngOnInit(): void {
@@ -441,6 +445,30 @@ export class CustomerFavoritesComponent implements OnInit {
   contactVendorFromBooking(vendorId: number): void {
     this.router.navigate(['/customer/chat'], { queryParams: { vendorId: vendorId } });
     this.closeBookingModal();
+  }
+
+  // Payment functionality
+  openPaymentModal(booking: BookingResponseDto): void {
+    this.bookingForPayment = booking;
+    this.showPaymentModal = true;
+  }
+
+  closePaymentModal(): void {
+    this.showPaymentModal = false;
+    this.bookingForPayment = null;
+  }
+
+  onPaymentSuccess(paymentResponse: any): void {
+    console.log('Payment successful:', paymentResponse);
+    // Refresh bookings to show updated status
+    this.loadBookings();
+    this.closePaymentModal();
+    // You can add a success message here
+  }
+
+  onPaymentError(error: string): void {
+    console.error('Payment error:', error);
+    // Handle payment error (show toast, etc.)
   }
 
   refreshBookings(): void {

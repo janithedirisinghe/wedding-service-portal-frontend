@@ -1,0 +1,78 @@
+/* Payment Modal Styles */
+// Customer Favorites Component Styles
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Card element styling */
+#card-element { 
+  padding: 12px;
+  border: none;
+  outline: none;
+}
+  
+#card-element.StripeElement {
+  border: none !important;
+  background: transparent !important;
+}
+
+#card-element.StripeElement--focus {
+  box-shadow: none !important;
+}
+
+#card-element.StripeElement--invalid {
+  border-color: #e53e3e !important;
+}
+
+/* Modal animations */
+.payment-modal-enter {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.payment-modal-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.payment-modal-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.payment-modal-exit-active {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+/* Custom card styling */
+.StripeElement {
+  background-color: white;
+  height: 40px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  box-shadow: 0 1px 3px 0 #e6ebf1;
+  -webkit-transition: box-shadow 150ms ease;
+  transition: box-shadow 150ms ease;
+}
+
+.StripeElement--focus {
+  box-shadow: 0 1px 3px 0 #cfd7df;
+}
+
+.StripeElement--invalid {
+  border-color: #fa755a;
+}
+
+.StripeElement--webkit-autofill {
+  background-color: #fefde5 !important;
+}
+
+/* Loading spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

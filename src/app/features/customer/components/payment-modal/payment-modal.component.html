@@ -1,0 +1,121 @@
+<!-- Payment Modal -->
+<div *ngIf="isVisible && booking" 
+     class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" 
+     (click)="close()">
+  <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 max-w-lg shadow-lg rounded-md bg-white" 
+       (click)="$event.stopPropagation()">
+    <div class="mt-3">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-semibold text-gray-900">Complete Payment</h3>
+        <button (click)="close()" 
+                class="text-gray-400 hover:text-gray-600 transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Booking Summary -->
+      <div class="bg-gray-50 rounded-lg p-4 mb-6">
+        <h4 class="font-medium text-gray-900 mb-2">Payment Summary</h4>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-600">Booking ID:</span>
+            <span class="font-medium">BK-{{ booking.bookingId }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Vendor:</span>
+            <span class="font-medium">{{ booking.vendorBusinessName }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Service:</span>
+            <span class="font-medium">{{ booking.serviceName }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Event Date:</span>
+            <span class="font-medium">{{ formatDate(booking.eventDate) }}</span>
+          </div>
+          <hr class="my-2">
+          <div class="flex justify-between text-lg font-semibold">
+            <span>Total Amount:</span>
+            <span class="text-purple-600">{{ formatAmount(booking.proposedPrice) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="text-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+        <p class="mt-2 text-gray-600">Initializing payment...</p>
+      </div>
+
+      <!-- Payment Form -->
+      <div *ngIf="!isLoading" class="space-y-6">
+        <!-- Card Element Container -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Card Information
+          </label>
+          <div class="border border-gray-300 rounded-lg p-3">
+            <div id="card-element">
+              <!-- Stripe Elements will create form elements here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Error Display -->
+        <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-3">
+          <div class="flex">
+            <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+            </svg>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">Payment Error</h3>
+              <p class="text-sm text-red-700 mt-1">{{ error }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Security Notice -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+          <div class="flex">
+            <svg class="h-5 w-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+            <div class="ml-3">
+              <p class="text-sm text-blue-700">
+                Your payment is secured by Stripe. We don't store your card information.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Debug Info (remove in production) -->
+        <div *ngIf="!isLoading" class="bg-gray-100 p-2 rounded text-xs text-gray-600 mb-4">
+          <div>Debug Info:</div>
+          <div>Client Secret: {{ clientSecret ? 'Available' : 'Not Available' }}</div>
+          <div>Card Valid: {{ isCardValid ? 'Valid' : 'Invalid' }}</div>
+          <div>Processing: {{ isProcessing ? 'Yes' : 'No' }}</div>
+          <div>Button Disabled: {{ isProcessing || !clientSecret || !isCardValid ? 'Yes' : 'No' }}</div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+          <button (click)="close()"
+                  [disabled]="isProcessing"
+                  class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-lg transition-colors disabled:opacity-50">
+            Cancel
+          </button>
+          
+          <button (click)="processPayment()"
+                  [disabled]="isProcessing || !clientSecret || !isCardValid"
+                  class="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center">
+            <div *ngIf="isProcessing" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+            <span>{{ isProcessing ? 'Processing...' : 'Pay ' + formatAmount(booking.proposedPrice) }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
