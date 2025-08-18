@@ -1,5 +1,5 @@
 <!-- Customer Favorites Component -->
-<app-customer-header pageTitle="My Favorites & Meetings" subtitle="Your saved wedding service providers and meeting requests"></app-customer-header>
+<app-customer-header pageTitle="My Favorites, Meetings & Bookings" subtitle="Your saved wedding service providers, meeting requests, and bookings"></app-customer-header>
 
 <div class="mx-auto bg-gray-50 min-h-screen">
   <!-- Content Section -->
@@ -22,6 +22,14 @@
         [class.text-gray-600]="activeTab !== 'meetings'"
         class="flex-1 py-3 px-4 rounded-md font-medium transition-colors">
         Meeting Requests
+      </button>
+      <button 
+        (click)="activeTab = 'bookings'; loadBookings()"
+        [class.bg-purple-600]="activeTab === 'bookings'"
+        [class.text-white]="activeTab === 'bookings'"
+        [class.text-gray-600]="activeTab !== 'bookings'"
+        class="flex-1 py-3 px-4 rounded-md font-medium transition-colors">
+        My Bookings
       </button>
     </div>
     
@@ -357,5 +365,232 @@
       </div>
     </div>
 
+    <!-- Bookings Tab Content -->
+    <div *ngIf="activeTab === 'bookings'">
+      <!-- Loading State -->
+      <div *ngIf="isBookingsLoading" class="flex justify-center items-center py-16">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <span class="ml-3 text-gray-600">Loading bookings...</span>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="bookingsError && !isBookingsLoading" class="text-center py-16">
+        <svg class="mx-auto h-16 w-16 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+        </svg>
+        <h3 class="mt-4 text-lg font-medium text-gray-900">Error Loading Bookings</h3>
+        <p class="mt-2 text-sm text-gray-500">{{bookingsError}}</p>
+        <button (click)="loadBookings()" 
+                class="mt-4 px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+          Try Again
+        </button>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!isBookingsLoading && !bookingsError && customerBookings.length === 0" class="text-center py-16">
+        <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 9l6-6m0 0l6 6m-6-6v9"/>
+        </svg>
+        <h3 class="mt-4 text-lg font-medium text-gray-900">No bookings yet</h3>
+        <p class="mt-2 text-sm text-gray-500">You haven't made any bookings yet.</p>
+        <button (click)="router.navigate(['/customer/search'])" 
+                class="mt-4 px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+          Find Vendors
+        </button>
+      </div>
+
+      <!-- Bookings Header -->
+      <div *ngIf="!isBookingsLoading && !bookingsError && customerBookings.length > 0" class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">My Bookings</h2>
+        <p class="text-gray-600">{{customerBookings.length}} booking{{customerBookings.length !== 1 ? 's' : ''}} total</p>
+      </div>
+
+      <!-- Search and Filter Controls -->
+      <div *ngIf="!isBookingsLoading && !bookingsError && customerBookings.length > 0" class="bg-white rounded-lg p-4 shadow-sm mb-6">
+        <div class="flex flex-col md:flex-row gap-4">
+          <div class="flex-1">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Search Bookings</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+              </div>
+              <input type="text" 
+                     placeholder="Search by vendor, service, or booking ID..." 
+                     [(ngModel)]="bookingSearchTerm"
+                     (input)="onBookingSearchChange()"
+                     class="pl-10 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+            </div>
+          </div>
+          <div class="flex-1">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Filter by Status</label>
+            <select [(ngModel)]="bookingStatusFilter" (ngModelChange)="onBookingFilterChange()" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+              <option value="">All Statuses</option>
+              <option value="PENDING">Pending</option>
+              <option value="ACCEPTED">Accepted</option>
+              <option value="REJECTED">Rejected</option>
+              <option value="CANCELLED">Cancelled</option>
+              <option value="COMPLETED">Completed</option>
+            </select>
+          </div>
+          <div class="flex items-end">
+            <button (click)="refreshBookings()" 
+                    class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+              <svg class="h-4 w-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+              Refresh
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bookings Table -->
+      <div *ngIf="!isBookingsLoading && !bookingsError && filteredBookings.length > 0" class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full border-collapse">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-200 text-left">
+                <th class="py-3 px-4 text-sm font-medium text-gray-700">Booking ID</th>
+                <th class="py-3 px-4 text-sm font-medium text-gray-700">Vendor</th>
+                <th class="py-3 px-4 text-sm font-medium text-gray-700">Service Details</th>
+                <th class="py-3 px-4 text-sm font-medium text-gray-700">Event Date</th>
+                <th class="py-3 px-4 text-sm font-medium text-gray-700">Amount</th>
+                <th class="py-3 px-4 text-sm font-medium text-gray-700 text-center">Status</th>
+                <th class="py-3 px-4 text-sm font-medium text-gray-700 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let booking of paginatedBookings" class="border-b hover:bg-gray-50 transition-colors">
+                <td class="py-3 px-4 text-sm text-gray-600">BK-{{ booking.bookingId }}</td>
+                <td class="py-3 px-4">
+                  <div class="flex items-center">
+                    <div class="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-500 mr-3">
+                      {{ booking.vendorBusinessName.charAt(0).toUpperCase() }}
+                    </div>
+                    <div>
+                      <span class="text-sm text-gray-700 font-medium">{{ booking.vendorBusinessName }}</span>
+                      <p class="text-xs text-gray-500">{{ booking.vendorType }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3 px-4">
+                  <div class="text-sm">
+                    <p class="font-medium text-gray-700">{{ booking.serviceName }}</p>
+                    <p class="text-gray-500 text-xs">{{ booking.vendorType }}</p>
+                    <p class="text-gray-500 text-xs">{{ booking.eventLocation }}</p>
+                    <p *ngIf="booking.specialRequirements" class="text-gray-500 text-xs mt-1 italic">"{{ booking.specialRequirements }}"</p>
+                  </div>
+                </td>
+                <td class="py-3 px-4">
+                  <div class="text-sm">
+                    <p class="text-gray-700">{{ formatDate(booking.eventDate) }}</p>
+                    <p class="text-xs text-gray-500">Booked: {{ formatDateTime(booking.requestDate) }}</p>
+                  </div>
+                </td>
+                <td class="py-3 px-4">
+                  <div class="text-sm">
+                    <p class="text-gray-700 font-medium">${{ booking.proposedPrice }}</p>
+                    <p class="text-xs text-gray-500">Service: ${{ booking.servicePricing }}</p>
+                  </div>
+                </td>
+                <td class="py-3 px-4 text-center">
+                  <span class="px-2 py-1 text-xs rounded-full" [ngClass]="getBookingStatusClass(booking.status)">
+                    {{ booking.status }}
+                  </span>
+                </td>
+                <td class="py-3 px-4 text-center">
+                  <div class="flex justify-center gap-2">
+                    <button (click)="viewBookingDetails(booking)" 
+                            class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded transition-colors" 
+                            title="View Details">
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                      </svg>
+                    </button>
+                    <button (click)="router.navigate(['/customer/chat'], { queryParams: { vendorId: booking.vendorId } })" 
+                            class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition-colors" 
+                            title="Contact Vendor">
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div *ngIf="filteredBookings.length > itemsPerPage" class="flex flex-col md:flex-row justify-between items-center p-4 bg-gray-50 border-t border-gray-200">
+          <p class="text-sm text-gray-700 mb-2 md:mb-0">
+            Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ Math.min(currentPage * itemsPerPage, totalItems) }} of {{ totalItems }} entries
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <button (click)="changePage(1)" 
+                    class="px-3 py-1 rounded" 
+                    [ngClass]="{'bg-gray-200 text-gray-600': currentPage === 1, 'bg-white hover:bg-gray-100 text-gray-700 border border-gray-300': currentPage !== 1}" 
+                    [disabled]="currentPage === 1">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+              </svg>
+            </button>
+            <button (click)="changePage(currentPage - 1)" 
+                    class="px-3 py-1 rounded" 
+                    [ngClass]="{'bg-gray-200 text-gray-600': currentPage === 1, 'bg-white hover:bg-gray-100 text-gray-700 border border-gray-300': currentPage !== 1}" 
+                    [disabled]="currentPage === 1">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+            </button>
+            <button *ngFor="let page of getPageNumbers(); let i = index" 
+                    (click)="changePage(page)" 
+                    class="px-3 py-1 rounded" 
+                    [ngClass]="{'bg-purple-600 text-white': currentPage === page, 'bg-white hover:bg-gray-100 text-gray-700 border border-gray-300': currentPage !== page}">
+              {{ page }}
+            </button>
+            <button (click)="changePage(currentPage + 1)" 
+                    class="px-3 py-1 rounded" 
+                    [ngClass]="{'bg-gray-200 text-gray-600': currentPage === totalPages, 'bg-white hover:bg-gray-100 text-gray-700 border border-gray-300': currentPage !== totalPages}" 
+                    [disabled]="currentPage === totalPages">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
+            <button (click)="changePage(totalPages)" 
+                    class="px-3 py-1 rounded" 
+                    [ngClass]="{'bg-gray-200 text-gray-600': currentPage === totalPages, 'bg-white hover:bg-gray-100 text-gray-700 border border-gray-300': currentPage !== totalPages}" 
+                    [disabled]="currentPage === totalPages">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Filtered Results -->
+      <div *ngIf="!isBookingsLoading && !bookingsError && customerBookings.length > 0 && filteredBookings.length === 0" class="text-center py-16">
+        <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <h3 class="mt-4 text-lg font-medium text-gray-900">No bookings match your search</h3>
+        <p class="mt-2 text-sm text-gray-500">Try changing your search terms or filter criteria.</p>
+      </div>
+    </div>
+
   </div>
 </div>
+
+<!-- Booking Details Modal -->
+<app-booking-details-modal 
+  [booking]="selectedBooking"
+  [isVisible]="showBookingModal"
+  (closeModal)="closeBookingModal()"
+  (cancelBooking)="cancelBooking($event)"
+  (contactVendor)="contactVendorFromBooking($event)">
+</app-booking-details-modal>

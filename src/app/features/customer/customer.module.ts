@@ -14,6 +14,7 @@ import { EditProfileModalComponent } from './customer-profile/edit-profile-modal
 import { VendorFollowButtonComponent } from './components/vendor-follow-button/vendor-follow-button.component';
 import { VendorSearchComponent } from './vendor-search/vendor-search.component';
 import { CustomerFavoritesComponent } from './customer-favorites/customer-favorites.component';
+import { BookingDetailsModalComponent } from './components/booking-details-modal/booking-details-modal.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { CustomerFavoritesComponent } from './customer-favorites/customer-favori
     EditProfileModalComponent,
     VendorFollowButtonComponent,
     VendorSearchComponent,
-    CustomerFavoritesComponent
+    CustomerFavoritesComponent,
+    BookingDetailsModalComponent
   ],
   imports: [
     CommonModule,
