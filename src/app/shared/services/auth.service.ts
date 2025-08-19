@@ -117,8 +117,8 @@ export class AuthService {
         this.router.navigate(['/vender']);
         break;
       case 'CUSTOMER':
-        this.router.navigate(['/customer']);
-        break;
+        this.router.navigate(['/customer/timeline']);
+        break; 
       default:
         this.router.navigate(['/auth/customer-login']);
         break;
