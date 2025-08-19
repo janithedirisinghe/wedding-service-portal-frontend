@@ -18,16 +18,16 @@ export class VendorMeetingService {
   /**
    * Get all meeting requests for a vendor
    */
-  getVendorMeetings(vendorId: number): Observable<VendorMeetingDTO[]> {
+  getVendorMeetings(userId: number): Observable<VendorMeetingDTO[]> {
     const headers = this.getHeaders();
-    const url = `${this.apiUrl}/vendor/${vendorId}`;
+    const url = `${this.apiUrl}/vendor_meetings/${userId}`;
     console.log('Making API request to:', url); // Log the URL
     console.log('Request headers:', headers); // Log headers
     
     return this.http.get<VendorMeetingDTO[]>(url, { headers, withCredentials: true })
       .pipe(
         catchError(this.handleError)
-      );
+      ); 
   }
 
   /**

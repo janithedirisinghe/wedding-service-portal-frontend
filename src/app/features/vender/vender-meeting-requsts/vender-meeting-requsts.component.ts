@@ -43,16 +43,55 @@ export class VenderMeetingRequstsComponent implements OnInit {
 
     console.log('Fetching meetings for vendor ID:', vendorId); // Debug log
     this.vendorMeetingService.getVendorMeetings(vendorId).subscribe({
-      next: (meetings) => {
+      next: (meetings: VendorMeetingDTO[]) => {
         console.log('Raw meetings response from API:', meetings); // Log the response
         console.log('Number of meetings received:', meetings.length);
-        this.meetingRequests = meetings.sort((a, b) => {
-          // Sort by requestedAt date (newest first)
-          const dateA = new Date(a.requestedAt);
-          const dateB = new Date(b.requestedAt);
-          return dateB.getTime() - dateA.getTime();
-        });
-        console.log('Sorted meetings:', this.meetingRequests); // Log after sorting
+        
+        // Debug: Log the structure of the first meeting to understand the API response
+        if (meetings.length > 0) {
+          console.log('First meeting object keys:', Object.keys(meetings[0]));
+          console.log('First meeting object:', meetings[0]);
+          console.log('First meeting ID check:', meetings[0].meetingId);
+          console.log('Customer info:', {
+            customerId: meetings[0].customerId,
+            customerName: meetings[0].customerName,
+            customerEmail: meetings[0].customerEmail
+          });
+        }
+        
+        // Process meetings ensuring all VendorMeetingDTO fields are properly handled
+        this.meetingRequests = meetings
+          .filter((meeting: VendorMeetingDTO) => {
+            // Basic validation to ensure we have essential data
+            return meeting && 
+                   meeting.meetingDateTime && 
+                   meeting.requestedAt;
+          })
+          .map((meeting: VendorMeetingDTO) => {
+            // Ensure all required fields are present with fallbacks
+            return {
+              ...meeting,
+              meetingId: meeting.meetingId || 0,
+              customerName: meeting.customerName || 'Unknown Customer',
+              customerEmail: meeting.customerEmail || 'No email provided',
+              location: meeting.location || 'No location specified',
+              status: meeting.status || MeetingStatus.PENDING,
+              meetingMood: meeting.meetingMood || MeetingMood.VIRTUAL,
+              customerId: meeting.customerId || 0,
+              vendorId: meeting.vendorId || vendorId,
+              vendorBusinessName: meeting.vendorBusinessName || 'Current Vendor',
+              vendorEmail: meeting.vendorEmail || 'vendor@example.com'
+            } as VendorMeetingDTO;
+          })
+          .sort((a: VendorMeetingDTO, b: VendorMeetingDTO) => {
+            // Sort by requestedAt date (newest first)
+            const dateA = new Date(a.requestedAt);
+            const dateB = new Date(b.requestedAt);
+            return dateB.getTime() - dateA.getTime();
+          });
+        
+        console.log('Final processed meetings:', this.meetingRequests); // Log after processing
+        console.log('Number of processed meetings:', this.meetingRequests.length);
         this.totalItems = this.meetingRequests.length;
         this.isLoading = false;
       },
@@ -93,12 +132,18 @@ export class VenderMeetingRequstsComponent implements OnInit {
   // Update meeting status
   private updateMeetingStatus(meetingId: number, action: MeetingActionRequest) {
     const vendorId = this.authService.getUserId();
+    if (!vendorId) {
+      this.error = 'Vendor ID not found. Please login again.';
+      return;
+    }
+    
     this.vendorMeetingService.updateMeetingStatus(vendorId, action).subscribe({
-      next: (updatedMeeting) => {
+      next: (updatedMeeting: VendorMeetingDTO) => {
         // Update the meeting in the local array
-        const index = this.meetingRequests.findIndex(m => m.meetingId === meetingId);
+        const index = this.meetingRequests.findIndex((m: VendorMeetingDTO) => m.meetingId === meetingId);
         if (index !== -1) {
           this.meetingRequests[index] = updatedMeeting;
+          console.log('Meeting updated successfully:', updatedMeeting);
         }
       },
       error: (error) => {
@@ -110,6 +155,10 @@ export class VenderMeetingRequstsComponent implements OnInit {
 
   // Format date for display
   formatDateTime(dateString: string): string {
+    if (!dateString) {
+      return 'No date provided';
+    }
+    
     const date = new Date(dateString);
     if (!date || isNaN(date.getTime())) {
       return 'Invalid date';
@@ -145,6 +194,10 @@ export class VenderMeetingRequstsComponent implements OnInit {
 
   // Get meeting mood display text
   getMeetingMoodText(mood: MeetingMood): string {
+    if (!mood) {
+      return 'Not specified';
+    }
+    
     switch (mood) {
       case MeetingMood.VIRTUAL:
         return 'Virtual Meeting';
@@ -153,7 +206,7 @@ export class VenderMeetingRequstsComponent implements OnInit {
       case MeetingMood.IN_PERSON:
         return 'In-Person Meeting';
       default:
-        return mood;
+        return String(mood);
     }
   }
 

@@ -83,18 +83,18 @@
                         <td class="py-3 px-4">
                             <div class="flex items-center">
                                 <div class="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-500 mr-3">
-                                    {{ request.customerName.charAt(0).toUpperCase() }}
+                                    {{ (request.customerName || 'Unknown').charAt(0).toUpperCase() }}
                                 </div>
                                 <div>
-                                    <span class="text-sm text-gray-700 font-medium">{{ request.customerName }}</span>
-                                    <p class="text-xs text-gray-500">{{ request.customerEmail }}</p>
+                                    <span class="text-sm text-gray-700 font-medium">{{ request.customerName || 'Unknown Customer' }}</span>
+                                    <p class="text-xs text-gray-500">{{ request.customerEmail || 'No email provided' }}</p>
                                 </div>
                             </div>
                         </td>
                         <td class="py-3 px-4">
                             <div class="text-sm">
                                 <p class="font-medium text-gray-700">{{ getMeetingMoodText(request.meetingMood) }}</p>
-                                <p class="text-gray-500 text-xs">{{ request.location }}</p>
+                                <p class="text-gray-500 text-xs">{{ request.location || 'No location specified' }}</p>
                                 <p *ngIf="request.notes" class="text-gray-500 text-xs mt-1 italic">"{{ request.notes }}"</p>
                             </div>
                         </td>

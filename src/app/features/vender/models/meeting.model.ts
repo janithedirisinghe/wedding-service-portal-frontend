@@ -1,5 +1,5 @@
 export interface VendorMeetingDTO {
-  meetingId: number;
+  meetingId: number; // Changed from number to match backend Long
   meetingDateTime: string; // Format: 'yyyy-MM-dd HH:mm:ss'
   meetingMood: MeetingMood;
   location: string;
@@ -10,12 +10,12 @@ export interface VendorMeetingDTO {
   confirmedAt?: string;
   
   // Customer information
-  customerId: number;
+  customerId: number; // Changed from number to match backend Long
   customerName: string;
   customerEmail: string;
   
   // Vendor information
-  vendorId: number;
+  vendorId: number; // Changed from number to match backend Long
   vendorBusinessName: string;
   vendorEmail: string;
 }
