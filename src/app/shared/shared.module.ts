@@ -19,6 +19,7 @@ import { CustomerToolbarComponent } from './components/customer-toolbar/customer
 import { VenderHeaderComponent } from './components/vender-header/vender-header.component';
 import { CustomerHeaderComponent } from './components/customer-header/customer-header.component';
 import { NavbartwoComponent } from './components/navbartwo/navbartwo.component';
+import { CustomerNavbarComponent } from './components/customer-navbar/customer-navbar.component';
 import { AdminSidebarComponent } from './components/admin-sidebar/admin-sidebar.component';
 import { AdminNavbarComponent } from './components/admin-navbar/admin-navbar.component';
 import { PreventDefaultDirective } from './directives/prevent-default.directive';
@@ -34,6 +35,7 @@ import { PreventDefaultDirective } from './directives/prevent-default.directive'
     CustomerToolbarComponent,
     SidebarTwoComponent,
     NavbartwoComponent,
+    CustomerNavbarComponent,
     AdminSidebarComponent,
     AdminNavbarComponent,
     PreventDefaultDirective,
@@ -58,6 +60,7 @@ import { PreventDefaultDirective } from './directives/prevent-default.directive'
     VenderSidebarComponent,
     SidebarTwoComponent,
     NavbartwoComponent,
+    CustomerNavbarComponent,
     FileUploaderComponent,
     CustomerToolbarComponent,
     VenderHeaderComponent,
