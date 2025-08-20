@@ -11,6 +11,7 @@ import { CustomerCompleteInfoComponent } from './customer-complete-info/customer
 import { RegisterBusinessInfoComponent } from './register-business-info/register-business-info.component';
 import { OtpVerificationComponent } from './otp-verification/otp-verification.component';
 import { RegisterVenderInfoComponent } from './register-vender-info/register-vender-info.component';
+import { AdminRegisterComponent } from './admin-register/admin-register.component';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ToastrModule } from 'ngx-toastr';
@@ -30,7 +31,8 @@ declarations: [
     CustomerCompleteInfoComponent,
     RegisterBusinessInfoComponent,
     OtpVerificationComponent,
-    RegisterVenderInfoComponent
+    RegisterVenderInfoComponent,
+    AdminRegisterComponent
   ],
   imports: [
     CommonModule,

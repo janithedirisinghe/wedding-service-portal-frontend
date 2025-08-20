@@ -6,6 +6,7 @@ import { CustomerLoginComponent } from './customer-login/customer-login.componen
 import { CustomerRegisterComponent } from './customer-register/customer-register.component';
 import { CustomerCompleteInfoComponent } from './customer-complete-info/customer-complete-info.component';
 import { VenderLoginComponent } from './vender-login/vender-login.component';
+import { AdminRegisterComponent } from './admin-register/admin-register.component';
 
 const routes: Routes = [
   {
@@ -16,7 +17,8 @@ const routes: Routes = [
       { path: 'customer-login', component: CustomerLoginComponent },
       { path: 'customer-register', component: CustomerRegisterComponent },
       { path: 'customer-complete-info', component: CustomerCompleteInfoComponent },
-      { path: 'vender-login', component: VenderLoginComponent}
+      { path: 'vender-login', component: VenderLoginComponent},
+      { path: 'admin-register', component: AdminRegisterComponent }
     ],
   },
 ];
