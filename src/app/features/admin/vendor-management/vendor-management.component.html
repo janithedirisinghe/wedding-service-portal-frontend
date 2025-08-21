@@ -9,12 +9,22 @@
   <div class="flex flex-wrap gap-4 mb-6">
     <button 
       (click)="showPendingRequests()" 
-      [class]="!showActiveVendors ? 'bg-blue-600 text-white' : 'bg-white text-blue-600 border-blue-600'"
+      [class]="!showActiveVendors && !showAllVendors && !showPendingVendors && !showVerifiedVendors ? 'bg-blue-600 text-white' : 'bg-white text-blue-600 border-blue-600'"
       class="px-6 py-2 border rounded-lg font-medium transition-colors duration-200 hover:bg-blue-50">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
-      Pending Requests
+      Pending Requests (Table)
+    </button>
+
+    <button 
+      (click)="loadPendingVendors()" 
+      [class]="showPendingVendors ? 'bg-yellow-600 text-white' : 'bg-white text-yellow-600 border-yellow-600'"
+      class="px-6 py-2 border rounded-lg font-medium transition-colors duration-200 hover:bg-yellow-50">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      Pending Vendors
     </button>
     
     <button 
@@ -24,7 +34,27 @@
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
-      Active Vendors
+      Active Vendors (Table)
+    </button>
+
+    <button 
+      (click)="loadVerifiedVendors()" 
+      [class]="showVerifiedVendors ? 'bg-emerald-600 text-white' : 'bg-white text-emerald-600 border-emerald-600'"
+      class="px-6 py-2 border rounded-lg font-medium transition-colors duration-200 hover:bg-emerald-50">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      Verified Vendors
+    </button>
+
+    <button 
+      (click)="showAllVendorsView()" 
+      [class]="showAllVendors ? 'bg-purple-600 text-white' : 'bg-white text-purple-600 border-purple-600'"
+      class="px-6 py-2 border rounded-lg font-medium transition-colors duration-200 hover:bg-purple-50">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7H5l14 14H5z" />
+      </svg>
+      All Vendors
     </button>
   </div>
 
@@ -34,7 +64,7 @@
   </div>
 
   <!-- Vendor Requests Table -->
-  <div *ngIf="!showActiveVendors && !isLoading" class="bg-white shadow-lg rounded-lg overflow-hidden">
+  <div *ngIf="!showActiveVendors && !showAllVendors && !showPendingVendors && !showVerifiedVendors && !isLoading" class="bg-white shadow-lg rounded-lg overflow-hidden">
     <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
       <h2 class="text-xl font-semibold text-gray-800">Pending Vendor Requests</h2>
       <p class="text-sm text-gray-600 mt-1">Review and approve/reject vendor applications</p>
@@ -137,7 +167,7 @@
   </div>
 
   <!-- Active Vendors Table -->
-  <div *ngIf="showActiveVendors && !isLoading" class="bg-white shadow-lg rounded-lg overflow-hidden">
+  <div *ngIf="showActiveVendors && !showAllVendors && !showPendingVendors && !showVerifiedVendors && !isLoading" class="bg-white shadow-lg rounded-lg overflow-hidden">
     <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
       <h2 class="text-xl font-semibold text-gray-800">Active Vendors</h2>
       <p class="text-sm text-gray-600 mt-1">Currently approved and active vendors</p>
@@ -226,6 +256,381 @@
       </svg>
       <h3 class="mt-2 text-sm font-medium text-gray-900">No active vendors</h3>
       <p class="mt-1 text-sm text-gray-500">No vendors are currently active in the system.</p>
+    </div>
+  </div>
+
+  <!-- Pending Vendors Grid -->
+  <div *ngIf="showPendingVendors && !isLoading" class="bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+      <h2 class="text-xl font-semibold text-gray-800">Pending Vendors</h2>
+      <p class="text-sm text-gray-600 mt-1">Vendors awaiting verification (verify = false)</p>
+    </div>
+    
+    <div class="p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div *ngFor="let vendor of pendingVendors" class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+          <!-- Vendor Image -->
+          <div class="relative">
+            <div class="h-48 bg-gray-200 rounded-t-lg overflow-hidden">
+              <img 
+                *ngIf="vendor.profileImageUrl; else placeholderImage"
+                [src]="vendor.profileImageUrl" 
+                [alt]="vendor.businessName"
+                class="w-full h-full object-cover">
+              <ng-template #placeholderImage>
+                <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-yellow-400 to-orange-500">
+                  <span class="text-white text-4xl font-bold">{{vendor.businessName.charAt(0)}}</span>
+                </div>
+              </ng-template>
+            </div>
+            <!-- Status Badge -->
+            <div class="absolute top-2 right-2">
+              <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded-full">
+                Pending Verification
+              </span>
+            </div>
+          </div>
+
+          <!-- Vendor Info -->
+          <div class="p-4">
+            <h3 class="text-lg font-semibold text-gray-900 mb-2 truncate">{{vendor.businessName}}</h3>
+            
+            <!-- Vendor Type -->
+            <div class="mb-3">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                {{vendor.VenType}}
+              </span>
+            </div>
+
+            <!-- Location -->
+            <div class="flex items-center text-sm text-gray-600 mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span class="truncate">{{vendor.location || 'Not specified'}}</span>
+            </div>
+
+            <!-- Phone -->
+            <div class="flex items-center text-sm text-gray-600 mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+              <span>{{vendor.telNo || 'Not provided'}}</span>
+            </div>
+
+            <!-- Registration Number -->
+            <div class="mb-3">
+              <span class="text-xs text-gray-500">BRN:</span>
+              <span class="text-sm font-mono text-gray-700 ml-1">{{vendor.brn || 'Not provided'}}</span>
+            </div>
+
+            <!-- Services Count -->
+            <div class="mb-3">
+              <span class="text-xs text-gray-500">Services:</span>
+              <span class="text-sm font-medium text-gray-700 ml-1">{{(vendor.services?.length || 0)}} service(s)</span>
+              <button *ngIf="vendor.services && vendor.services.length > 0"
+                      (click)="showServices(vendor)"
+                      class="ml-2 text-blue-600 hover:text-blue-800 text-sm underline">
+                View Services
+              </button>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex space-x-2 mt-4">
+              <button (click)="approveVendorFromPending(vendor)"
+                      class="flex-1 bg-green-600 text-white text-sm font-medium py-2 px-3 rounded-md hover:bg-green-700 transition-colors duration-200">
+                Approve
+              </button>
+              <button (click)="rejectVendorFromPending(vendor)"
+                      class="flex-1 bg-red-600 text-white text-sm font-medium py-2 px-3 rounded-md hover:bg-red-700 transition-colors duration-200">
+                Reject
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State for Pending Vendors -->
+      <div *ngIf="pendingVendors.length === 0" class="text-center py-12">
+        <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No pending vendors</h3>
+        <p class="mt-1 text-sm text-gray-500">All vendors have been verified.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Verified Vendors Grid -->
+  <div *ngIf="showVerifiedVendors && !isLoading" class="bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+      <h2 class="text-xl font-semibold text-gray-800">Verified Vendors</h2>
+      <p class="text-sm text-gray-600 mt-1">Vendors that have been verified (verify = true)</p>
+    </div>
+    
+    <div class="p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div *ngFor="let vendor of verifiedVendors" class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+          <!-- Vendor Image -->
+          <div class="relative">
+            <div class="h-48 bg-gray-200 rounded-t-lg overflow-hidden">
+              <img 
+                *ngIf="vendor.profileImageUrl; else placeholderImageVerified"
+                [src]="vendor.profileImageUrl" 
+                [alt]="vendor.businessName"
+                class="w-full h-full object-cover">
+              <ng-template #placeholderImageVerified>
+                <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-green-400 to-blue-500">
+                  <span class="text-white text-4xl font-bold">{{vendor.businessName.charAt(0)}}</span>
+                </div>
+              </ng-template>
+            </div>
+            <!-- Status Badge -->
+            <div class="absolute top-2 right-2">
+              <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
+                Verified
+              </span>
+            </div>
+          </div>
+
+          <!-- Vendor Info -->
+          <div class="p-4">
+            <h3 class="text-lg font-semibold text-gray-900 mb-2 truncate">{{vendor.businessName}}</h3>
+            
+            <!-- Vendor Type -->
+            <div class="mb-3">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                {{vendor.VenType}}
+              </span>
+            </div>
+
+            <!-- Location -->
+            <div class="flex items-center text-sm text-gray-600 mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span class="truncate">{{vendor.location || 'Not specified'}}</span>
+            </div>
+
+            <!-- Phone -->
+            <div class="flex items-center text-sm text-gray-600 mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+              <span>{{vendor.telNo || 'Not provided'}}</span>
+            </div>
+
+            <!-- Registration Number -->
+            <div class="mb-3">
+              <span class="text-xs text-gray-500">BRN:</span>
+              <span class="text-sm font-mono text-gray-700 ml-1">{{vendor.brn || 'Not provided'}}</span>
+            </div>
+
+            <!-- Services Count -->
+            <div class="mb-3">
+              <span class="text-xs text-gray-500">Services:</span>
+              <span class="text-sm font-medium text-gray-700 ml-1">{{(vendor.services?.length || 0)}} service(s)</span>
+              <button *ngIf="vendor.services && vendor.services.length > 0"
+                      (click)="showServices(vendor)"
+                      class="ml-2 text-blue-600 hover:text-blue-800 text-sm underline">
+                View Services
+              </button>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex space-x-2 mt-4">
+              <button class="flex-1 bg-gray-600 text-white text-sm font-medium py-2 px-3 rounded-md hover:bg-gray-700 transition-colors duration-200"
+                      (click)="viewVendorDetails(vendor.venderId)">
+                View Details
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State for Verified Vendors -->
+      <div *ngIf="verifiedVendors.length === 0" class="text-center py-12">
+        <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No verified vendors</h3>
+        <p class="mt-1 text-sm text-gray-500">No vendors have been verified yet.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- All Vendors Grid -->
+  <div *ngIf="showAllVendors && !isLoading" class="bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+      <h2 class="text-xl font-semibold text-gray-800">All Vendors</h2>
+      <p class="text-sm text-gray-600 mt-1">Complete list of all vendors in the system</p>
+    </div>
+    
+    <div class="p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div *ngFor="let vendor of allVendors" class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+          <!-- Vendor Image -->
+          <div class="relative">
+            <div class="h-48 bg-gray-200 rounded-t-lg overflow-hidden">
+              <img 
+                *ngIf="vendor.profileImageUrl; else placeholderImage"
+                [src]="vendor.profileImageUrl" 
+                [alt]="vendor.businessName"
+                class="w-full h-full object-cover">
+              <ng-template #placeholderImage>
+                <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-400 to-blue-500">
+                  <span class="text-white text-4xl font-bold">{{vendor.businessName.charAt(0)}}</span>
+                </div>
+              </ng-template>
+            </div>
+            <!-- Status Badge -->
+            <div class="absolute top-2 right-2">
+              <span *ngIf="vendor.verify && vendor.isActive" class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
+                Active
+              </span>
+              <span *ngIf="!vendor.verify" class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded-full">
+                Pending
+              </span>
+              <span *ngIf="!vendor.isActive" class="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded-full">
+                Inactive
+              </span>
+            </div>
+          </div>
+
+          <!-- Vendor Info -->
+          <div class="p-4">
+            <h3 class="text-lg font-semibold text-gray-900 mb-2 truncate">{{vendor.businessName}}</h3>
+            
+            <!-- Vendor Type -->
+            <div class="mb-3">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                {{vendor.VenType}}
+              </span>
+            </div>
+
+            <!-- Location -->
+            <div class="flex items-center text-sm text-gray-600 mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span class="truncate">{{vendor.location || 'Not specified'}}</span>
+            </div>
+
+            <!-- Phone -->
+            <div class="flex items-center text-sm text-gray-600 mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+              <span>{{vendor.telNo || 'Not provided'}}</span>
+            </div>
+
+            <!-- Registration Number -->
+            <div class="mb-3">
+              <span class="text-xs text-gray-500">BRN:</span>
+              <span class="text-sm font-mono text-gray-700 ml-1">{{vendor.brn || 'Not provided'}}</span>
+            </div>
+
+            <!-- Availability -->
+            <div class="mb-3">
+              <span class="text-xs text-gray-500">Availability:</span>
+              <span class="text-sm text-gray-700 ml-1">{{vendor.availability || 'Not specified'}}</span>
+            </div>
+
+            <!-- Bio (if available) -->
+            <div *ngIf="vendor.bio" class="mb-3">
+              <p class="text-sm text-gray-600 line-clamp-3">{{vendor.bio}}</p>
+            </div>
+
+            <!-- Services Count -->
+            <div class="mb-3">
+              <span class="text-xs text-gray-500">Services:</span>
+              <span class="text-sm font-medium text-gray-700 ml-1">{{(vendor.services?.length || 0)}} service(s)</span>
+              <button *ngIf="vendor.services && vendor.services.length > 0"
+                      (click)="showServices(vendor)"
+                      class="ml-2 text-blue-600 hover:text-blue-800 text-sm underline">
+                View Services
+              </button>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex space-x-2 mt-4">
+              <button *ngIf="!vendor.verify" 
+                      (click)="approveVendor(vendor.venderId.toString())"
+                      class="flex-1 bg-green-600 text-white text-sm font-medium py-2 px-3 rounded-md hover:bg-green-700 transition-colors duration-200">
+                Approve
+              </button>
+              <button *ngIf="vendor.isActive" 
+                      (click)="deactivateVendor(vendor)"
+                      class="flex-1 bg-red-600 text-white text-sm font-medium py-2 px-3 rounded-md hover:bg-red-700 transition-colors duration-200">
+                Deactivate
+              </button>
+              <button class="flex-1 bg-gray-600 text-white text-sm font-medium py-2 px-3 rounded-md hover:bg-gray-700 transition-colors duration-200"
+                      (click)="viewVendorDetails(vendor.venderId)">
+                View Details
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State for All Vendors -->
+      <div *ngIf="allVendors.length === 0" class="text-center py-12">
+        <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z" />
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No vendors found</h3>
+        <p class="mt-1 text-sm text-gray-500">No vendors are currently registered in the system.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Services Popup Modal -->
+  <div *ngIf="showServicesPopup" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" (click)="closeServicesPopup()">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white" (click)="$event.stopPropagation()">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">
+          Services - {{selectedVendorName}}
+        </h3>
+        <button (click)="closeServicesPopup()" class="text-gray-400 hover:text-gray-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Services List -->
+      <div class="mt-4 max-h-96 overflow-y-auto">
+        <div *ngIf="selectedVendorServices.length === 0" class="text-center py-8">
+          <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z" />
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">No services</h3>
+          <p class="mt-1 text-sm text-gray-500">This vendor hasn't added any services yet.</p>
+        </div>
+
+        <div *ngFor="let service of selectedVendorServices; let i = index" class="border border-gray-200 rounded-lg p-4 mb-4 last:mb-0">
+          <div class="flex justify-between items-start mb-2">
+            <h4 class="text-lg font-semibold text-gray-900">{{service.name}}</h4>
+            <span class="text-lg font-bold text-green-600">${{service.pricing}}</span>
+          </div>
+          <p class="text-sm text-gray-600 mb-2">{{service.description}}</p>
+          <div class="flex items-center text-xs text-gray-500">
+            <span class="bg-gray-100 px-2 py-1 rounded">Service ID: {{service.serviceId}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex justify-end pt-4 border-t border-gray-200 mt-4">
+        <button (click)="closeServicesPopup()" 
+                class="px-4 py-2 bg-gray-500 text-white text-sm font-medium rounded-md hover:bg-gray-600 transition-colors duration-200">
+          Close
+        </button>
+      </div>
     </div>
   </div>
 </div>

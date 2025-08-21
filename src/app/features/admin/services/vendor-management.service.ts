@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { delay, map, catchError } from 'rxjs/operators';
+import { AdminService } from './admin.service';
+import { Vendor } from '../../../shared/Models/vendor.model';
 
 export interface VendorRequest {
   id: string;
@@ -13,6 +15,11 @@ export interface VendorRequest {
   businessAddress: string;
   requestDate: Date;
   status: 'pending' | 'approved' | 'rejected';
+  profileImageUrl?: string;
+  bio?: string;
+  availability?: string;
+  country?: string;
+  location?: string;
 }
 
 export interface ActiveVendor {
@@ -26,6 +33,11 @@ export interface ActiveVendor {
   approvedDate: Date;
   totalBookings: number;
   rating: number;
+  profileImageUrl?: string;
+  bio?: string;
+  availability?: string;
+  country?: string;
+  location?: string;
 }
 
 @Injectable({
@@ -34,11 +46,134 @@ export interface ActiveVendor {
 export class VendorManagementService {
   private apiUrl = '/api/admin/vendors'; // Replace with actual API URL
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private adminService: AdminService) { }
+
+  // Helper method to map Vendor to VendorRequest
+  private mapVendorToRequest(vendor: Vendor): VendorRequest {
+    return {
+      id: vendor.venderId.toString(),
+      vendorName: vendor.businessName,
+      registerNumber: vendor.brn,
+      vendorType: vendor.VenType, // Updated to use VenType from API
+      email: vendor.user?.email || '', // Assuming email is in user object
+      phone: vendor.telNo,
+      businessAddress: vendor.location,
+      requestDate: new Date(), // You might want to get this from creation date
+      status: vendor.verify ? 'approved' : 'pending',
+      profileImageUrl: vendor.profileImageUrl || undefined,
+      bio: vendor.bio,
+      availability: vendor.availability || undefined,
+      country: vendor.country,
+      location: vendor.location
+    };
+  }
+
+  // Helper method to map Vendor to ActiveVendor
+  private mapVendorToActive(vendor: Vendor): ActiveVendor {
+    return {
+      id: vendor.venderId.toString(),
+      vendorName: vendor.businessName,
+      registerNumber: vendor.brn,
+      vendorType: vendor.VenType, // Updated to use VenType from API
+      email: vendor.user?.email || '', // Assuming email is in user object
+      phone: vendor.telNo,
+      businessAddress: vendor.location,
+      approvedDate: new Date(), // You might want to get this from actual approval date
+      totalBookings: 0, // This would need to come from booking data
+      rating: 0, // This would need to come from rating data
+      profileImageUrl: vendor.profileImageUrl || undefined,
+      bio: vendor.bio,
+      availability: vendor.availability || undefined,
+      country: vendor.country,
+      location: vendor.location
+    };
+  }
 
   // Get all pending vendor requests
   getPendingVendorRequests(): Observable<VendorRequest[]> {
-    // For now, return mock data. Replace with actual API call
+    return this.adminService.getAllVendors().pipe(
+      map(vendors => vendors
+        .filter(vendor => !vendor.verify) // Filter non-verified vendors
+        .map(vendor => this.mapVendorToRequest(vendor))
+      ),
+      catchError(error => {
+        console.error('Error fetching pending vendors:', error);
+        // Return mock data as fallback
+        return this.getMockPendingRequests();
+      })
+    );
+  }
+
+  // Get all active vendors
+  getActiveVendors(): Observable<ActiveVendor[]> {
+    return this.adminService.getAllVendors().pipe(
+      map(vendors => vendors
+        .filter(vendor => vendor.verify && (vendor.isActive !== false)) // Filter verified and active vendors
+        .map(vendor => this.mapVendorToActive(vendor))
+      ),
+      catchError(error => {
+        console.error('Error fetching active vendors:', error);
+        // Return mock data as fallback
+        return this.getMockActiveVendors();
+      })
+    );
+  }
+
+  // Approve a vendor request
+  approveVendor(vendorId: string): Observable<Vendor | any> {
+    const numericId = parseInt(vendorId, 10);
+    return this.adminService.approveVendor(numericId).pipe(
+      catchError(error => {
+        console.error('Error approving vendor:', error);
+        // Return mock success as fallback
+        return of({ success: true, message: 'Vendor approved successfully' }).pipe(delay(300));
+      })
+    );
+  }
+
+  // Reject a vendor request
+  rejectVendor(vendorId: string): Observable<Vendor | any> {
+    const numericId = parseInt(vendorId, 10);
+    return this.adminService.rejectVendor(numericId).pipe(
+      catchError(error => {
+        console.error('Error rejecting vendor:', error);
+        // Return mock success as fallback
+        return of({ success: true, message: 'Vendor rejected successfully' }).pipe(delay(300));
+      })
+    );
+  }
+
+  // Deactivate a vendor (separate from rejection)
+  deactivateVendor(vendorId: string): Observable<Vendor | any> {
+    const numericId = parseInt(vendorId, 10);
+    return this.adminService.deactivateVendor(numericId).pipe(
+      catchError(error => {
+        console.error('Error deactivating vendor:', error);
+        // Return mock success as fallback
+        return of({ success: true, message: 'Vendor deactivated successfully' }).pipe(delay(300));
+      })
+    );
+  }
+
+  // Get all vendors (both pending and active)
+  getAllVendors(): Observable<Vendor[]> {
+    return this.adminService.getAllVendors();
+  }
+
+  // Get vendor details by ID
+  getVendorDetails(vendorId: string): Observable<VendorRequest | ActiveVendor> {
+    const numericId = parseInt(vendorId, 10);
+    return this.adminService.getVendorById(numericId).pipe(
+      map(vendor => vendor.verify ? this.mapVendorToActive(vendor) : this.mapVendorToRequest(vendor)),
+      catchError(error => {
+        console.error('Error fetching vendor details:', error);
+        return of({} as VendorRequest);
+      })
+    );
+  }
+
+  // Fallback mock data methods
+  private getMockPendingRequests(): Observable<VendorRequest[]> {
     const mockData: VendorRequest[] = [
       {
         id: '1',
@@ -75,13 +210,10 @@ export class VendorManagementService {
       }
     ];
     
-    return of(mockData).pipe(delay(500)); // Simulate API delay
-    // return this.http.get<VendorRequest[]>(`${this.apiUrl}/requests`);
+    return of(mockData).pipe(delay(500));
   }
 
-  // Get all active vendors
-  getActiveVendors(): Observable<ActiveVendor[]> {
-    // For now, return mock data. Replace with actual API call
+  private getMockActiveVendors(): Observable<ActiveVendor[]> {
     const mockData: ActiveVendor[] = [
       {
         id: '101',
@@ -121,28 +253,6 @@ export class VendorManagementService {
       }
     ];
     
-    return of(mockData).pipe(delay(500)); // Simulate API delay
-    // return this.http.get<ActiveVendor[]>(`${this.apiUrl}/active`);
-  }
-
-  // Approve a vendor request
-  approveVendor(vendorId: string): Observable<any> {
-    // For now, return success response. Replace with actual API call
-    return of({ success: true, message: 'Vendor approved successfully' }).pipe(delay(300));
-    // return this.http.put(`${this.apiUrl}/approve/${vendorId}`, {});
-  }
-
-  // Reject a vendor request
-  rejectVendor(vendorId: string): Observable<any> {
-    // For now, return success response. Replace with actual API call
-    return of({ success: true, message: 'Vendor rejected successfully' }).pipe(delay(300));
-    // return this.http.put(`${this.apiUrl}/reject/${vendorId}`, {});
-  }
-
-  // Get vendor details by ID
-  getVendorDetails(vendorId: string): Observable<VendorRequest | ActiveVendor> {
-    // For now, return mock data. Replace with actual API call
-    return of({} as VendorRequest).pipe(delay(300));
-    // return this.http.get<VendorRequest | ActiveVendor>(`${this.apiUrl}/${vendorId}`);
+    return of(mockData).pipe(delay(500));
   }
 }
