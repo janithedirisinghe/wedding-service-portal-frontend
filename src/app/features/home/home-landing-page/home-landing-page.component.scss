@@ -2,13 +2,159 @@
 @tailwind components;
 @tailwind utilities;
 
-.logo {
-    font-size: 24px;
-    font-weight: bold;
+/* Custom animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 0.4; }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+/* Custom gradient text */
+.gradient-text {
+  @apply text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-purple-600;
+}
+
+/* Custom button styles */
+.btn-primary {
+  @apply relative px-8 py-4 bg-gradient-to-r from-rose-500 to-purple-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300;
+}
+
+.btn-primary::before {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-r from-purple-600 to-rose-500 rounded-full opacity-0 transition-opacity duration-300;
+}
+
+.btn-primary:hover::before {
+  opacity: 1;
+}
+
+.btn-primary span {
+  @apply relative z-10;
+}
+
+/* Service card hover effects */
+.service-card {
+  @apply bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-8;
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+}
+
+.service-icon {
+  @apply w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-transform duration-300;
+}
+
+.service-card:hover .service-icon {
+  transform: scale(1.1);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gradient-to-b from-rose-500 to-purple-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gradient-to-b from-purple-600 to-rose-500;
+}
+
+/* Hero image animation */
+.hero-image {
+  @apply transform rotate-3 hover:rotate-0 transition-transform duration-500;
+}
+
+/* Section dividers */
+.section-divider {
+  @apply w-24 h-1 bg-gradient-to-r from-rose-500 to-purple-600 mx-auto rounded-full;
+}
+
+/* Stats counter animation */
+@keyframes countUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.stat-number {
+  animation: countUp 0.6s ease-out;
+}
+
+/* Decorative elements */
+.decorative-blob {
+  @apply absolute rounded-full mix-blend-multiply filter blur-xl opacity-70;
+}
+
+.blob-1 {
+  @apply bg-yellow-200 animate-pulse;
+}
+
+.blob-2 {
+  @apply bg-purple-200 animate-pulse;
+  animation-delay: 1s;
+}
+
+/* Contact section styling */
+.contact-card {
+  @apply bg-gradient-to-r from-rose-50 to-purple-50 rounded-3xl p-8 lg:p-12;
+}
+
+.contact-icon {
+  @apply w-12 h-12 rounded-full flex items-center justify-center mx-auto;
+}
+
+/* Responsive spacing utilities */
+@screen sm {
+  .hero-spacing {
+    @apply py-16;
   }
-  .logo .wed {
-    color: #FFD700; /* Yellow color */
+}
+
+@screen lg {
+  .hero-spacing {
+    @apply py-20;
   }
-  .logo .ease {
-    color: #000000; /* Black color */
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Focus states for accessibility */
+.btn-primary:focus,
+.btn-secondary:focus {
+  @apply ring-4 ring-purple-300 ring-opacity-50 outline-none;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
   }
+}

@@ -1,23 +1,144 @@
-<div class="card ">
-    <p-menubar [model]="items">
-      <!-- Logo SVG -->
-      <ng-template pTemplate="start">
-        <ng-template pTemplate="items" let-item let-root="root">
-          <a pRipple class="flex align-items-center p-menuitem-link" [routerLink]="item.routerLink">
-            <span [class]="item.icon"></span>
-            <span class="ml-2">{{ item.label }}</span>
-           </a>
-        </ng-template>
-      </ng-template>
-  
-      <!-- Menu items -->
-      
-  
-      <!-- Search bar on the right -->
-      <ng-template pTemplate="end">
-        <div class="logo">
-          <span class="wed">Wed</span><span class="ease">Ease</span>
-      </div>
-      </ng-template>
-    </p-menubar>
-  </div>
+<!-- Modern Navbar -->
+<nav class="bg-white/95 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16 lg:h-20">
+            
+            <!-- Logo -->
+            <div class="flex-shrink-0">
+                <a routerLink="/home" class="flex items-center space-x-2 group">
+                    <div class="w-10 h-10 bg-gradient-to-r from-rose-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="logo text-2xl font-bold">
+                        <span class="wed text-yellow-500">Wed</span><span class="ease text-gray-900">Ease</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Desktop Navigation Menu -->
+            <div class="hidden md:block">
+                <div class="ml-10 flex items-baseline space-x-8">
+                    <a 
+                        routerLink="/home" 
+                        routerLinkActive="text-rose-600 border-b-2 border-rose-600"
+                        [routerLinkActiveOptions]="{exact: true}"
+                        class="text-gray-700 hover:text-rose-600 px-3 py-2 text-sm font-semibold transition-colors duration-300 border-b-2 border-transparent hover:border-rose-200">
+                        Home
+                    </a>
+                    <a 
+                        (click)="scrollToSection('services')" 
+                        class="text-gray-700 hover:text-rose-600 px-3 py-2 text-sm font-semibold transition-colors duration-300 border-b-2 border-transparent hover:border-rose-200 cursor-pointer">
+                        Services
+                    </a>
+                    <a 
+                        (click)="scrollToSection('about')" 
+                        class="text-gray-700 hover:text-rose-600 px-3 py-2 text-sm font-semibold transition-colors duration-300 border-b-2 border-transparent hover:border-rose-200 cursor-pointer">
+                        About
+                    </a>
+                    <a 
+                        (click)="scrollToSection('contact')" 
+                        class="text-gray-700 hover:text-rose-600 px-3 py-2 text-sm font-semibold transition-colors duration-300 border-b-2 border-transparent hover:border-rose-200 cursor-pointer">
+                        Contact
+                    </a>
+                </div>
+            </div>
+
+            <!-- Desktop CTA Buttons -->
+            <div class="hidden md:flex items-center space-x-4">
+                <button 
+                    routerLink="/auth/customer-login"
+                    class="text-gray-700 hover:text-rose-600 px-4 py-2 text-sm font-semibold transition-colors duration-300">
+                    Sign In
+                </button>
+                <button 
+                    routerLink="/home/get-start"
+                    class="bg-gradient-to-r from-rose-500 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300">
+                    Get Started
+                </button>
+            </div>
+
+            <!-- Mobile menu button -->
+            <div class="md:hidden">
+                <button 
+                    type="button"
+                    (click)="toggleMobileMenu()"
+                    class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-rose-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-rose-500 transition-colors duration-300"
+                    aria-controls="mobile-menu" 
+                    aria-expanded="false">
+                    <span class="sr-only">Open main menu</span>
+                    <!-- Menu icon -->
+                    <svg 
+                        [class.hidden]="isMobileMenuOpen"
+                        class="block h-6 w-6" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor" 
+                        aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    <!-- Close icon -->
+                    <svg 
+                        [class.hidden]="!isMobileMenuOpen"
+                        class="block h-6 w-6" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor" 
+                        aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div 
+        [class.hidden]="!isMobileMenuOpen"
+        class="md:hidden bg-white border-t border-gray-200" 
+        id="mobile-menu">
+        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            <a 
+                routerLink="/home" 
+                routerLinkActive="bg-rose-50 text-rose-600 border-l-4 border-rose-600"
+                [routerLinkActiveOptions]="{exact: true}"
+                (click)="closeMobileMenu()"
+                class="text-gray-700 hover:bg-gray-50 hover:text-rose-600 block px-3 py-2 text-base font-medium transition-colors duration-300">
+                Home
+            </a>
+            <a 
+                href="#services" 
+                (click)="scrollToSection('services'); closeMobileMenu()"
+                class="text-gray-700 hover:bg-gray-50 hover:text-rose-600 block px-3 py-2 text-base font-medium transition-colors duration-300 cursor-pointer">
+                Services
+            </a>
+            <a 
+                (click)="scrollToSection('about'); closeMobileMenu()"
+                class="text-gray-700 hover:bg-gray-50 hover:text-rose-600 block px-3 py-2 text-base font-medium transition-colors duration-300 cursor-pointer">
+                About
+            </a>
+            <a 
+                (click)="scrollToSection('contact'); closeMobileMenu()"
+                class="text-gray-700 hover:bg-gray-50 hover:text-rose-600 block px-3 py-2 text-base font-medium transition-colors duration-300 cursor-pointer">
+                Contact
+            </a>
+        </div>
+        
+        <!-- Mobile CTA Buttons -->
+        <div class="px-4 py-3 border-t border-gray-200 space-y-3">
+            <button 
+                routerLink="/auth/customer-login"
+                (click)="closeMobileMenu()"
+                class="w-full text-center text-gray-700 hover:text-rose-600 px-4 py-2 text-base font-semibold transition-colors duration-300 border border-gray-300 rounded-full hover:border-rose-300">
+                Sign In
+            </button>
+            <button 
+                routerLink="/home/get-start"
+                (click)="closeMobileMenu()"
+                class="w-full bg-gradient-to-r from-rose-500 to-purple-600 text-white px-6 py-3 rounded-full text-base font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300">
+                Get Started
+            </button>
+        </div>
+    </div>
+</nav>
