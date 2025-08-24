@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { VendorSearchService, Vendor as ApiVendor, SearchFilters as ApiSearchFilters } from '../services/vendor-search.service';
+import { catchError, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { Subject, of } from 'rxjs';
 
 export interface Vendor {
   id: string;
@@ -28,6 +31,11 @@ export interface SearchFilters {
   followerCount: string;
   availability: string;
   sortBy: string;
+  verify: string;
+  isActive: string;
+  serviceName: string;
+  minPrice: string;
+  maxPrice: string;
 }
 
 export interface QuickFilter {
@@ -48,6 +56,15 @@ export class VendorSearchComponent implements OnInit {
   searchQuery: string = '';
   showAdvancedFilters: boolean = false;
   isLoading: boolean = false;
+  searchSubject = new Subject<string>();
+  suggestions: string[] = [];
+  showSuggestions: boolean = false;
+  
+  // API vendors data
+  apiVendors: ApiVendor[] = [];
+  
+  // Error handling
+  error: string | null = null;
 
   // Filters
   filters: SearchFilters = {
@@ -58,7 +75,12 @@ export class VendorSearchComponent implements OnInit {
     priceRange: '',
     followerCount: '',
     availability: '',
-    sortBy: 'relevance'
+    sortBy: 'relevance',
+    verify: '',
+    isActive: '',
+    serviceName: '',
+    minPrice: '',
+    maxPrice: ''
   };
 
   // Quick filters
@@ -74,29 +96,10 @@ export class VendorSearchComponent implements OnInit {
   ];
 
   // Filter options
-  availableLocations: string[] = [
-    'New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 
-    'San Antonio', 'San Diego', 'Dallas', 'San Jose', 'Austin', 'Jacksonville',
-    'Fort Worth', 'Columbus', 'Charlotte', 'San Francisco', 'Indianapolis', 
-    'Seattle', 'Denver', 'Washington DC', 'Boston', 'El Paso', 'Nashville',
-    'Detroit', 'Oklahoma City', 'Portland', 'Las Vegas', 'Memphis', 'Louisville',
-    'Baltimore', 'Milwaukee', 'Albuquerque', 'Tucson', 'Fresno', 'Sacramento'
-  ];
-
-  availableCountries: string[] = [
-    'United States', 'Canada', 'United Kingdom', 'Australia', 'Germany', 
-    'France', 'Spain', 'Italy', 'Netherlands', 'Sweden', 'Norway', 'Denmark',
-    'Switzerland', 'Austria', 'Belgium', 'Ireland', 'Portugal', 'Finland',
-    'New Zealand', 'Japan', 'South Korea', 'Singapore', 'UAE', 'India'
-  ];
-
-  availableVendorTypes: string[] = [
-    'Photography', 'Videography', 'Catering', 'Venue', 'Decoration', 
-    'Floral Design', 'Music & Entertainment', 'DJ Services', 'Live Band',
-    'Wedding Planning', 'Makeup & Beauty', 'Hair Styling', 'Bridal Fashion',
-    'Groom\'s Attire', 'Jewelry', 'Transportation', 'Honeymoon Planning',
-    'Stationery & Invitations', 'Cake & Desserts', 'Lighting & Sound'
-  ];
+  // Filter options - will be loaded from API
+  availableLocations: string[] = [];
+  availableCountries: string[] = [];
+  availableVendorTypes: string[] = [];
 
   // Data
   allVendors: Vendor[] = [];
@@ -108,101 +111,254 @@ export class VendorSearchComponent implements OnInit {
   itemsPerPage: number = 12;
   totalPages: number = 1;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private vendorSearchService: VendorSearchService
+  ) {}
 
   ngOnInit(): void {
-    this.loadVendors();
+    this.loadInitialData();
+    this.setupSearchAutocomplete();
   }
 
-  // Load mock vendor data
-  loadVendors(): void {
+  // Load initial data from API
+  loadInitialData(): void {
     this.isLoading = true;
-    
-    // Simulate API call
-    setTimeout(() => {
-      this.allVendors = this.generateMockVendors();
-      this.filteredVendors = [...this.allVendors];
-      this.updatePagination();
-      this.isLoading = false;
-    }, 1000);
+    this.error = null;
+
+    // Load active and verified vendors by default
+    this.vendorSearchService.getActiveAndVerifiedVendors()
+      .pipe(
+        catchError(err => {
+          console.error('Error loading vendors:', err);
+          this.error = 'Failed to load vendors. Please try again.';
+          return of([]);
+        })
+      )
+      .subscribe(vendors => {
+        this.apiVendors = vendors;
+        this.allVendors = this.convertApiVendorsToDisplayVendors(vendors);
+        this.filteredVendors = [...this.allVendors];
+        this.updatePagination();
+        this.isLoading = false;
+      });
+
+    // Load filter options
+    this.loadFilterOptions();
   }
 
-  // Generate mock vendor data
-  generateMockVendors(): Vendor[] {
-    const vendors: Vendor[] = [];
-    const businessNames = [
-      'Elegant Moments Photography', 'Divine Catering Solutions', 'Enchanted Gardens Venue',
-      'Bella Rosa Floral Design', 'Perfect Harmony Music', 'Luxury Wedding Planners',
-      'Artistic Vision Studios', 'Gourmet Delights Catering', 'Crystal Palace Ballroom',
-      'Romantic Roses Florist', 'Celebration Sounds DJ', 'Dream Wedding Coordinators',
-      'Timeless Memories Photo', 'Exquisite Taste Catering', 'Majestic Manor Venue',
-      'Blooming Beauty Florals', 'Melodic Moments Music', 'Elite Event Planners',
-      'Capture the Magic Photo', 'Savory Selections Catering', 'Grand Ballroom Venue',
-      'Precious Petals Florist', 'Rhythm & Blues Band', 'Wonderful Wedding Planners',
-      'Picture Perfect Studios', 'Culinary Creations Catering', 'Fairytale Castle Venue',
-      'Garden of Love Florist', 'Symphony Sounds Music', 'Blissful Moments Planning'
-    ];
-
-    for (let i = 0; i < 30; i++) {
-      vendors.push({
-        id: `vendor-${i + 1}`,
-        businessName: businessNames[i],
-        vendorType: this.availableVendorTypes[Math.floor(Math.random() * this.availableVendorTypes.length)],
-        location: this.availableLocations[Math.floor(Math.random() * this.availableLocations.length)],
-        country: this.availableCountries[Math.floor(Math.random() * this.availableCountries.length)],
-        averageRating: Math.round((Math.random() * 2 + 3) * 10) / 10, // 3.0 to 5.0
-        reviewCount: Math.floor(Math.random() * 200) + 10, // 10 to 210
-        followerCount: Math.floor(Math.random() * 5000) + 50, // 50 to 5050
-        startingPrice: Math.floor(Math.random() * 2500) + 200, // 200 to 2700
-        bio: `Professional wedding service provider with ${Math.floor(Math.random() * 15) + 1} years of experience. Specializing in creating unforgettable moments for your special day.`,
-        availability: Math.random() > 0.3 ? 'available' : 'busy',
-        isFavorite: Math.random() > 0.8
+  // Load filter options from API
+  loadFilterOptions(): void {
+    // Load vendor types
+    this.vendorSearchService.getAllVendorTypes()
+      .pipe(catchError(err => of([])))
+      .subscribe(types => {
+        this.availableVendorTypes = types;
+        this.updateQuickFilters();
       });
-    }
 
-    return vendors;
+    // Load countries
+    this.vendorSearchService.getAllCountries()
+      .pipe(catchError(err => of([])))
+      .subscribe(countries => {
+        this.availableCountries = countries;
+      });
+
+    // Extract unique locations from loaded vendors
+    this.extractLocationsFromVendors();
+  }
+
+  // Extract unique locations from current vendors
+  extractLocationsFromVendors(): void {
+    const locations = new Set<string>();
+    this.apiVendors.forEach(vendor => {
+      if (vendor.location && vendor.location.trim()) {
+        locations.add(vendor.location.trim());
+      }
+    });
+    this.availableLocations = Array.from(locations).sort();
+  }
+
+  // Setup search autocomplete
+  setupSearchAutocomplete(): void {
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(query => {
+        if (query && query.length >= 2) {
+          return this.vendorSearchService.getBusinessNameSuggestions(query, 5)
+            .pipe(catchError(err => of([])));
+        }
+        return of([]);
+      })
+    ).subscribe(suggestions => {
+      this.suggestions = suggestions;
+      this.showSuggestions = suggestions.length > 0 && this.searchQuery.length >= 2;
+    });
+  }
+
+  // Convert API vendors to display format
+  convertApiVendorsToDisplayVendors(apiVendors: ApiVendor[]): Vendor[] {
+    return apiVendors.map(apiVendor => ({
+      id: apiVendor.venderId.toString(),
+      businessName: apiVendor.businessName || '',
+      vendorType: apiVendor.venType || '',
+      location: apiVendor.location || '',
+      country: apiVendor.country || '',
+      averageRating: this.vendorSearchService.getAverageRating(apiVendor),
+      reviewCount: 0, // You might need to implement this
+      followerCount: this.vendorSearchService.getFollowerCount(apiVendor),
+      startingPrice: this.vendorSearchService.getStartingPrice(apiVendor),
+      bio: apiVendor.bio || '',
+      image: apiVendor.profileImageUrl || undefined,
+      availability: apiVendor.availability === 'available' ? 'available' : 'busy',
+      isFavorite: false, // You might need to implement this
+      verify: apiVendor.verify,
+      isActive: apiVendor.isActive
+    }));
+  }
+
+  // Update quick filters based on available vendor types
+  updateQuickFilters(): void {
+    // Update quick filters with actual vendor types from API
+    this.quickFilters = [
+      ...this.availableVendorTypes.slice(0, 5).map(type => ({
+        label: type,
+        key: 'vendorType',
+        value: type,
+        active: false
+      })),
+      { label: 'Available Now', key: 'availability', value: 'available', active: false },
+      { label: 'Verified Only', key: 'verify', value: 'true', active: false },
+      { label: 'Active Only', key: 'isActive', value: 'true', active: false }
+    ];
   }
 
   // Search functionality
   onSearchChange(): void {
-    this.applyFilters();
+    // Trigger autocomplete
+    this.searchSubject.next(this.searchQuery);
+    
+    // Perform search
+    if (this.searchQuery.trim()) {
+      this.performSearch();
+    } else {
+      this.loadInitialData();
+    }
+  }
+
+  // Perform search using API
+  performSearch(): void {
+    if (!this.searchQuery.trim()) {
+      return;
+    }
+
+    this.isLoading = true;
+    this.error = null;
+
+    // Use quick search API for general search
+    this.vendorSearchService.quickSearch(this.searchQuery.trim())
+      .pipe(
+        catchError(err => {
+          console.error('Error searching vendors:', err);
+          this.error = 'Search failed. Please try again.';
+          return of([]);
+        })
+      )
+      .subscribe(vendors => {
+        this.apiVendors = vendors;
+        this.allVendors = this.convertApiVendorsToDisplayVendors(vendors);
+        this.applyClientSideFilters();
+        this.isLoading = false;
+      });
+  }
+
+  // Select suggestion
+  selectSuggestion(suggestion: string): void {
+    this.searchQuery = suggestion;
+    this.showSuggestions = false;
+    this.performSearch();
+  }
+
+  // Hide suggestions
+  hideSuggestions(): void {
+    setTimeout(() => {
+      this.showSuggestions = false;
+    }, 200);
   }
 
   // Filter functionality
   applyFilters(): void {
+    // If we have specific filter values, use API-based advanced search
+    if (this.hasSpecificFilters()) {
+      this.performAdvancedSearch();
+    } else {
+      // Use client-side filtering for simple cases
+      this.applyClientSideFilters();
+    }
+  }
+
+  // Check if we have specific filters that should trigger API search
+  hasSpecificFilters(): boolean {
+    return !!(
+      this.filters.location ||
+      this.filters.country ||
+      this.filters.vendorType ||
+      this.filters.availability ||
+      this.filters.verify ||
+      this.filters.isActive ||
+      this.filters.serviceName ||
+      (this.filters.minPrice && this.filters.maxPrice)
+    );
+  }
+
+  // Perform advanced search using API
+  performAdvancedSearch(): void {
+    this.isLoading = true;
+    this.error = null;
+
+    // Build API search filters
+    const apiFilters: ApiSearchFilters = {};
+    
+    if (this.filters.location) apiFilters.location = this.filters.location;
+    if (this.filters.country) apiFilters.country = this.filters.country;
+    if (this.filters.vendorType) apiFilters.venType = this.filters.vendorType;
+    if (this.filters.availability) apiFilters.availability = this.filters.availability;
+    if (this.filters.verify) apiFilters.verify = this.filters.verify === 'true';
+    if (this.filters.isActive) apiFilters.isActive = this.filters.isActive === 'true';
+    if (this.searchQuery.trim()) apiFilters.businessName = this.searchQuery.trim();
+
+    // Use advanced search API
+    this.vendorSearchService.searchVendors(apiFilters)
+      .pipe(
+        catchError(err => {
+          console.error('Error in advanced search:', err);
+          this.error = 'Advanced search failed. Please try again.';
+          return of([]);
+        })
+      )
+      .subscribe(vendors => {
+        this.apiVendors = vendors;
+        this.allVendors = this.convertApiVendorsToDisplayVendors(vendors);
+        
+        // Apply additional client-side filters
+        this.applyClientSideFilters();
+        this.isLoading = false;
+      });
+  }
+
+  // Apply client-side filtering for UI-specific filters
+  applyClientSideFilters(): void {
     let filtered = [...this.allVendors];
 
-    // Apply search query
-    if (this.searchQuery.trim()) {
-      const query = this.searchQuery.toLowerCase();
-      filtered = filtered.filter(vendor => 
-        vendor.businessName.toLowerCase().includes(query) ||
-        vendor.vendorType.toLowerCase().includes(query) ||
-        vendor.location.toLowerCase().includes(query) ||
-        vendor.country.toLowerCase().includes(query) ||
-        vendor.bio.toLowerCase().includes(query)
-      );
-    }
-
-    // Apply filters
-    if (this.filters.location) {
-      filtered = filtered.filter(vendor => vendor.location === this.filters.location);
-    }
-
-    if (this.filters.country) {
-      filtered = filtered.filter(vendor => vendor.country === this.filters.country);
-    }
-
-    if (this.filters.vendorType) {
-      filtered = filtered.filter(vendor => vendor.vendorType === this.filters.vendorType);
-    }
-
+    // Apply rating filter
     if (this.filters.rating) {
       const minRating = parseFloat(this.filters.rating);
       filtered = filtered.filter(vendor => vendor.averageRating >= minRating);
     }
 
-    if (this.filters.priceRange) {
+    // Apply price range filter
+    if (this.filters.priceRange && !this.filters.minPrice && !this.filters.maxPrice) {
       filtered = filtered.filter(vendor => {
         switch (this.filters.priceRange) {
           case 'budget':
@@ -219,13 +375,19 @@ export class VendorSearchComponent implements OnInit {
       });
     }
 
+    // Apply custom price range
+    if (this.filters.minPrice && this.filters.maxPrice) {
+      const minPrice = parseFloat(this.filters.minPrice);
+      const maxPrice = parseFloat(this.filters.maxPrice);
+      filtered = filtered.filter(vendor => 
+        vendor.startingPrice >= minPrice && vendor.startingPrice <= maxPrice
+      );
+    }
+
+    // Apply follower count filter
     if (this.filters.followerCount) {
       const minFollowers = parseInt(this.filters.followerCount);
       filtered = filtered.filter(vendor => vendor.followerCount >= minFollowers);
-    }
-
-    if (this.filters.availability) {
-      filtered = filtered.filter(vendor => vendor.availability === this.filters.availability);
     }
 
     // Apply sorting
@@ -234,6 +396,57 @@ export class VendorSearchComponent implements OnInit {
     this.filteredVendors = filtered;
     this.currentPage = 1;
     this.updatePagination();
+  }
+
+  // Service-based search methods
+  searchByService(): void {
+    if (!this.filters.serviceName.trim()) {
+      return;
+    }
+
+    this.isLoading = true;
+    this.vendorSearchService.searchByServiceName(this.filters.serviceName.trim())
+      .pipe(
+        catchError(err => {
+          console.error('Error searching by service:', err);
+          return of([]);
+        })
+      )
+      .subscribe(vendors => {
+        this.apiVendors = vendors;
+        this.allVendors = this.convertApiVendorsToDisplayVendors(vendors);
+        this.applyClientSideFilters();
+        this.isLoading = false;
+      });
+  }
+
+  searchByPriceRange(): void {
+    if (!this.filters.minPrice || !this.filters.maxPrice) {
+      return;
+    }
+
+    const minPrice = parseFloat(this.filters.minPrice);
+    const maxPrice = parseFloat(this.filters.maxPrice);
+
+    if (isNaN(minPrice) || isNaN(maxPrice) || minPrice < 0 || maxPrice < minPrice) {
+      this.error = 'Please enter valid price range values.';
+      return;
+    }
+
+    this.isLoading = true;
+    this.vendorSearchService.searchByServicePriceRange(minPrice, maxPrice)
+      .pipe(
+        catchError(err => {
+          console.error('Error searching by price range:', err);
+          return of([]);
+        })
+      )
+      .subscribe(vendors => {
+        this.apiVendors = vendors;
+        this.allVendors = this.convertApiVendorsToDisplayVendors(vendors);
+        this.applyClientSideFilters();
+        this.isLoading = false;
+      });
   }
 
   // Sort vendors
@@ -290,12 +503,72 @@ export class VendorSearchComponent implements OnInit {
       priceRange: '',
       followerCount: '',
       availability: '',
-      sortBy: 'relevance'
+      sortBy: 'relevance',
+      verify: '',
+      isActive: '',
+      serviceName: '',
+      minPrice: '',
+      maxPrice: ''
     };
     
     this.quickFilters.forEach(filter => filter.active = false);
     this.searchQuery = '';
-    this.applyFilters();
+    this.suggestions = [];
+    this.showSuggestions = false;
+    this.error = null;
+    this.loadInitialData();
+  }
+
+  // Special filter methods
+  searchVerifiedOnly(): void {
+    this.isLoading = true;
+    this.vendorSearchService.getVerifiedVendors()
+      .pipe(
+        catchError(err => {
+          console.error('Error loading verified vendors:', err);
+          return of([]);
+        })
+      )
+      .subscribe(vendors => {
+        this.apiVendors = vendors;
+        this.allVendors = this.convertApiVendorsToDisplayVendors(vendors);
+        this.applyClientSideFilters();
+        this.isLoading = false;
+      });
+  }
+
+  searchActiveOnly(): void {
+    this.isLoading = true;
+    this.vendorSearchService.getActiveVendors()
+      .pipe(
+        catchError(err => {
+          console.error('Error loading active vendors:', err);
+          return of([]);
+        })
+      )
+      .subscribe(vendors => {
+        this.apiVendors = vendors;
+        this.allVendors = this.convertApiVendorsToDisplayVendors(vendors);
+        this.applyClientSideFilters();
+        this.isLoading = false;
+      });
+  }
+
+  searchMostFollowed(): void {
+    this.isLoading = true;
+    this.vendorSearchService.getMostFollowedVendors(20)
+      .pipe(
+        catchError(err => {
+          console.error('Error loading most followed vendors:', err);
+          return of([]);
+        })
+      )
+      .subscribe(vendors => {
+        this.apiVendors = vendors;
+        this.allVendors = this.convertApiVendorsToDisplayVendors(vendors);
+        this.applyClientSideFilters();
+        this.isLoading = false;
+      });
   }
 
   // Pagination
@@ -337,7 +610,7 @@ export class VendorSearchComponent implements OnInit {
   // Vendor actions
   viewVendorProfile(vendor: Vendor): void {
     // Navigate to vendor profile with the vendor ID
-    this.router.navigate(['/customer/vender-profile'], { queryParams: { id: vendor.id } });
+    this.router.navigate(['/customer/vender-profile'], { queryParams: { vendorId: vendor.id } });
   }
 
   contactVendor(vendor: Vendor): void {
