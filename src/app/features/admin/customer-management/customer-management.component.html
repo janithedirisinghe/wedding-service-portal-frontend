@@ -1,0 +1,238 @@
+<div class="p-6 bg-gray-50 min-h-screen">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Customer Management</h1>
+        <div class="flex items-center space-x-4">
+            <!-- <div class="relative">
+                <input type="text" placeholder="Search customers..." class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <svg class="w-5 h-5 absolute right-3 top-2.5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>  -->
+            <!-- <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">
+                Add Customer
+            </button> -->
+            <button (click)="loadCustomers()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Error message -->
+    <div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 relative" role="alert">
+        <span class="block sm:inline">{{ error }}</span>
+        <button (click)="error = null" class="absolute top-0 bottom-0 right-0 px-4 py-3">
+            <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                <title>Close</title>
+                <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Loading spinner -->
+    <div *ngIf="loading" class="flex justify-center my-8">
+        <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
+    </div>
+
+    <!-- No customers message -->
+    <div *ngIf="!loading && customers.length === 0" class="bg-white shadow-md rounded-lg p-6 text-center">
+        <p class="text-gray-600">No customers found.</p>
+    </div>
+
+    <!-- Customers table -->
+    <div *ngIf="!loading && customers.length > 0" class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="min-w-full leading-normal">
+            <thead>
+                <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                    <th class="py-3 px-6 text-left">Customer Name</th>
+                    <th class="py-3 px-6 text-left">Email</th>
+                    <th class="py-3 px-6 text-center">Phone</th>
+                    <th class="py-3 px-6 text-center">Wedding Date</th>
+                    <th class="py-3 px-6 text-center">Status</th>
+                    <th class="py-3 px-6 text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="text-gray-700 text-sm font-light">
+                <tr *ngFor="let customer of customers" class="border-b border-gray-200 hover:bg-gray-100">
+                    <td class="py-3 px-6 text-left whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="mr-2">
+                                <img class="w-8 h-8 rounded-full object-cover" [src]="customer.profileImageUrl || defaultAvatar" alt="customer avatar" 
+                                    (error)="customer.profileImageUrl = defaultAvatar">
+                            </div>
+                            <span class="font-medium">{{ customer.firstName }} {{ customer.lastName }}</span>
+                        </div>
+                    </td>
+                    <td class="py-3 px-6 text-left">
+                        <span>{{ customer.userEmail }}</span>
+                    </td>
+                    <td class="py-3 px-6 text-center">
+                        <span>{{ customer.phoneNumber }}</span>
+                    </td>
+                    <td class="py-3 px-6 text-center">
+                        <span>{{ formatDate(customer.weddingDate) }}</span>
+                    </td>
+                    <td class="py-3 px-6 text-center">
+                        <span [ngClass]="{
+                            'bg-green-200 text-green-800': customer.isActive,
+                            'bg-red-200 text-red-800': !customer.isActive
+                        }" class="py-1 px-3 rounded-full text-xs">
+                            {{ customer.isActive ? 'Active' : 'Inactive' }}
+                        </span>
+                    </td>
+                    <td class="py-3 px-6 text-center">
+                        <div class="flex item-center justify-center space-x-2">
+                            <button (click)="openDetailsModal(customer)" class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 focus:outline-none">
+                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                            <button (click)="toggleStatus(customer)" class="w-8 h-8 flex items-center justify-center rounded-full bg-yellow-100 hover:bg-yellow-200 text-yellow-600 focus:outline-none relative" [disabled]="loadingId === customer.customerId">
+                                <!-- Loading spinner inside button -->
+                                <div *ngIf="loadingId === customer.customerId" class="absolute inset-0 flex items-center justify-center">
+                                    <div class="w-4 h-4 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin"></div>
+                                </div>
+                                <!-- Toggle icon -->
+                                <svg *ngIf="loadingId !== customer.customerId" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h.01M12 7h.01M16 7h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Customer Details Modal -->
+    <div *ngIf="isModalOpen" class="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex justify-center items-center">
+        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-screen overflow-y-auto">
+            <!-- Modal Header -->
+            <div class="border-b px-6 py-4 flex items-center justify-between sticky top-0 bg-white z-10">
+                <h3 class="text-xl font-semibold text-gray-900">Customer Details</h3>
+                <button (click)="closeModal()" class="text-gray-400 hover:text-gray-500">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div *ngIf="selectedCustomer" class="p-6">
+                <!-- Profile Section -->
+                <div class="flex flex-col md:flex-row gap-6 mb-6">
+                    <div class="w-32 h-32 flex-shrink-0">
+                        <img [src]="selectedCustomer.profileImageUrl || defaultAvatar" alt="Profile" class="w-full h-full object-cover rounded-lg"
+                             (error)="selectedCustomer.profileImageUrl = defaultAvatar">
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-bold">{{ selectedCustomer.firstName }} {{ selectedCustomer.lastName }}</h2>
+                        <p class="text-gray-600">{{ '@' + selectedCustomer.userName }}</p>
+                        <p class="text-gray-700 mt-2">{{ selectedCustomer.bio || 'No bio provided' }}</p>
+                        
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs font-medium">
+                                {{ selectedCustomer.followerCount }} followers
+                            </span>
+                            <span [ngClass]="{
+                                'bg-green-100 text-green-800': selectedCustomer.isActive,
+                                'bg-red-100 text-red-800': !selectedCustomer.isActive
+                            }" class="px-3 py-1 rounded-full text-xs font-medium">
+                                {{ selectedCustomer.isActive ? 'Active Account' : 'Inactive Account' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Details Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Contact Information -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-gray-700 mb-3 border-b pb-2">Contact Information</h3>
+                        <div class="space-y-2">
+                            <div class="flex">
+                                <span class="w-24 text-gray-500">Email:</span>
+                                <span class="font-medium">{{ selectedCustomer.userEmail }}</span>
+                            </div>
+                            <div class="flex">
+                                <span class="w-24 text-gray-500">Phone:</span>
+                                <span class="font-medium">{{ selectedCustomer.phoneNumber }}</span>
+                            </div>
+                            <div class="flex">
+                                <span class="w-24 text-gray-500">Address:</span>
+                                <span class="font-medium">{{ selectedCustomer.address || 'Not provided' }}</span>
+                            </div>
+                            <div class="flex">
+                                <span class="w-24 text-gray-500">City:</span>
+                                <span class="font-medium">{{ selectedCustomer.city || 'Not provided' }}</span>
+                            </div>
+                            <div class="flex">
+                                <span class="w-24 text-gray-500">Country:</span>
+                                <span class="font-medium">{{ selectedCustomer.country || 'Not provided' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Wedding Information -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-gray-700 mb-3 border-b pb-2">Wedding Details</h3>
+                        <div class="space-y-2">
+                            <div class="flex">
+                                <span class="w-32 text-gray-500">Wedding Date:</span>
+                                <span class="font-medium">{{ formatDate(selectedCustomer.weddingDate) }}</span>
+                            </div>
+                            <div class="flex">
+                                <span class="w-32 text-gray-500">Budget:</span>
+                                <span class="font-medium">{{ selectedCustomer.budget ? '$' + selectedCustomer.budget : 'Not specified' }}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-gray-500 mb-1">Preferred Vendors:</span>
+                                <div class="flex flex-wrap gap-1 mt-1">
+                                    <span *ngFor="let type of selectedCustomer.preferredVendorTypes" class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                                        {{ type }}
+                                    </span>
+                                    <span *ngIf="!selectedCustomer.preferredVendorTypes || selectedCustomer.preferredVendorTypes.length === 0" class="text-gray-500 text-sm">
+                                        No preferences selected
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- System Information -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-gray-700 mb-3 border-b pb-2">System Information</h3>
+                        <div class="space-y-2">
+                            <div class="flex">
+                                <span class="w-32 text-gray-500">Customer ID:</span>
+                                <span class="font-medium">{{ selectedCustomer.customerId }}</span>
+                            </div>
+                            <div class="flex">
+                                <span class="w-32 text-gray-500">User ID:</span>
+                                <span class="font-medium">{{ selectedCustomer.userId }}</span>
+                            </div>
+                            <div class="flex">
+                                <span class="w-32 text-gray-500">DOB:</span>
+                                <span class="font-medium">{{ formatDate(selectedCustomer.dateOfBirth) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="mt-6 flex justify-end gap-3">
+                    <button (click)="closeModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+                        Close
+                    </button>
+                    <button (click)="toggleStatus(selectedCustomer)" [ngClass]="{
+                        'bg-red-600 hover:bg-red-700': selectedCustomer.isActive,
+                        'bg-green-600 hover:bg-green-700': !selectedCustomer.isActive
+                    }" class="px-4 py-2 text-white rounded">
+                        {{ selectedCustomer.isActive ? 'Deactivate Account' : 'Activate Account' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -140,7 +140,7 @@ export class VenderProfileCustomerComponent implements OnInit {
     this.reviewsLoading = true;
     this.reviewsError = null;
 
-    this.reviewService.getReviewsByVendorId(this.vendorId).subscribe({
+    this.reviewService.getReviewsByVendorIdVendorId(this.vendorId).subscribe({
       next: (reviews) => {
         console.log('Raw reviews from API:', reviews);
         this.reviews = reviews.sort((a, b) => {
@@ -181,7 +181,7 @@ export class VenderProfileCustomerComponent implements OnInit {
     this.postsLoading = true;
     this.postsError = null;
   
-    this.postService.getPostsByVendorId(this.vendorId).subscribe({
+    this.postService.getPostsByVendorIdByVenderId(this.vendorId).subscribe({
       next: (posts) => {
         // Sort posts by date (newest first) and postId (highest first) as secondary sort
         this.posts = posts.sort((a, b) => {

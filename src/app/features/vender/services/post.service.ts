@@ -123,4 +123,10 @@ getPostsByVendorId(userId: number): Observable<PostModel[]> {
     });
 }
 
+getPostsByVendorIdByVenderId(venderId: number): Observable<PostModel[]> {
+    return this.http.get<PostModel[]>(`${this.baseUrl}/posts/vendorId/${venderId}`, {
+      withCredentials: true
+    });
+}
+
 }

@@ -28,6 +28,71 @@
         <p class="mt-1 text-xs text-gray-500">Specify the pricing for the service</p>
       </div>
 
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="mb-5">
+          <label class="block mb-2 text-sm font-semibold text-gray-700">Pricing Model</label>
+          <select formControlName="pricingModel" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+            <option value="FIXED">Fixed Price</option>
+            <option value="PER_HOUR">Per Hour</option>
+            <option value="PER_DAY">Per Day</option>
+            <option value="PACKAGE">Package</option>
+          </select>
+          <p class="mt-1 text-xs text-gray-500">Choose how you charge for this service.</p>
+        </div>
+
+        <div class="mb-5">
+          <label class="block mb-2 text-sm font-semibold text-gray-700">Status</label>
+          <select formControlName="status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+            <option value="DRAFT">Draft</option>
+          </select>
+          <p class="mt-1 text-xs text-gray-500">Set current availability status.</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="mb-5">
+          <label class="block mb-2 text-sm font-semibold text-gray-700">Advance Percentage (%)</label>
+          <input type="number" formControlName="advancePercentage" min="0" max="100" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="e.g. 30">
+          <p class="mt-1 text-xs text-gray-500">Optional advance payment percentage.</p>
+        </div>
+        <div class="mb-5">
+          <label class="block mb-2 text-sm font-semibold text-gray-700">Discount (%)</label>
+          <input type="number" formControlName="discountPercent" min="0" max="100" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="e.g. 10">
+          <p class="mt-1 text-xs text-gray-500">Promotional discount (optional).</p>
+        </div>
+        <div class="mb-5">
+          <label class="block mb-2 text-sm font-semibold text-gray-700">Book Before (Days)</label>
+          <input type="number" formControlName="bookBeforeDays" min="0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="e.g. 7">
+          <p class="mt-1 text-xs text-gray-500">How many days in advance must bookings be made?</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="mb-5">
+          <label class="block mb-2 text-sm font-semibold text-gray-700">Service Area Type</label>
+          <select formControlName="serviceAreaType" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+            <option value="LOCAL">Local</option>
+            <option value="NATIONAL">National</option>
+            <option value="ONLINE">Online</option>
+            <option value="REMOTE">Remote</option>
+          </select>
+          <p class="mt-1 text-xs text-gray-500">Select the geographic coverage.</p>
+        </div>
+        <div class="mb-5 flex items-center gap-3">
+          <div>
+            <label class="block mb-2 text-sm font-semibold text-gray-700">Available</label>
+            <input type="checkbox" formControlName="isAvailable" class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <label class="block mb-2 text-sm font-semibold text-gray-700">Cancellation Policy</label>
+        <textarea formControlName="cancellationPolicy" rows="3" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Describe your cancellation or refund policy"></textarea>
+      </div>
+
       <div class="flex justify-end mt-6">
         <button type="button" class="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 mr-3">
           Cancel

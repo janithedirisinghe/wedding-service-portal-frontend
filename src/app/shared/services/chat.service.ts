@@ -21,8 +21,8 @@ export class ChatService {
     return this.http.post<ChatMessageDTO>(`${this.baseUrl}/message`, payload);
   } 
 
-  getUserChatRooms(): Observable<ChatRoomDTO[]> {
-    return this.http.get<ChatRoomDTO[]>(`${this.baseUrl}/rooms`);
+  getUserChatRooms(userId: number): Observable<ChatRoomDTO[]> {
+    return this.http.get<ChatRoomDTO[]>(`${this.baseUrl}/rooms`, { params: { userId } });
   }
  
   getChatMessages(chatRoomId: number, page = 0, size = 50): Observable<ChatMessageDTO[]> {

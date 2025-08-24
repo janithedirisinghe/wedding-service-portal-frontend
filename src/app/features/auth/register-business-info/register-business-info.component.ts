@@ -51,13 +51,12 @@ export class RegisterBusinessInfoComponent implements OnInit{
 
     this.venderService.postVenderDetails(formvalues, userId).subscribe(
       (response: any) => {
-        if (response.message === 'User registered successfully!') {
+        if (response.message === 'Vendor registered successfully!') {
           localStorage.setItem('vendorId', response.vendorId);
-          this.router.navigate(['/vender']);
+          this.router.navigate(['auth/vender-login']);
           setTimeout(() => {
-          this.toastr.success('Vendor registered successfully'); // Show success message
-          }
-          , 1000);
+            this.toastr.success('Vendor registered successfully'); // Show success message
+          }, 1000);
           this.bussinesForm.reset();
         }
         this.isSubmitting = false;

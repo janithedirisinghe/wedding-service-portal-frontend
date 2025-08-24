@@ -70,7 +70,7 @@ export class CustomerService {
      * @returns Observable containing vendor details
      */
     getVendorDetails(vendorId: number): Observable<any> {
-        return this.http.get<any>(`${this.vendorApiUrl}getvendor/${vendorId}`, {
+        return this.http.get<any>(`${this.vendorApiUrl}getvenderByVenderId/${vendorId}`, {
             withCredentials: true
         });
     }

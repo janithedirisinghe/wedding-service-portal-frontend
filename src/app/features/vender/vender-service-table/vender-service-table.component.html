@@ -289,3 +289,165 @@
     </button>
   </div>
 </div>
+<!-- Removed extra closing div -->
+
+<!-- Edit Service Modal -->
+<div *ngIf="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+  <div class="bg-white w-full max-w-3xl rounded-lg shadow-xl overflow-hidden">
+    <div class="flex justify-between items-center px-6 py-4 border-b bg-gradient-to-r from-purple-50 to-indigo-50">
+      <h3 class="text-lg font-semibold text-gray-800">Edit Service</h3>
+      <button (click)="closeEditModal()" class="text-gray-500 hover:text-gray-700">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+    <form [formGroup]="editForm" (ngSubmit)="saveEdit()" class="p-6 max-h-[70vh] overflow-y-auto space-y-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+          <input formControlName="name" type="text" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Pricing (₹)</label>
+          <input formControlName="pricing" type="number" min="0" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400" />
+        </div>
+      </div>
+
+        <!-- Service Details Modal (moved outside to avoid nesting issues) -->
+        <div *ngIf="showDetailsModal" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div class="bg-white w-full max-w-3xl rounded-lg shadow-xl overflow-hidden animate-fadeIn">
+            <div class="flex justify-between items-center px-6 py-4 border-b bg-gradient-to-r from-purple-50 to-indigo-50">
+              <h3 class="text-lg font-semibold text-gray-800">Service Details</h3>
+              <button (click)="closeDetailsModal()" class="text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div class="p-6 max-h-[70vh] overflow-y-auto">
+              <div *ngIf="loadingDetails" class="flex items-center justify-center py-10">
+                <div class="w-10 h-10 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
+              </div>
+              <div *ngIf="detailsError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">{{ detailsError }}</div>
+              <div *ngIf="!loadingDetails && selectedService">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Basic Information</h4>
+                    <div class="space-y-2 text-sm">
+                      <div><span class="font-medium text-gray-700">Service ID:</span> {{ selectedService.serviceId || 'N/A' }}</div>
+                      <div><span class="font-medium text-gray-700">Name:</span> {{ selectedService.name }}</div>
+                      <div><span class="font-medium text-gray-700">Status:</span>
+                        <span class="px-2 py-0.5 rounded-full text-xs" [ngClass]="{
+                          'bg-green-100 text-green-700': selectedService.status === 'ACTIVE',
+                          'bg-yellow-100 text-yellow-700': selectedService.status === 'DRAFT',
+                          'bg-red-100 text-red-700': selectedService.status === 'INACTIVE'
+                        }">{{ selectedService.status || 'N/A' }}</span>
+                      </div>
+                      <div><span class="font-medium text-gray-700">Pricing Model:</span> {{ selectedService.pricingModel || 'N/A' }}</div>
+                      <div><span class="font-medium text-gray-700">Base Pricing:</span> ₹{{ selectedService.pricing }}</div>
+                      <div><span class="font-medium text-gray-700">Available:</span>
+                        <span [ngClass]="selectedService.isAvailable ? 'text-green-600' : 'text-red-600'">{{ selectedService.isAvailable ? 'Yes' : 'No' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Commercials</h4>
+                    <div class="space-y-2 text-sm">
+                      <div><span class="font-medium text-gray-700">Advance %:</span> {{ selectedService.advancePercentage ?? '—' }}</div>
+                      <div><span class="font-medium text-gray-700">Discount %:</span> {{ selectedService.discountPercent ?? '—' }}</div>
+                      <div><span class="font-medium text-gray-700">Book Before Days:</span> {{ selectedService.bookBeforeDays ?? '—' }}</div>
+                      <div><span class="font-medium text-gray-700">Service Area:</span> {{ selectedService.serviceAreaType || '—' }}</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-6">
+                  <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Description</h4>
+                  <p class="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{{ selectedService.description || 'No description provided.' }}</p>
+                </div>
+                <div class="mt-6" *ngIf="selectedService.cancellationPolicy">
+                  <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Cancellation Policy</h4>
+                  <p class="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{{ selectedService.cancellationPolicy }}</p>
+                </div>
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Meta</h4>
+                    <div class="space-y-2 text-xs text-gray-600">
+                      <div>Created: {{ selectedService.createdAt || '—' }}</div>
+                      <div>Updated: {{ selectedService.updatedAt || '—' }}</div>
+                      <div *ngIf="selectedService.isDeleted !== undefined">Deleted: {{ selectedService.isDeleted ? 'Yes' : 'No' }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="px-6 py-4 border-t flex justify-end bg-gray-50">
+              <button (click)="closeDetailsModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm">Close</button>
+            </div>
+          </div>
+        </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        <textarea formControlName="description" rows="3" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"></textarea>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Pricing Model</label>
+          <select formControlName="pricingModel" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400">
+            <option value="FIXED">Fixed</option>
+            <option value="PER_HOUR">Per Hour</option>
+            <option value="PER_DAY">Per Day</option>
+            <option value="PACKAGE">Package</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+          <select formControlName="status" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400">
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+            <option value="DRAFT">Draft</option>
+          </select>
+        </div>
+        <div class="flex items-center mt-6">
+          <label class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+            <input formControlName="isAvailable" type="checkbox" class="h-4 w-4 text-purple-600 border-gray-300 rounded" />
+            <span>Available</span>
+          </label>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Advance %</label>
+          <input formControlName="advancePercentage" type="number" min="0" max="100" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Discount %</label>
+          <input formControlName="discountPercent" type="number" min="0" max="100" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Book Before (Days)</label>
+          <input formControlName="bookBeforeDays" type="number" min="0" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400" />
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Service Area</label>
+          <select formControlName="serviceAreaType" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400">
+            <option value="LOCAL">Local</option>
+            <option value="NATIONAL">National</option>
+            <option value="ONLINE">Online</option>
+            <option value="REMOTE">Remote</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Cancellation Policy</label>
+          <textarea formControlName="cancellationPolicy" rows="2" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"></textarea>
+        </div>
+      </div>
+      <div *ngIf="editError" class="text-sm text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded">{{ editError }}</div>
+      <div class="flex justify-end space-x-3 pt-2">
+        <button type="button" (click)="closeEditModal()" class="px-4 py-2 text-sm rounded bg-gray-200 hover:bg-gray-300 text-gray-700">Cancel</button>
+        <button type="submit" [disabled]="savingEdit || editForm.invalid" class="px-4 py-2 text-sm rounded bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center">
+          <span *ngIf="!savingEdit">Save Changes</span>
+          <span *ngIf="savingEdit" class="flex items-center"><span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>Saving...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

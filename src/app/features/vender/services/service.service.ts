@@ -18,15 +18,52 @@ export class VenderService {
     }
 
 
-    createService(Service: ServiceModel): Observable<any> {
-        return this.http.post<ServiceModel>(`${this.baseUrl}/services`, Service, {
+    createService(service: ServiceModel): Observable<any> {
+        // Map to backend DTO (if naming differences exist adjust here)
+        const payload = {
+          name: service.name,
+          description: service.description,
+          pricing: service.pricing,
+          userId: service.userId,
+          status: service.status,
+          pricingModel: service.pricingModel,
+            advancePercentage: service.advancePercentage,
+            discountPercent: service.discountPercent,
+            bookBeforeDays: service.bookBeforeDays,
+            isAvailable: service.isAvailable,
+            serviceAreaType: service.serviceAreaType,
+            cancellationPolicy: service.cancellationPolicy
+        };
+        return this.http.post(`${this.baseUrl}/services`, payload, {
           withCredentials: true
         });
     }
 
     getServicesByVenderId(venderId: number): Observable<any>{
-      return this.http.get<ServiceModel[]>(`${this.baseUrl}/services/getServiceByVendorId/${venderId}`,{
+      return this.http.get<ServiceModel[]>(`${this.baseUrl}/services/getServiceByUserId/${venderId}`,{
       withCredentials: true
     });
     }
+
+    updateService(serviceId: number, service: ServiceModel): Observable<any> {
+      const payload = {
+        serviceId: serviceId,
+        name: service.name,
+        description: service.description,
+        pricing: service.pricing,
+        userId: service.userId,
+        status: service.status,
+        pricingModel: service.pricingModel,
+        advancePercentage: service.advancePercentage,
+        discountPercent: service.discountPercent,
+        bookBeforeDays: service.bookBeforeDays,
+        isAvailable: service.isAvailable,
+        serviceAreaType: service.serviceAreaType,
+        cancellationPolicy: service.cancellationPolicy
+      };
+      return this.http.put(`${this.baseUrl}/services/${serviceId}`, payload, {
+        withCredentials: true
+      });
+    }
+
 }

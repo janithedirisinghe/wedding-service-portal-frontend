@@ -7,12 +7,14 @@ import { AdminRoutingModule } from './admin-routing.module';
 import { AdminBodyPageComponent } from './admin-body-page/admin-body-page.component';
 import { VendorManagementComponent } from './vendor-management/vendor-management.component';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+import { CustomerManagementComponent } from './customer-management/customer-management.component';
 
 @NgModule({
 declarations: [
     AdminBodyPageComponent,
     VendorManagementComponent,
-    AdminDashboardComponent
+    AdminDashboardComponent,
+    CustomerManagementComponent
   ],
   imports: [
     CommonModule,

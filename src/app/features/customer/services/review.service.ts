@@ -23,6 +23,12 @@ export class ReviewService {
     });
   }
 
+  getReviewsByVendorIdVendorId(vendorId: number): Observable<ReviewModel[]> {
+    return this.http.get<ReviewModel[]>(`${this.apiUrl}/vendorId/${vendorId}`, {
+      withCredentials: true
+    });
+  }
+
   /**
    * Get all reviews by a specific customer
    * @param customerId - The ID of the customer

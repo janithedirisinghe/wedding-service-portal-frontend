@@ -91,8 +91,10 @@ export class VenderChatComponent implements OnInit, OnDestroy {
   }
 
   private loadRooms(): void {
-    this.chatApi.getUserChatRooms().subscribe({
-      next: rooms => {
+    const userId = Number(this.auth.getUserId());
+    this.chatApi.getUserChatRooms(userId).subscribe({
+      next: rooms => { 
+        console.log('Loaded chat rooms:', rooms); // Debug log
         const uid = this.auth.getUserId() || undefined;
         this.chats = rooms.map(r => ({
           id: this.chatApi.getRoomId(r),
