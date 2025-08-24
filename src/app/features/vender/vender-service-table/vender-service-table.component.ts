@@ -45,6 +45,8 @@ export class VenderServiceTableComponent implements OnInit {
 
   // View service details
   viewServiceDetails(serviceId: number): void {
+  // Ensure edit modal is closed before showing details
+  this.showEditModal = false;
     const found = this.venderServiceDetails.find(s => s.serviceId === serviceId);
     if (!found) {
       this.detailsError = 'Service not found in current list';
@@ -65,6 +67,8 @@ export class VenderServiceTableComponent implements OnInit {
   // Edit service
   editService(serviceId?: number): void {
   if(!serviceId) return;
+  // Ensure details modal closed when editing
+  this.showDetailsModal = false;
   const found = this.venderServiceDetails.find(s => s.serviceId === serviceId);
   if(!found) return;
   this.selectedService = found;
@@ -75,9 +79,30 @@ export class VenderServiceTableComponent implements OnInit {
 
   // Delete service
   deleteService(serviceId?: number): void {
-    if (serviceId) {
-      console.log(`Deleting service with ID: ${serviceId}`);
-    }
+    if (!serviceId) return;
+    const idx = this.venderServiceDetails.findIndex(s => s.serviceId === serviceId);
+    if (idx === -1) return;
+ 
+    // Optimistic removal
+    const removed = this.venderServiceDetails[idx];
+    this.venderServiceDetails.splice(idx, 1);
+
+    this.venderService.deleteService(serviceId).subscribe({
+      next: () => {
+        // If the deleted item was being viewed/edited, close modals
+        if (this.selectedService && this.selectedService.serviceId === serviceId) {
+          this.closeDetailsModal();
+          this.closeEditModal();
+        }
+      },
+      error: (err) => {
+        console.error('Delete failed', err);
+        // Rollback UI
+        this.venderServiceDetails.splice(idx, 0, removed);
+        // Optionally surface an error (could wire a toast service)
+        alert(err?.error?.message || 'Failed to delete service');
+      }
+    });
   }
 
   // Add new service
@@ -137,18 +162,19 @@ export class VenderServiceTableComponent implements OnInit {
       cancellationPolicy: formVal.cancellationPolicy
     };
     this.venderService.updateService(this.selectedService.serviceId, payload).subscribe({
-      next: () => {
-        // update local list
+      next: (updated) => {
         const idx = this.venderServiceDetails.findIndex(s => s.serviceId === this.selectedService!.serviceId);
         if(idx > -1) {
-          this.venderServiceDetails[idx] = { ...this.venderServiceDetails[idx], ...payload };
+          // Merge backend updated fields
+            this.venderServiceDetails[idx] = { ...this.venderServiceDetails[idx], ...updated };
         }
         this.savingEdit = false;
         this.showEditModal = false;
+        this.selectedService = null;
       },
       error: (err) => {
         console.error('Update failed', err);
-        this.editError = 'Failed to update service';
+        this.editError = err?.error?.message || 'Failed to update service';
         this.savingEdit = false;
       }
     });
@@ -156,6 +182,10 @@ export class VenderServiceTableComponent implements OnInit {
 
   closeEditModal() {
     this.showEditModal = false;
+    // preserve selectedService only if details modal currently open
+    if(!this.showDetailsModal) {
+      this.selectedService = null;
+    }
     this.editForm.reset();
   }
 
