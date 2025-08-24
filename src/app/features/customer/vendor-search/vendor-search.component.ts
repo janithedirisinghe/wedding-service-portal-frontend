@@ -7,7 +7,7 @@ export interface Vendor {
   vendorType: string;
   location: string;
   country: string;
-  rating: number;
+  averageRating: number;
   reviewCount: number;
   followerCount: number;
   startingPrice: number;
@@ -15,6 +15,8 @@ export interface Vendor {
   image?: string;
   availability: 'available' | 'busy';
   isFavorite: boolean;
+  verify?: boolean;
+  isActive?: boolean;
 }
 
 export interface SearchFilters {
@@ -148,7 +150,7 @@ export class VendorSearchComponent implements OnInit {
         vendorType: this.availableVendorTypes[Math.floor(Math.random() * this.availableVendorTypes.length)],
         location: this.availableLocations[Math.floor(Math.random() * this.availableLocations.length)],
         country: this.availableCountries[Math.floor(Math.random() * this.availableCountries.length)],
-        rating: Math.round((Math.random() * 2 + 3) * 10) / 10, // 3.0 to 5.0
+        averageRating: Math.round((Math.random() * 2 + 3) * 10) / 10, // 3.0 to 5.0
         reviewCount: Math.floor(Math.random() * 200) + 10, // 10 to 210
         followerCount: Math.floor(Math.random() * 5000) + 50, // 50 to 5050
         startingPrice: Math.floor(Math.random() * 2500) + 200, // 200 to 2700
@@ -197,7 +199,7 @@ export class VendorSearchComponent implements OnInit {
 
     if (this.filters.rating) {
       const minRating = parseFloat(this.filters.rating);
-      filtered = filtered.filter(vendor => vendor.rating >= minRating);
+      filtered = filtered.filter(vendor => vendor.averageRating >= minRating);
     }
 
     if (this.filters.priceRange) {
@@ -238,7 +240,7 @@ export class VendorSearchComponent implements OnInit {
   sortVendors(vendors: Vendor[]): Vendor[] {
     switch (this.filters.sortBy) {
       case 'rating':
-        return vendors.sort((a, b) => b.rating - a.rating);
+        return vendors.sort((a, b) => b.averageRating - a.averageRating);
       case 'followers':
         return vendors.sort((a, b) => b.followerCount - a.followerCount);
       case 'price_low':

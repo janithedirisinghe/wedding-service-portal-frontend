@@ -8,6 +8,9 @@ export interface BackendVendor {
   venType: string;
   bio: string;
   telNo: string;
+  profileImageUrl?: string;
+  isActive?: boolean;
+  verify?: boolean;
   user?: {
     userId: number;
     username: string;
@@ -21,11 +24,19 @@ export interface FollowingResponse {
   success: boolean;
   followingCount: number;
   following: BackendVendor[];
+  followingSummaries?: {
+    vendorId: number;
+    businessName: string;
+    profileImageUrl?: string;
+    followerCount?: number;
+    reviewCount?: number;
+    averageRating?: number;
+  }[];
   message?: string;
 }
 
 // Utility function to validate and fix backend vendor data
-function validateBackendVendor(vendor: any): BackendVendor | null {
+export function validateBackendVendor(vendor: any): BackendVendor | null {
   if (!vendor || typeof vendor !== 'object') {
     return null;
   }
@@ -45,6 +56,9 @@ function validateBackendVendor(vendor: any): BackendVendor | null {
     venType: vendor.venType || vendor.VenType || '',
     bio: vendor.bio || '',
     telNo: vendor.telNo || '',
+  profileImageUrl: vendor.profileImageUrl || vendor.profile_image_url || '',
+  isActive: typeof vendor.isActive === 'boolean' ? vendor.isActive : (vendor.is_active ?? true),
+  verify: typeof vendor.verify === 'boolean' ? vendor.verify : (vendor.Verify ?? false),
     user: vendor.user || undefined,
     services: vendor.services || [],
     followers: vendor.followers || []
@@ -52,19 +66,25 @@ function validateBackendVendor(vendor: any): BackendVendor | null {
 }
 
 // Utility function to convert backend vendor to frontend vendor
-export function convertToFrontendVendor(backendVendor: BackendVendor): import('../vendor-search/vendor-search.component').Vendor {
+export function convertToFrontendVendor(
+  backendVendor: BackendVendor,
+  summary?: { followerCount?: number; reviewCount?: number; averageRating?: number; profileImageUrl?: string }
+): import('../vendor-search/vendor-search.component').Vendor {
   return {
     id: backendVendor.venderId.toString(),
     businessName: backendVendor.businessName,
     vendorType: backendVendor.venType,
     location: backendVendor.location,
     country: backendVendor.country,
-    rating: 4.5, // Default rating since it's not in backend model
-    reviewCount: 0, // Default review count
-    followerCount: backendVendor.followers ? backendVendor.followers.length : 0,
-    startingPrice: 0, // Default starting price
+    averageRating: summary?.averageRating ?? 0,
+    reviewCount: summary?.reviewCount ?? 0,
+    followerCount: summary?.followerCount ?? (backendVendor.followers ? backendVendor.followers.length : 0),
+    startingPrice: 0,
     bio: backendVendor.bio,
     availability: backendVendor.availability === 'available' ? 'available' : 'busy',
-    isFavorite: true // Since this is for favorites, it's always true
+    isFavorite: true,
+    image: summary?.profileImageUrl || backendVendor.profileImageUrl || undefined,
+    verify: backendVendor.verify,
+    isActive: backendVendor.isActive
   };
 }

@@ -85,7 +85,16 @@ export class CustomerFavoritesComponent implements OnInit {
     this.followService.getCustomerFollowing(userId).subscribe({
       next: (response) => {
         if (response.success) {
-          this.favoriteVendors = response.following.map(convertToFrontendVendor);
+          const summariesMap = new Map<number, { followerCount?: number; reviewCount?: number; averageRating?: number; profileImageUrl?: string }>();
+          (response.followingSummaries || []).forEach(s => {
+            summariesMap.set(s.vendorId, {
+              followerCount: s.followerCount,
+              reviewCount: s.reviewCount,
+              averageRating: s.averageRating,
+              profileImageUrl: s.profileImageUrl
+            });
+          });
+          this.favoriteVendors = response.following.map(v => convertToFrontendVendor(v, summariesMap.get(v.venderId)));
           
           if (this.favoriteVendors.length === 0) {
             this.error = 'No favorite vendors found';

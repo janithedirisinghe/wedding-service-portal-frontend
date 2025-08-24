@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { FollowRequest, FollowResponse } from '../models/follow.model';
-import { FollowingResponse } from '../models/vendor.model';
+import { FollowingResponse, validateBackendVendor } from '../models/vendor.model';
 
 @Injectable({
   providedIn: 'root'
@@ -119,11 +119,26 @@ export class FollowService {
    */
   getCustomerFollowing(userId: number): Observable<FollowingResponse> {
     return this.http.get<FollowingResponse>(`${this.apiUrl}/customer/${userId}/following`).pipe(
+      map(resp => {
+        if (!resp || !Array.isArray(resp.following)) {
+          return { success: false, followingCount: 0, following: [], message: 'Malformed response' };
+        }
+        const cleaned = resp.following
+          .map(v => validateBackendVendor(v))
+          .filter((v): v is NonNullable<typeof v> => !!v);
+        return {
+          success: resp.success !== false,
+          followingCount: resp.followingCount ?? cleaned.length,
+          following: cleaned,
+          followingSummaries: resp.followingSummaries,
+          message: resp.message
+        };
+      }),
       catchError((error) => {
         console.error('Error fetching customer following:', error);
         return of({
           success: false,
-          followingCount: 0,
+          followingCount: 0, 
           following: [],
           message: 'Failed to load favorites'
         });
