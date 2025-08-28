@@ -33,7 +33,14 @@ export class VenderBookingRequestsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.fetchBookingRequests();
+    // Wait for auth initialization before fetching data
+    this.authService.waitForAuthInitialization().subscribe(isLoggedIn => {
+      if (isLoggedIn) {
+        this.fetchBookingRequests();
+      } else {
+        this.error = 'Please login to view booking requests.';
+      }
+    });
   }
 
   fetchBookingRequests() {

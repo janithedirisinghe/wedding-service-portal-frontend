@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, map, catchError, throwError, BehaviorSubject } from 'rxjs';
+import { Observable, map, catchError, throwError, BehaviorSubject, switchMap, filter, of } from 'rxjs';
 import { AuthService } from './auth.service';
 import { 
   NotificationResponseDTO, 
@@ -33,20 +33,45 @@ export class NotificationService {
    * Get notifications for the current user with pagination
    */
   getUserNotifications(page: number = 0, size: number = 20): Observable<NotificationPageResponse> {
-    const userId = this.authService.getUserId();
-    
-    if (!userId) {
-      return throwError(() => new Error('User not authenticated'));
-    }
+    // Wait for auth to be initialized before making API calls
+    return this.authService.authInitialized$.pipe(
+      filter(initialized => initialized), // Wait until auth is initialized
+      switchMap(() => {
+        const userId = this.authService.getUserId();
+        
+        if (!userId) {
+          // User is not authenticated, return empty response instead of error
+          return of({
+            content: [],
+            pageable: {
+              pageNumber: page,
+              pageSize: size,
+              sort: { empty: true, sorted: false, unsorted: true },
+              offset: 0,
+              paged: true,
+              unpaged: false
+            },
+            totalElements: 0,
+            totalPages: 0,
+            last: true,
+            size: size,
+            number: page,
+            sort: { empty: true, sorted: false, unsorted: true },
+            first: true,
+            numberOfElements: 0,
+            empty: true
+          } as NotificationPageResponse);
+        }
 
-    const params = new HttpParams()
-      .set('page', page.toString())
-      .set('size', size.toString());
+        const params = new HttpParams()
+          .set('page', page.toString())
+          .set('size', size.toString());
 
-    return this.http.get<NotificationPageResponse>(
-      `${this.apiUrl}/user/${userId}`,
-      { params, withCredentials: true }
-    ).pipe(
+        return this.http.get<NotificationPageResponse>(
+          `${this.apiUrl}/user/${userId}`,
+          { params, withCredentials: true }
+        );
+      }),
       map(response => {
         // Update unread count
         const unreadCount = response.content.filter(n => !n.isRead).length;
@@ -67,7 +92,27 @@ export class NotificationService {
       }),
       catchError(error => {
         console.error('Error fetching notifications:', error);
-        return throwError(() => error);
+        // Return empty response instead of throwing error
+        return of({
+          content: [],
+          pageable: {
+            pageNumber: page,
+            pageSize: size,
+            sort: { empty: true, sorted: false, unsorted: true },
+            offset: 0,
+            paged: true,
+            unpaged: false
+          },
+          totalElements: 0,
+          totalPages: 0,
+          last: true,
+          size: size,
+          number: page,
+          sort: { empty: true, sorted: false, unsorted: true },
+          first: true,
+          numberOfElements: 0,
+          empty: true
+        } as NotificationPageResponse);
       })
     );
   }

@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angu
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { NotificationService } from '../../services/notification.service';
+import { AuthService } from '../../services/auth.service';
 import { 
   NotificationDisplay, 
   NotificationPageResponse, 
@@ -212,10 +213,18 @@ export class NotificationPanelComponent implements OnInit, OnDestroy {
   private pageSize: number = 20;
   private destroy$ = new Subject<void>();
 
-  constructor(private notificationService: NotificationService) {}
+  constructor(
+    private notificationService: NotificationService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
-    this.loadNotifications();
+    // Wait for auth initialization before loading notifications
+    this.authService.waitForAuthInitialization().subscribe(isLoggedIn => {
+      if (isLoggedIn) {
+        this.loadNotifications();
+      }
+    });
     this.subscribeToNotifications();
   }
 
@@ -225,6 +234,12 @@ export class NotificationPanelComponent implements OnInit, OnDestroy {
   }
 
   private loadNotifications(): void {
+    // Only load notifications if user is authenticated
+    if (!this.authService.isLoggedIn()) {
+      this.loading = false;
+      return;
+    }
+
     this.loading = true;
     this.notificationService.getUserNotifications(0, this.pageSize)
       .pipe(takeUntil(this.destroy$))

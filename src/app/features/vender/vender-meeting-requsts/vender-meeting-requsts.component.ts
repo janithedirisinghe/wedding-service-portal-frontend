@@ -27,7 +27,14 @@ export class VenderMeetingRequstsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.fetchMeetingRequests();
+    // Wait for auth initialization before fetching data
+    this.authService.waitForAuthInitialization().subscribe(isLoggedIn => {
+      if (isLoggedIn) {
+        this.fetchMeetingRequests();
+      } else {
+        this.error = 'Please login to view meeting requests.';
+      }
+    });
   }
 
   fetchMeetingRequests() {

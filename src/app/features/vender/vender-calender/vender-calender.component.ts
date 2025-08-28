@@ -56,7 +56,14 @@ export class VenderCalenderComponent implements OnInit {
 
   ngOnInit() {
     this.generateCalendar();
-    this.loadCalendarData();
+    // Wait for auth initialization before loading data
+    this.authService.waitForAuthInitialization().subscribe(isLoggedIn => {
+      if (isLoggedIn) {
+        this.loadCalendarData();
+      } else {
+        this.error = 'Please login to view calendar.';
+      }
+    });
   }
 
   generateCalendar() {

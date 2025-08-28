@@ -82,11 +82,21 @@ export class CustomerNavbarComponent implements OnInit, OnDestroy {
         this.notifications = notifications.slice(0, 5); // Show only recent 5 in navbar
       });
 
-    // Load initial notifications
-    this.loadNotifications();
+    // Wait for auth initialization before loading notifications
+    this.authService.waitForAuthInitialization().subscribe(isLoggedIn => {
+      if (isLoggedIn) {
+        this.loadNotifications();
+      }
+    });
   }
 
   loadNotifications(): void {
+    // Only load notifications if user is authenticated
+    if (!this.authService.isLoggedIn()) {
+      this.loadingNotifications = false;
+      return;
+    }
+
     this.loadingNotifications = true;
     this.notificationService.getRecentNotifications(5)
       .pipe(takeUntil(this.destroy$))

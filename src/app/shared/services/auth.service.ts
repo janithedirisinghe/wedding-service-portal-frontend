@@ -1,7 +1,7 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap, catchError, of } from 'rxjs';
+import { Observable, tap, catchError, of, BehaviorSubject, filter, take, map } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { Login } from '../Models/login.model';
 
@@ -17,6 +17,10 @@ export class AuthService {
     username: string;
   } | null = null;
 
+  // Track authentication state and initialization
+  private authInitializedSubject = new BehaviorSubject<boolean>(false);
+  public authInitialized$ = this.authInitializedSubject.asObservable();
+
   constructor(
     private http: HttpClient, 
     private router: Router,
@@ -24,6 +28,13 @@ export class AuthService {
   ) {
     // Initialize auth state from localStorage on service creation
     this.initializeAuthState();
+    // Validate session with backend on app load (browser only)
+    if (isPlatformBrowser(this.platformId)) {
+      this.validateSessionWithBackend();
+    } else {
+      // If not in browser, mark as initialized
+      this.authInitializedSubject.next(true);
+    }
   }
 
   private initializeAuthState(): void {
@@ -40,7 +51,37 @@ export class AuthService {
           localStorage.removeItem('userSession');
         }
       }
-    } 
+    }
+  }
+
+  /**
+   * Validate session with backend using httpOnly cookie
+   * If not authenticated, auto-logout and clear local state
+   */
+  private validateSessionWithBackend(): void {
+    this.http.get<{ role: string; userId: number; username: string }>(`${this.apiUrl}/session`, { withCredentials: true })
+      .pipe(
+        catchError(() => of(null))
+      )
+      .subscribe((response) => {
+        if (response && response.userId) {
+          // Session is valid, update local userData and localStorage
+          this.userData = {
+            role: response.role,
+            userId: response.userId,
+            username: response.username
+          };
+          if (isPlatformBrowser(this.platformId)) {
+            localStorage.setItem('userSession', JSON.stringify(this.userData));
+          }
+        } else {
+          // Session invalid, clear local state but don't redirect here
+          // Let components handle the redirect based on their needs
+          this.clearAuthState();
+        }
+        // Mark authentication as initialized regardless of success/failure
+        this.authInitializedSubject.next(true);
+      });
   }
 
   login(login: Login): Observable<any> {
@@ -94,6 +135,17 @@ export class AuthService {
 
   isLoggedIn(): boolean {
     return !!this.userData;
+  }
+
+  /**
+   * Wait for auth initialization to complete, then check if user is logged in
+   */
+  waitForAuthInitialization(): Observable<boolean> {
+    return this.authInitialized$.pipe(
+      filter(initialized => initialized),
+      take(1),
+      map(() => this.isLoggedIn())
+    );
   }
 
   getUserRole(): string | null {
