@@ -17,7 +17,7 @@ import { CustomerMeetingDTO, MeetingMood, MeetingStatus } from '../models/meetin
 export class CustomerFavoritesComponent implements OnInit {
   
   // Tab management
-  activeTab: 'favorites' | 'meetings' | 'bookings' = 'favorites';
+  activeTab: 'overview' | 'favorites' | 'meetings' | 'bookings' = 'overview';
   
   // Favorites properties
   favoriteVendors: Vendor[] = [];
@@ -69,6 +69,8 @@ export class CustomerFavoritesComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadFavorites();
+    this.loadMeetings();
+    this.loadBookings();
   }
 
   loadFavorites(): void {
@@ -196,6 +198,16 @@ export class CustomerFavoritesComponent implements OnInit {
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  }
+
+  getPendingMeetingsCount(): number {
+    return this.customerMeetings.filter(meeting => meeting.status === 'PENDING').length;
+  }
+
+  getPaymentDueCount(): number {
+    return this.customerBookings.filter(booking => 
+      booking.status === 'ACCEPTED'
+    ).length;
   }
 
   getMeetingMoodText(mood: MeetingMood): string {

@@ -8,6 +8,45 @@
   background-color: #f8fafc;
 }
 
+// Sidebar Navigation Styles
+.sidebar-nav {
+  min-height: 100vh;
+  width: 64px; // 16 * 4 = 4rem
+  position: sticky;
+  top: 0;
+}
+
+.nav-item {
+  transition: all 0.2s ease-in-out;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+  
+  &.active {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  }
+}
+
+// Dashboard Cards
+.dashboard-card {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+}
+
+// Activity Items
+.activity-item {
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: translateX(4px);
+  }
+}
+
 // Custom line clamp utility
 .line-clamp-2 {
   display: -webkit-box;
@@ -47,7 +86,31 @@
 }
 
 // Responsive design
+@media (max-width: 1024px) {
+  .sidebar-nav {
+    width: 64px; // Keep same width on tablet
+  }
+}
+
 @media (max-width: 768px) {
+  .sidebar-nav {
+    width: 100%;
+    min-height: auto;
+    position: relative;
+    
+    .nav-item {
+      padding: 0.75rem;
+    }
+  }
+  
+  .main-layout {
+    flex-direction: column;
+  }
+  
+  .dashboard-cards {
+    grid-template-columns: 1fr;
+  }
+  
   .favorites-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -66,6 +129,29 @@
     
     .vendor-info {
       padding: 1rem;
+    }
+  }
+  
+  .sidebar-nav {
+    // On mobile, show icons in horizontal layout
+    .nav-item {
+      padding: 0.5rem;
+      
+      svg {
+        height: 1.25rem;
+        width: 1.25rem;
+      }
+    }
+    
+    nav {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 1rem;
+    }
+    
+    .space-y-3 > :not([hidden]) ~ :not([hidden]) {
+      margin-top: 0;
+      margin-left: 0.5rem;
     }
   }
 }
