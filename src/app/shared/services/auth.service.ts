@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, tap, catchError, of, BehaviorSubject, filter, take, map } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { Login } from '../Models/login.model';
+import { ChangePasswordRequest, ChangePasswordResponse } from '../Models/change-password.model';
 
 @Injectable({
   providedIn: 'root',
@@ -158,6 +159,17 @@ export class AuthService {
 
   getUserName(): string | null {
     return this.userData?.username || null;
+  }
+
+  /**
+   * Change user password
+   */
+  changePassword(changePasswordData: ChangePasswordRequest): Observable<ChangePasswordResponse> {
+    return this.http.post<ChangePasswordResponse>(
+      `${this.apiUrl}/change-password`,
+      changePasswordData,
+      { withCredentials: true }
+    );
   }
 
   redirectUser(role: string): void {

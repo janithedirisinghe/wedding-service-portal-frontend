@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CustomerService } from '../services';
 import { CustomerDetails } from '../models';
 import { AuthService } from '../../../shared/services/auth.service';
+import { ChangePasswordRequest } from '../../../shared/Models/change-password.model';
 
 @Component({
   selector: 'app-customer-profile',
@@ -13,6 +14,17 @@ export class CustomerProfileComponent implements OnInit {
   loading: boolean = false;
   error: string | null = null;
   isEditModalOpen: boolean = false;
+  isChangePasswordModalOpen: boolean = false;
+  
+  // Change password form data
+  changePasswordData: ChangePasswordRequest = {
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  };
+  changePasswordLoading: boolean = false;
+  changePasswordError: string | null = null;
+  changePasswordSuccess: string | null = null;
 
   constructor(private customerService: CustomerService, private authService: AuthService) { }
 
@@ -91,5 +103,86 @@ export class CustomerProfileComponent implements OnInit {
   onProfileUpdated(updatedProfile: CustomerDetails): void {
     this.profile = updatedProfile;
     this.closeEditModal();
+  }
+
+  /**
+   * Open the change password modal
+   */
+  openChangePasswordModal(): void {
+    this.isChangePasswordModalOpen = true;
+    this.resetChangePasswordForm();
+  }
+
+  /**
+   * Close the change password modal
+   */
+  closeChangePasswordModal(): void {
+    this.isChangePasswordModalOpen = false;
+    this.resetChangePasswordForm();
+  }
+
+  /**
+   * Reset change password form
+   */
+  private resetChangePasswordForm(): void {
+    this.changePasswordData = {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    };
+    this.changePasswordError = null;
+    this.changePasswordSuccess = null;
+    this.changePasswordLoading = false;
+  }
+
+  /**
+   * Handle change password submission
+   */
+  onChangePassword(): void {
+    // Reset messages
+    this.changePasswordError = null;
+    this.changePasswordSuccess = null;
+
+    // Validate form
+    if (!this.changePasswordData.currentPassword || !this.changePasswordData.newPassword || !this.changePasswordData.confirmPassword) {
+      this.changePasswordError = 'All fields are required';
+      return;
+    }
+
+    if (this.changePasswordData.newPassword !== this.changePasswordData.confirmPassword) {
+      this.changePasswordError = 'New password and confirmation do not match';
+      return;
+    }
+
+    if (this.changePasswordData.newPassword.length < 6) {
+      this.changePasswordError = 'New password must be at least 6 characters long';
+      return;
+    }
+
+    if (this.changePasswordData.currentPassword === this.changePasswordData.newPassword) {
+      this.changePasswordError = 'New password must be different from current password';
+      return;
+    }
+
+    // Submit password change
+    this.changePasswordLoading = true;
+    this.authService.changePassword(this.changePasswordData).subscribe({
+      next: (response) => {
+        this.changePasswordLoading = false;
+        if (response.message) {
+          this.changePasswordSuccess = response.message;
+          // Auto close modal after 2 seconds
+          setTimeout(() => {
+            this.closeChangePasswordModal();
+          }, 2000);
+        } else if (response.error) {
+          this.changePasswordError = response.error;
+        }
+      },
+      error: (error) => {
+        this.changePasswordLoading = false;
+        this.changePasswordError = error.error?.error || 'An error occurred while changing password';
+      }
+    });
   }
 }

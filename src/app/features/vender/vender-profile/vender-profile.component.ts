@@ -1,6 +1,6 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { venderDetails } from '../models/vender.model';
 import { VendorProfileService } from '../services/venderProfile.service';
 import { VenderHeaderComponent } from '../../../shared/components/vender-header/vender-header.component';
@@ -9,12 +9,13 @@ import { PostService } from '../services/post.service';
 import { PostModel } from '../models/post.model';
 import { VendorReviewService } from '../services/review.service';
 import { ReviewDTO } from '../models/review.model';
+import { ChangePasswordRequest } from '../../../shared/Models/change-password.model';
 
 @Component({
   selector: 'app-vender-profile',
   templateUrl: './vender-profile.component.html',
   standalone: true,
-  imports: [CommonModule, VenderHeaderComponent, ReactiveFormsModule], // Import ReactiveFormsModule
+  imports: [CommonModule, VenderHeaderComponent, ReactiveFormsModule, FormsModule], // Import FormsModule
   styleUrls: ['./vender-profile.component.css']
 })
 export class VenderProfileComponent implements OnInit {
@@ -41,6 +42,17 @@ export class VenderProfileComponent implements OnInit {
   editSuccess: string | null = null;
   selectedProfileImage: File | null = null;
   previewImageUrl: string | null = null;
+  
+  // Change password modal properties
+  isChangePasswordModalOpen: boolean = false;
+  changePasswordData = {
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  };
+  changePasswordLoading: boolean = false;
+  changePasswordError: string | null = null;
+  changePasswordSuccess: string | null = null;
   
   constructor(
     private vendorProfileService: VendorProfileService, 
@@ -355,5 +367,87 @@ export class VenderProfileComponent implements OnInit {
       if (field.errors['pattern']) return `Please enter a valid ${fieldName.toLowerCase()}`;
     }
     return '';
+  }
+
+  // Change Password Methods
+  /**
+   * Open the change password modal
+   */
+  openChangePasswordModal(): void {
+    this.isChangePasswordModalOpen = true;
+    this.resetChangePasswordForm();
+  }
+
+  /**
+   * Close the change password modal
+   */
+  closeChangePasswordModal(): void {
+    this.isChangePasswordModalOpen = false;
+    this.resetChangePasswordForm();
+  }
+
+  /**
+   * Reset change password form
+   */
+  private resetChangePasswordForm(): void {
+    this.changePasswordData = {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    };
+    this.changePasswordError = null;
+    this.changePasswordSuccess = null;
+    this.changePasswordLoading = false;
+  }
+
+  /**
+   * Handle change password submission
+   */
+  onChangePassword(): void {
+    // Reset messages
+    this.changePasswordError = null;
+    this.changePasswordSuccess = null;
+
+    // Validate form
+    if (!this.changePasswordData.currentPassword || !this.changePasswordData.newPassword || !this.changePasswordData.confirmPassword) {
+      this.changePasswordError = 'All fields are required';
+      return;
+    }
+
+    if (this.changePasswordData.newPassword !== this.changePasswordData.confirmPassword) {
+      this.changePasswordError = 'New password and confirmation do not match';
+      return;
+    }
+
+    if (this.changePasswordData.newPassword.length < 6) {
+      this.changePasswordError = 'New password must be at least 6 characters long';
+      return;
+    }
+
+    if (this.changePasswordData.currentPassword === this.changePasswordData.newPassword) {
+      this.changePasswordError = 'New password must be different from current password';
+      return;
+    }
+
+    // Submit password change
+    this.changePasswordLoading = true;
+    this.authService.changePassword(this.changePasswordData).subscribe({
+      next: (response) => {
+        this.changePasswordLoading = false;
+        if (response.message) {
+          this.changePasswordSuccess = response.message;
+          // Auto close modal after 2 seconds
+          setTimeout(() => {
+            this.closeChangePasswordModal();
+          }, 2000);
+        } else if (response.error) {
+          this.changePasswordError = response.error;
+        }
+      },
+      error: (error) => {
+        this.changePasswordLoading = false;
+        this.changePasswordError = error.error?.error || 'An error occurred while changing password';
+      }
+    });
   }
 }
