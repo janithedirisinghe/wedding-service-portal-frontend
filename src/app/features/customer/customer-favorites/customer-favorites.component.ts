@@ -17,7 +17,7 @@ import { CustomerMeetingDTO, MeetingMood, MeetingStatus } from '../models/meetin
 export class CustomerFavoritesComponent implements OnInit {
   
   // Tab management
-  activeTab: 'overview' | 'favorites' | 'meetings' | 'bookings' = 'overview';
+  activeTab: 'overview' | 'favorites' | 'meetings' | 'bookings' | 'weddingSummary' = 'overview';
   
   // Favorites properties
   favoriteVendors: Vendor[] = [];
@@ -210,6 +210,56 @@ export class CustomerFavoritesComponent implements OnInit {
     ).length;
   }
 
+  // Wedding Summary Methods
+  getConfirmedBookings(): BookingResponseDto[] {
+    return this.customerBookings.filter(booking => booking.status === 'ACCEPTED');
+  }
+
+  getTotalWeddingCost(): number {
+    return this.getConfirmedBookings().reduce((total, booking) => total + booking.proposedPrice, 0);
+  }
+
+  getTotalServiceCost(): number {
+    return this.getConfirmedBookings().reduce((total, booking) => total + booking.servicePricing, 0);
+  }
+
+  getRemainingPayment(): number {
+    const totalCost = this.getTotalWeddingCost();
+    const serviceCost = this.getTotalServiceCost();
+    return totalCost - serviceCost;
+  }
+
+  getWeddingDate(): Date | null {
+    const confirmedBookings = this.getConfirmedBookings();
+    if (confirmedBookings.length === 0) return null;
+    
+    // Return the earliest event date from confirmed bookings
+    return confirmedBookings
+      .map(booking => new Date(booking.eventDate))
+      .sort((a, b) => a.getTime() - b.getTime())[0];
+  }
+
+  getWeddingLocation(): string {
+    const confirmedBookings = this.getConfirmedBookings();
+    if (confirmedBookings.length === 0) return 'Not specified';
+    
+    // Get the most common location or the first one
+    const locations = confirmedBookings.map(booking => booking.eventLocation);
+    return locations[0] || 'Not specified';
+  }
+
+  getBookingsByVendorType(): { [key: string]: BookingResponseDto[] } {
+    const confirmedBookings = this.getConfirmedBookings();
+    return confirmedBookings.reduce((groups, booking) => {
+      const type = booking.vendorType;
+      if (!groups[type]) {
+        groups[type] = [];
+      }
+      groups[type].push(booking);
+      return groups;
+    }, {} as { [key: string]: BookingResponseDto[] });
+  }
+
   getMeetingMoodText(mood: MeetingMood): string {
     switch (mood) {
       case MeetingMood.VIRTUAL:
@@ -246,6 +296,14 @@ export class CustomerFavoritesComponent implements OnInit {
   contactVendorForMeeting(meeting: CustomerMeetingDTO): void {
     this.router.navigate(['/customer/chat'], { 
       queryParams: { vendorId: meeting.vendorId } 
+    });
+  }
+
+  navigateToVendorReview(vendorId: number): void {
+    // Navigate to the vendor's profile page where reviews can be added
+    // You can adjust this route based on your app's routing structure
+    this.router.navigate(['/customer/vender-profile'], { 
+      queryParams: { vendorId: vendorId, showReviews: true } 
     });
   }
 
