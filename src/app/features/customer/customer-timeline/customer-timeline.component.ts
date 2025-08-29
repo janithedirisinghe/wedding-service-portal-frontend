@@ -13,6 +13,9 @@ import { TimelinePostDTO, TimelineType, TimelineFilter } from '../models/timelin
 export class CustomerTimelineComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   
+  // Expose enum for template use
+  TimelineType = TimelineType;
+  
   timelineData: TimelinePostDTO[] = [];
   loading = false;
   error: string | null = null;
