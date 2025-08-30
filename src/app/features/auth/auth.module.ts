@@ -12,6 +12,7 @@ import { RegisterBusinessInfoComponent } from './register-business-info/register
 import { OtpVerificationComponent } from './otp-verification/otp-verification.component';
 import { RegisterVenderInfoComponent } from './register-vender-info/register-vender-info.component';
 import { AdminRegisterComponent } from './admin-register/admin-register.component';
+import { AdminLoginComponent } from './admin-login/admin-login.component';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ToastrModule } from 'ngx-toastr';
@@ -32,7 +33,8 @@ declarations: [
     RegisterBusinessInfoComponent,
     OtpVerificationComponent,
     RegisterVenderInfoComponent,
-    AdminRegisterComponent
+    AdminRegisterComponent,
+    AdminLoginComponent
   ],
   imports: [
     CommonModule,

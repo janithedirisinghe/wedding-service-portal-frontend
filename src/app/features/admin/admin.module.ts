@@ -9,6 +9,7 @@ import { VendorManagementComponent } from './vendor-management/vendor-management
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 import { CustomerManagementComponent } from './customer-management/customer-management.component';
 import { VendorTypeManagementComponent } from './vendor-type-management/vendor-type-management.component';
+import { AdminProfileComponent } from './admin-profile/admin-profile.component';
 
 @NgModule({
 declarations: [
@@ -16,7 +17,8 @@ declarations: [
     VendorManagementComponent,
     AdminDashboardComponent,
     CustomerManagementComponent,
-    VendorTypeManagementComponent
+    VendorTypeManagementComponent,
+    AdminProfileComponent
   ],
   imports: [
     CommonModule,

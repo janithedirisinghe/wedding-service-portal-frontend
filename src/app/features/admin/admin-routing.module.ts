@@ -5,15 +5,19 @@ import { VendorManagementComponent } from './vendor-management/vendor-management
 import { CustomerManagementComponent } from './customer-management/customer-management.component';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 import { VendorTypeManagementComponent } from './vendor-type-management/vendor-type-management.component';
+import { AdminProfileComponent } from './admin-profile/admin-profile.component';
+import { AdminGuard } from '../../shared/guards/admin.guard';
 
 const routes: Routes = [
     { path: '', component: AdminBodyPageComponent, 
+      canActivate: [AdminGuard],
       children: [
         { path: '', component: AdminDashboardComponent }, // Default route
         { path: 'dashboard', component: AdminDashboardComponent },
         { path: 'vendor-management', component: VendorManagementComponent },
         { path: 'customer-management', component: CustomerManagementComponent },
         { path: 'vendor-type-management', component: VendorTypeManagementComponent },
+        { path: 'profile', component: AdminProfileComponent },
       ]
     }, 
 ];

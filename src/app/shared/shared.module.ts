@@ -54,6 +54,10 @@ import { PreventDefaultDirective } from './directives/prevent-default.directive'
     VenderHeaderComponent,
     CustomerHeaderComponent,
   ],  exports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule,
     HomeNavbarComponent,
     HomeFooterComponent,
     MainNavbarComponent,
