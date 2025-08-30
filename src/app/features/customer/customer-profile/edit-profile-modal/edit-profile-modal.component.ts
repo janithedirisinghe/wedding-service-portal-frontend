@@ -121,14 +121,35 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
   onProfileImageSelect(event: any): void {
     const file = event.target.files[0];
     if (file && file.type.startsWith('image/')) {
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        this.errorMessage = 'Profile image size should not exceed 5MB';
+      // Validate file size (max 1MB to match backend limits)
+      const maxSizeInBytes = 1 * 1024 * 1024; // 1MB
+      if (file.size > maxSizeInBytes) {
+        this.errorMessage = `Profile image size should not exceed 1MB. Current file size: ${(file.size / (1024 * 1024)).toFixed(2)}MB`;
+        // Reset file input
+        const fileInput = event.target as HTMLInputElement;
+        fileInput.value = '';
+        return;
+      }
+
+      // Validate file type more strictly
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!allowedTypes.includes(file.type.toLowerCase())) {
+        this.errorMessage = 'Please select a valid image file (JPEG, PNG, GIF, or WebP)';
+        // Reset file input
+        const fileInput = event.target as HTMLInputElement;
+        fileInput.value = '';
         return;
       }
 
       this.selectedProfileImage = file;
       this.errorMessage = '';
+
+      console.log('Selected image:', {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        sizeInMB: (file.size / (1024 * 1024)).toFixed(2)
+      });
 
       // Create preview
       const reader = new FileReader();
@@ -136,6 +157,11 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
         this.profileImagePreview = e.target?.result as string;
       };
       reader.readAsDataURL(file);
+    } else {
+      this.errorMessage = 'Please select a valid image file';
+      // Reset file input
+      const fileInput = event.target as HTMLInputElement;
+      fileInput.value = '';
     }
   }
 
@@ -187,6 +213,20 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
       };
       
       this.userId = this.authService.getUserId();
+      
+      console.log('Submit form data:', {
+        userId: this.userId,
+        updateData,
+        hasImage: !!this.selectedProfileImage,
+        imageName: this.selectedProfileImage?.name,
+        imageSize: this.selectedProfileImage?.size
+      });
+
+      if (!this.userId) {
+        this.isLoading = false;
+        this.errorMessage = 'User authentication error. Please log in again.';
+        return;
+      }
 
       // Choose service method based on whether image is selected
       const updateObservable = this.selectedProfileImage 
@@ -195,6 +235,7 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
 
       updateObservable.subscribe({
         next: (updatedProfile: CustomerDetails) => {
+          console.log('Profile updated successfully:', updatedProfile);
           this.isLoading = false;
           this.successMessage = 'Profile updated successfully!';
           this.profileUpdated.emit(updatedProfile);
@@ -205,9 +246,29 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
           }, 1500);
         },
         error: (error) => {
-          console.error('Error updating profile:', error);
+          console.error('Full error object:', error);
+          console.error('Error status:', error.status);
+          console.error('Error message:', error.message);
+          console.error('Error details:', error.error);
+          
           this.isLoading = false;
-          this.errorMessage = error.error?.message || 'Failed to update profile. Please try again.';
+          
+          // Handle different types of errors
+          if (error.status === 403) {
+            this.errorMessage = 'Access denied. Please check your authentication or try logging in again.';
+          } else if (error.status === 401) {
+            this.errorMessage = 'Authentication failed. Please log in again.';
+          } else if (error.status === 413) {
+            this.errorMessage = 'File too large. Please choose a smaller image (max 1MB).';
+          } else if (error.status === 415) {
+            this.errorMessage = 'Unsupported file type. Please use a valid image format.';
+          } else if (error.message && error.message.includes('MaxUploadSizeExceededException')) {
+            this.errorMessage = 'File size exceeds server limit. Please choose a smaller image (max 1MB).';
+          } else if (error.error && typeof error.error === 'string' && error.error.includes('upload size')) {
+            this.errorMessage = 'File size exceeds server limit. Please choose a smaller image (max 1MB).';
+          } else {
+            this.errorMessage = error.error?.message || `Failed to update profile. Error: ${error.status || 'Unknown'}`;
+          }
         }
       });
     } else {
