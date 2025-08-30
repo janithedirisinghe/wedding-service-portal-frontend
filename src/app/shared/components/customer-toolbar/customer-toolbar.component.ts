@@ -78,4 +78,8 @@ export class CustomerToolbarComponent implements OnInit {
     // Reset unread messages when user opens chat
     this.unreadMessages = 0;
   }
+
+  navigateToHelpSupport() {
+    this.router.navigate(['/customer/help-support']);
+  }
 }

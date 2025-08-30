@@ -9,6 +9,7 @@ import { VenderBookingRequestsComponent } from './vender-booking-requests/vender
 import { VenderProfileComponent } from './vender-profile/vender-profile.component';
 import { VenderServiceTableComponent } from './vender-service-table/vender-service-table.component';
 import { VenderChatComponent } from './vender-chat/vender-chat.component';
+import { VenderHelpSupportComponent } from './vender-help-support/vender-help-support.component';
 
 const routes: Routes = [
     { path: '', component: VenderBodyPageComponent, 
@@ -22,6 +23,7 @@ const routes: Routes = [
         { path: 'profile', component: VenderProfileComponent },
         { path: 'serviceList', component: VenderServiceTableComponent},
   { path: 'chat', component: VenderChatComponent },
+        { path: 'help-support', component: VenderHelpSupportComponent },
         { path: '**', redirectTo: 'posts' } // Wildcard route for invalid vendor routes
       ]
     }, 

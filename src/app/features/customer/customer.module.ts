@@ -16,6 +16,7 @@ import { VendorSearchComponent } from './vendor-search/vendor-search.component';
 import { CustomerFavoritesComponent } from './customer-favorites/customer-favorites.component';
 import { BookingDetailsModalComponent } from './components/booking-details-modal/booking-details-modal.component';
 import { PaymentModalComponent } from './components/payment-modal/payment-modal.component';
+import { CustomerHelpSupportComponent } from './customer-help-support/customer-help-support.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { PaymentModalComponent } from './components/payment-modal/payment-modal.
     VendorSearchComponent,
     CustomerFavoritesComponent,
     BookingDetailsModalComponent,
-    PaymentModalComponent
+    PaymentModalComponent,
+    CustomerHelpSupportComponent
   ],
   imports: [
     CommonModule,

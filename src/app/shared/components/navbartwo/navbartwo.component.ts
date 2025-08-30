@@ -386,6 +386,25 @@ export class NavbartwoComponent implements OnInit, OnDestroy {
     this.showProfileDropdown = false;
     this.router.navigate(['/settings']);
   }
+
+  viewHelpSupport() {
+    this.showProfileDropdown = false;
+    // Navigate to help support page based on role
+    const role = this.authService.getUserRole()?.toLowerCase();
+    switch(role) {
+      case 'vendor':
+        this.router.navigate(['/vender/help-support']);
+        break;
+      case 'customer':
+        this.router.navigate(['/customer/help-support']);
+        break;
+      case 'admin':
+        this.router.navigate(['/admin/help-support']);
+        break;
+      default:
+        this.router.navigate(['/help-support']);
+    }
+  }
   // Close dropdowns when clicking outside
   closeDropdowns() {
     this.showNotifications = false;

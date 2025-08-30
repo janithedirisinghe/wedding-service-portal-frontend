@@ -395,6 +395,11 @@ export class CustomerNavbarComponent implements OnInit, OnDestroy {
     this.router.navigate(['/customer/favorites']);
   }
 
+  viewHelpSupport() {
+    this.showProfileDropdown = false;
+    this.router.navigate(['/customer/help-support']);
+  }
+
   // Close dropdowns when clicking outside
   closeDropdowns() {
     this.showNotifications = false;

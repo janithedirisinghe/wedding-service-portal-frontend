@@ -6,6 +6,7 @@ import { CustomerManagementComponent } from './customer-management/customer-mana
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 import { VendorTypeManagementComponent } from './vendor-type-management/vendor-type-management.component';
 import { AdminProfileComponent } from './admin-profile/admin-profile.component';
+import { AdminHelpSupportComponent } from './admin-help-support/admin-help-support.component';
 import { AdminGuard } from '../../shared/guards/admin.guard';
 
 const routes: Routes = [
@@ -18,8 +19,9 @@ const routes: Routes = [
         { path: 'customer-management', component: CustomerManagementComponent },
         { path: 'vendor-type-management', component: VendorTypeManagementComponent },
         { path: 'profile', component: AdminProfileComponent },
+        { path: 'help-support', component: AdminHelpSupportComponent },
       ]
-    }, 
+    },  
 ];
 
 @NgModule({

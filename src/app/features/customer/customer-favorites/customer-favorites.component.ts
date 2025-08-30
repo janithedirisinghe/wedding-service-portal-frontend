@@ -4,6 +4,7 @@ import { Vendor } from '../vendor-search/vendor-search.component';
 import { FollowService } from '../services/follow.service';
 import { AuthService } from '../../../shared/services/auth.service';
 import { CustomerMeetingService } from '../services/customer-meeting.service';
+import { CustomerReviewService, ReviewWithVendorDTO } from '../services/customer-review.service';
 import { CustomerBookingService, BookingResponseDto, BookingStatus } from '../services/customer-booking.service';
 import { PaymentService } from '../services/payment.service';
 import { convertToFrontendVendor } from '../models/vendor.model';
@@ -17,7 +18,7 @@ import { CustomerMeetingDTO, MeetingMood, MeetingStatus } from '../models/meetin
 export class CustomerFavoritesComponent implements OnInit {
   
   // Tab management
-  activeTab: 'overview' | 'favorites' | 'meetings' | 'bookings' | 'weddingSummary' = 'overview';
+  activeTab: 'overview' | 'favorites' | 'meetings' | 'bookings' | 'weddingSummary' | 'reviews' = 'overview';
   
   // Favorites properties
   favoriteVendors: Vendor[] = [];
@@ -43,6 +44,11 @@ export class CustomerFavoritesComponent implements OnInit {
   showPaymentModal: boolean = false;
   bookingForPayment: BookingResponseDto | null = null;
   
+  // Reviews properties
+  customerReviews: ReviewWithVendorDTO[] = [];
+  isReviewsLoading: boolean = false;
+  reviewsError: string | null = null;
+  
   // Pagination properties for bookings
   currentPage: number = 1;
   itemsPerPage: number = 10;
@@ -64,13 +70,15 @@ export class CustomerFavoritesComponent implements OnInit {
     private authService: AuthService,
     private customerMeetingService: CustomerMeetingService,
     private customerBookingService: CustomerBookingService,
-    private paymentService: PaymentService
+    private paymentService: PaymentService,
+    private customerReviewService: CustomerReviewService
   ) {}
 
   ngOnInit(): void {
     this.loadFavorites();
     this.loadMeetings();
     this.loadBookings();
+    this.loadReviews();
   }
 
   loadFavorites(): void {
@@ -304,6 +312,13 @@ export class CustomerFavoritesComponent implements OnInit {
     // You can adjust this route based on your app's routing structure
     this.router.navigate(['/customer/vender-profile'], { 
       queryParams: { vendorId: vendorId, showReviews: true } 
+    });
+  }
+
+  navigateToVendorFromReview(vendorId: number): void {
+    // Navigate to the vendor's profile page
+    this.router.navigate(['/customer/vender-profile'], { 
+      queryParams: { vendorId: vendorId } 
     });
   }
 
@@ -553,4 +568,36 @@ export class CustomerFavoritesComponent implements OnInit {
   refreshBookings(): void {
     this.loadBookings();
   }
+
+  // Reviews functionality
+  loadReviews(): void {
+    this.isReviewsLoading = true;
+    this.reviewsError = null;
+    
+    const userId = this.authService.getUserId();
+    if (!userId) {
+      this.reviewsError = 'User not authenticated';
+      this.isReviewsLoading = false;
+      return;
+    }
+
+    this.customerReviewService.getReviewsByCustomerUserId(userId).subscribe({
+      next: (reviews) => {
+        this.customerReviews = reviews.sort((a, b) => {
+          // Sort by createdAt date (newest first)
+          const dateA = new Date(a.createdAt);
+          const dateB = new Date(b.createdAt);
+          return dateB.getTime() - dateA.getTime();
+        });
+        this.isReviewsLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading reviews:', error);
+        this.reviewsError = 'Failed to load reviews. Please try again.';
+        this.isReviewsLoading = false;
+      }
+    });
+  }
+
+
 }

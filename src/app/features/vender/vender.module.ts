@@ -12,6 +12,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { VenderServiceFormComponent } from './vender-service-form/vender-service-form.component';
 import { VenderServiceTableComponent } from './vender-service-table/vender-service-table.component';
 import { VenderChatComponent } from './vender-chat/vender-chat.component';
+import { VenderHelpSupportComponent } from './vender-help-support/vender-help-support.component';
+import { VenderProfileComponent } from './vender-profile/vender-profile.component';
 
 @NgModule({
 declarations: [
@@ -22,7 +24,8 @@ declarations: [
     VenderBookingRequestsComponent,
     VenderServiceFormComponent,
   VenderServiceTableComponent,
-  VenderChatComponent
+  VenderChatComponent,
+  VenderHelpSupportComponent
 
   ],
   imports: [
@@ -31,7 +34,8 @@ declarations: [
     VenderRoutingModule,
     HttpClientModule,
   ReactiveFormsModule,
-  FormsModule
+  FormsModule,
+  VenderProfileComponent
 ],
   exports: [
     

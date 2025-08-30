@@ -7,6 +7,7 @@ import { CustomerChatComponent } from './customer-chat/customer-chat.component';
 import { CustomerProfileComponent } from './customer-profile/customer-profile.component';
 import { VendorSearchComponent } from './vendor-search/vendor-search.component';
 import { CustomerFavoritesComponent } from './customer-favorites/customer-favorites.component';
+import { CustomerHelpSupportComponent } from './customer-help-support/customer-help-support.component';
 
 
 const routes: Routes = [
@@ -17,7 +18,8 @@ const routes: Routes = [
         {path : 'chat', component: CustomerChatComponent},
         {path : 'customer-profile', component: CustomerProfileComponent},
         {path : 'search', component: VendorSearchComponent},
-        {path : 'favorites', component: CustomerFavoritesComponent}
+        {path : 'favorites', component: CustomerFavoritesComponent},
+        {path : 'help-support', component: CustomerHelpSupportComponent}
       ]
     }, 
 ];
