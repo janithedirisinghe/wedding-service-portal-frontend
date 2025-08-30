@@ -114,17 +114,43 @@ export class AuthService {
   }
 
   logout(): void {
+    // Get user role before clearing auth state
+    const userRole = this.getUserRole();
+    
     this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true }).subscribe({
       next: () => {
         this.clearAuthState();
-        this.router.navigate(['/auth/customer-login']);
+        this.redirectToLoginPage(userRole);
       },
       error: () => {
         // Even if logout request fails, clear local state
         this.clearAuthState();
-        this.router.navigate(['/auth/customer-login']);
+        this.redirectToLoginPage(userRole);
       }
     });
+  }
+
+  private redirectToLoginPage(userRole: string | null): void {
+    let loginRoute = '/auth/customer-login'; // Default to customer login
+    
+    if (userRole) {
+      const role = userRole.toLowerCase();
+      switch (role) {
+        case 'admin':
+          loginRoute = '/auth/admin-login';
+          break;
+        case 'vendor':
+        case 'vender':
+          loginRoute = '/auth/vender-login';
+          break;
+        case 'customer':
+        default:
+          loginRoute = '/auth/customer-login';
+          break;
+      }
+    }
+    
+    this.router.navigate([loginRoute]);
   }
 
   private clearAuthState(): void {
