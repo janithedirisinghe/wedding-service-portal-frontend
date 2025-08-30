@@ -10,6 +10,8 @@ import { PostModel } from '../models/post.model';
 import { VendorReviewService } from '../services/review.service';
 import { ReviewDTO } from '../models/review.model';
 import { ChangePasswordRequest } from '../../../shared/Models/change-password.model';
+import { VendorTypeService, VendorType } from '../../admin/services/vendor-type.service';
+import { VendorStatsDTO } from '../models/vendor-stats.model';
 
 @Component({
   selector: 'app-vender-profile',
@@ -54,13 +56,24 @@ export class VenderProfileComponent implements OnInit {
   changePasswordError: string | null = null;
   changePasswordSuccess: string | null = null;
   
+  // Vendor types properties
+  vendorTypes: VendorType[] = [];
+  loadingVendorTypes: boolean = false;
+  selectedCategory: string = 'All Services';
+  
+  // Vendor stats properties
+  vendorStats: VendorStatsDTO | null = null;
+  statsLoading: boolean = false;
+  statsError: string | null = null;
+  
   constructor(
     private vendorProfileService: VendorProfileService, 
     @Inject(PLATFORM_ID) private platformId: Object, 
     public authService: AuthService,
     private postService: PostService,
     private formBuilder: FormBuilder,
-    private vendorReviewService: VendorReviewService
+    private vendorReviewService: VendorReviewService,
+    private vendorTypeService: VendorTypeService
   ) {
     // Initialize edit profile form
     this.editProfileForm = this.formBuilder.group({
@@ -79,6 +92,36 @@ export class VenderProfileComponent implements OnInit {
     this.getvenderDetails(this.userId);
     this.fetchPosts(this.userId);
     this.fetchReviews(this.userId);
+    this.fetchVendorStats(this.userId);
+    this.loadVendorTypes();
+  }
+
+  loadVendorTypes(): void {
+    this.loadingVendorTypes = true;
+    this.vendorTypeService.getActiveVendorTypes().subscribe({
+      next: (vendorTypes: VendorType[]) => {
+        this.vendorTypes = vendorTypes;
+        this.loadingVendorTypes = false;
+        console.log('Loaded vendor types:', vendorTypes);
+      },
+      error: (error) => {
+        console.error('Error loading vendor types:', error);
+        this.loadingVendorTypes = false;
+        // Fallback to hardcoded options if API fails
+        this.vendorTypes = [
+          { vendorTypeName: 'Photography', isActive: true },
+          { vendorTypeName: 'Videography', isActive: true },
+          { vendorTypeName: 'Florist', isActive: true },
+          { vendorTypeName: 'Caterer', isActive: true },
+          { vendorTypeName: 'DJ/Music', isActive: true },
+          { vendorTypeName: 'Decorator', isActive: true },
+          { vendorTypeName: 'Venue', isActive: true },
+          { vendorTypeName: 'Makeup Artist', isActive: true },
+          { vendorTypeName: 'Wedding Planner', isActive: true },
+          { vendorTypeName: 'Transportation', isActive: true }
+        ];
+      }
+    });
   }
   selectedTab: string = 'posts';
    getVenderProfileDetails(venderId: number){
@@ -157,6 +200,23 @@ export class VenderProfileComponent implements OnInit {
     });
   }
 
+  fetchVendorStats(vendorId: number): void {
+    this.statsLoading = true;
+    this.statsError = null;
+    
+    this.vendorProfileService.getVendorStats(vendorId).subscribe({
+      next: (stats) => {
+        this.vendorStats = stats;
+        this.statsLoading = false;
+      },
+      error: (error) => {
+        console.error('Error fetching vendor stats:', error);
+        this.statsError = 'Failed to load stats. Please try again.';
+        this.statsLoading = false;
+      }
+    });
+  }
+
   // Helper method to format date
   formatDate(dateString: string): string {
     const date = new Date(dateString);
@@ -229,8 +289,10 @@ export class VenderProfileComponent implements OnInit {
     return result;
   }
 
-  selectTab(tab: string): void {
-    this.selectedTab = tab;
+  selectCategory(category: string): void {
+    this.selectedCategory = category;
+    // Here you can implement filtering logic for services based on category
+    // For now, we'll just update the selected category
   }
 
   // Edit Profile Methods

@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders, HttpResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable, map, catchError, throwError } from "rxjs";
 import { CustomerDetails, CustomerStats } from "../models/customer.model";
+import { VendorSuggestionResponseDTO } from "../models/vendor-suggestion.model";
 import { environment } from "../../../../environments/environment";
 
 @Injectable({
@@ -217,5 +218,21 @@ updateCustomerProfileWithImageAlt(userId: number | null, customerDTO: Partial<Cu
         return this.http.get<CustomerStats>(`${this.apiUrl}stats/${userId}`, {
             withCredentials: true
         });
+    }
+
+    /**
+     * Get personalized vendor suggestions for a user
+     * @param userId - The ID of the user
+     * @returns Observable containing vendor suggestions
+     */
+    getPersonalizedVendorSuggestions(userId: number): Observable<VendorSuggestionResponseDTO> {
+        return this.http.get<VendorSuggestionResponseDTO>(`${this.apiUrl}users/${userId}/personalized-suggestions`, {
+            withCredentials: true
+        }).pipe(
+            catchError((error: any) => {
+                console.error('Error fetching personalized suggestions:', error);
+                return throwError(() => error);
+            })
+        );
     }
 }

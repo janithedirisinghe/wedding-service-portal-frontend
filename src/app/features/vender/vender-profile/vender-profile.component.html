@@ -42,15 +42,15 @@
     <!-- Profile Stats Cards -->
     <div class="grid grid-cols-3 gap-2 sm:gap-4 mt-4 mb-6">
       <div class="bg-purple-50 rounded-lg p-3 sm:p-4 text-center transition-transform hover:transform hover:scale-105 duration-300">
-        <div class="text-xl sm:text-2xl font-bold text-purple-700">335</div>
+        <div class="text-xl sm:text-2xl font-bold text-purple-700">{{ vendorStats?.followerCount || 0 }}</div>
         <div class="text-xs sm:text-sm text-purple-600 font-medium">FOLLOWERS</div>
       </div>
       <div class="bg-indigo-50 rounded-lg p-3 sm:p-4 text-center transition-transform hover:transform hover:scale-105 duration-300">
-        <div class="text-xl sm:text-2xl font-bold text-indigo-700">{{ posts.length }}</div>
+        <div class="text-xl sm:text-2xl font-bold text-indigo-700">{{ vendorStats?.postCount || posts.length }}</div>
         <div class="text-xs sm:text-sm text-indigo-600 font-medium">POSTS</div>
       </div>
       <div class="bg-blue-50 rounded-lg p-3 sm:p-4 text-center transition-transform hover:transform hover:scale-105 duration-300">
-        <div class="text-xl sm:text-2xl font-bold text-blue-700">{{ getTotalReviews() }}</div>
+        <div class="text-xl sm:text-2xl font-bold text-blue-700">{{ vendorStats?.reviewCount || getTotalReviews() }}</div>
         <div class="text-xs sm:text-sm text-blue-600 font-medium">REVIEWS</div>
       </div>
     </div>
@@ -488,11 +488,14 @@
       <!-- Service Categories -->
       <div class="flex overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-purple-200 scrollbar-track-gray-100">
         <button class="px-4 py-2 bg-purple-600 text-white rounded-full mr-2 whitespace-nowrap transform hover:scale-105 transition-all duration-200">All Services</button>
-        <button class="px-4 py-2 bg-white border border-gray-200 hover:bg-purple-50 text-gray-600 rounded-full mr-2 whitespace-nowrap transform hover:scale-105 transition-all duration-200">Photography</button>
-        <button class="px-4 py-2 bg-white border border-gray-200 hover:bg-purple-50 text-gray-600 rounded-full mr-2 whitespace-nowrap transform hover:scale-105 transition-all duration-200">Venue</button>
-        <button class="px-4 py-2 bg-white border border-gray-200 hover:bg-purple-50 text-gray-600 rounded-full mr-2 whitespace-nowrap transform hover:scale-105 transition-all duration-200">Catering</button>
-        <button class="px-4 py-2 bg-white border border-gray-200 hover:bg-purple-50 text-gray-600 rounded-full mr-2 whitespace-nowrap transform hover:scale-105 transition-all duration-200">Decoration</button>
-        <button class="px-4 py-2 bg-white border border-gray-200 hover:bg-purple-50 text-gray-600 rounded-full whitespace-nowrap transform hover:scale-105 transition-all duration-200">Entertainment</button>
+        <button 
+          *ngFor="let vendorType of vendorTypes" 
+          class="px-4 py-2 bg-white border border-gray-200 hover:bg-purple-50 text-gray-600 rounded-full mr-2 whitespace-nowrap transform hover:scale-105 transition-all duration-200"
+          [class.bg-purple-600]="selectedCategory === vendorType.vendorTypeName"
+          [class.text-white]="selectedCategory === vendorType.vendorTypeName"
+          (click)="selectCategory(vendorType.vendorTypeName)">
+          {{ vendorType.vendorTypeName }}
+        </button>
       </div>
     </div>
     
@@ -998,24 +1001,40 @@
             <label for="venType" class="block text-sm font-medium text-gray-700 mb-2">
               Vendor Type *
             </label>
+            
+            <!-- Loading state -->
+            <div *ngIf="loadingVendorTypes" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 flex items-center">
+              <svg class="animate-spin h-4 w-4 mr-2 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span class="text-sm text-gray-600">Loading vendor types...</span>
+            </div>
+            
+            <!-- Vendor type select -->
             <select
+              *ngIf="!loadingVendorTypes"
               id="venType"
               formControlName="venType"
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               [class.border-red-500]="isFieldInvalid('venType')"
             >
               <option value="">Select Vendor Type</option>
-              <option value="Photography">Photography</option>
-              <option value="Venue">Venue</option>
-              <option value="Catering">Catering</option>
-              <option value="Decoration">Decoration</option>
-              <option value="Entertainment">Entertainment</option>
-              <option value="Transportation">Transportation</option>
-              <option value="Beauty & Makeup">Beauty & Makeup</option>
-              <option value="Flowers">Flowers</option>
-              <option value="Music & DJ">Music & DJ</option>
-              <option value="Wedding Planning">Wedding Planning</option>
+              <option *ngFor="let vendorType of vendorTypes" [value]="vendorType.vendorTypeName">
+                {{ vendorType.vendorTypeName }}
+              </option>
             </select>
+            
+            <!-- Empty state -->
+            <div *ngIf="!loadingVendorTypes && vendorTypes.length === 0" class="w-full px-3 py-2 border border-yellow-300 rounded-lg bg-yellow-50">
+              <div class="flex items-center">
+                <svg class="h-4 w-4 mr-2 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.314 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                <span class="text-sm text-yellow-800">No vendor types available. Please contact support.</span>
+              </div>
+            </div>
+            
             <div *ngIf="isFieldInvalid('venType')" class="text-red-500 text-sm mt-1">
               {{ getFieldError('venType') }}
             </div>

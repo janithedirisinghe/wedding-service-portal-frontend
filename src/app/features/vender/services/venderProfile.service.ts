@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { venderDetails } from "../models/vender.model";
+import { VendorStatsDTO } from "../models/vendor-stats.model";
 
 @Injectable({
     providedIn: 'root',
@@ -38,6 +39,12 @@ import { venderDetails } from "../models/vender.model";
     
     return this.http.put<venderDetails>(`${this.apiUrl}updateprofile/${userId}`, formData, {
       withCredentials: true
+    }); 
+  }
+
+  getVendorStats(userId: number): Observable<VendorStatsDTO> {
+    return this.http.get<VendorStatsDTO>(`${this.apiUrl}stats/${userId}`, {
+      withCredentials: true
     });
   }
-  }
+}

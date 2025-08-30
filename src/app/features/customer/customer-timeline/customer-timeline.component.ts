@@ -1,9 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject, takeUntil, catchError, of } from 'rxjs';
+import { Router } from '@angular/router';
 import { TimelineService } from '../services/timeline.service';
 import { FollowService } from '../services/follow.service';
+import { CustomerService } from '../services/customer.service';
 import { AuthService } from '../../../shared/services/auth.service';
 import { TimelinePostDTO, TimelineType, TimelineFilter } from '../models/timeline.model';
+import { SuggestedVendorDTO, VendorSuggestionResponseDTO } from '../models/vendor-suggestion.model';
 
 @Component({
   selector: 'app-customer-timeline',
@@ -21,6 +24,11 @@ export class CustomerTimelineComponent implements OnInit, OnDestroy {
   error: string | null = null;
   currentCustomerId: number | null = null;
   followingInProgress = new Set<number>(); // Track which vendors are being followed/unfollowed
+  
+  // Vendor suggestions
+  suggestedVendors: SuggestedVendorDTO[] = [];
+  suggestionsLoading = false;
+  suggestionsError: string | null = null;
   
   // Pagination
   currentPage = 0;
@@ -41,7 +49,9 @@ export class CustomerTimelineComponent implements OnInit, OnDestroy {
   constructor(
     private timelineService: TimelineService,
     private followService: FollowService,
-    private authService: AuthService
+    private customerService: CustomerService,
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -66,6 +76,33 @@ export class CustomerTimelineComponent implements OnInit, OnDestroy {
     }
     
     this.loadTimelineData();
+    this.loadVendorSuggestions();
+  }
+
+  /**
+   * Load personalized vendor suggestions
+   */
+  loadVendorSuggestions() {
+    if (!this.currentCustomerId) {
+      return;
+    }
+
+    this.suggestionsLoading = true;
+    this.suggestionsError = null;
+
+    this.customerService.getPersonalizedVendorSuggestions(this.currentCustomerId)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Error loading vendor suggestions:', error);
+          this.suggestionsError = 'Failed to load vendor suggestions. Please try again.';
+          return of({ suggestedVendors: [], totalSuggestions: 0, message: '', appliedFilters: [] });
+        })
+      )
+      .subscribe((response: VendorSuggestionResponseDTO) => {
+        this.suggestionsLoading = false;
+        this.suggestedVendors = response.suggestedVendors || [];
+      });
   }
 
   /**
@@ -162,6 +199,7 @@ export class CustomerTimelineComponent implements OnInit, OnDestroy {
    */
   refreshTimeline() {
     this.loadTimelineData();
+    this.loadVendorSuggestions();
   }
 
   /**
@@ -250,5 +288,20 @@ export class CustomerTimelineComponent implements OnInit, OnDestroy {
    */
   onImageError(event: any) {
     event.target.src = 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png';
+  }
+
+  /**
+   * Get vendor profile image with fallback
+   */
+  getVendorProfileImage(vendor: SuggestedVendorDTO): string {
+    // For now, return a placeholder since the DTO doesn't include profile image
+    return 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png';
+  }
+
+  /**
+   * Navigate to vendor profile page
+   */
+  navigateToVendor(vendorId: number) {
+    this.router.navigate(['/customer/vendor-profile', vendorId]);
   }
 }
