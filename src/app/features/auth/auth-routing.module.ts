@@ -8,6 +8,7 @@ import { CustomerCompleteInfoComponent } from './customer-complete-info/customer
 import { VenderLoginComponent } from './vender-login/vender-login.component';
 import { AdminRegisterComponent } from './admin-register/admin-register.component';
 import { AdminLoginComponent } from './admin-login/admin-login.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 
 const routes: Routes = [
   {
@@ -20,7 +21,8 @@ const routes: Routes = [
       { path: 'customer-complete-info', component: CustomerCompleteInfoComponent },
       { path: 'vender-login', component: VenderLoginComponent},
       { path: 'admin-register', component: AdminRegisterComponent },
-      { path: 'admin-login', component: AdminLoginComponent }
+      { path: 'admin-login', component: AdminLoginComponent },
+      { path: 'forgot-password', component: ForgotPasswordComponent }
     ],
   },
 ];

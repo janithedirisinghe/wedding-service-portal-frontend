@@ -19,6 +19,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { AuthService } from '../../shared/services/auth.service';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 
 
 @NgModule({
@@ -34,7 +35,8 @@ declarations: [
     OtpVerificationComponent,
     RegisterVenderInfoComponent,
     AdminRegisterComponent,
-    AdminLoginComponent
+    AdminLoginComponent,
+    ForgotPasswordComponent
   ],
   imports: [
     CommonModule,

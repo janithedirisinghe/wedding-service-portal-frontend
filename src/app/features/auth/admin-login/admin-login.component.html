@@ -91,7 +91,7 @@
           </div>
 
           <div class="text-sm">
-            <a href="#" class="font-medium text-red-600 hover:text-red-500 transition-colors duration-200">
+            <a [routerLink]="['/auth/forgot-password']" [queryParams]="{type: 'admin'}" class="font-medium text-red-600 hover:text-red-500 transition-colors duration-200">
               Forgot your password?
             </a>
           </div>
