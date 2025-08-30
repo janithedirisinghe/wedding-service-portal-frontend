@@ -265,6 +265,27 @@ export class VenderProfileComponent implements OnInit {
     return this.reviews.length;
   }
 
+  // Helper method to get total service value
+  getTotalServiceValue(): string {
+    if (!this.vendor?.services || this.vendor.services.length === 0) return '0';
+    const total = this.vendor.services.reduce((sum, service) => sum + (service.pricing || 0), 0);
+    return total.toLocaleString();
+  }
+
+  // Helper method to get average pricing
+  getAveragePricing(): string {
+    if (!this.vendor?.services || this.vendor.services.length === 0) return '0';
+    const total = this.vendor.services.reduce((sum, service) => sum + (service.pricing || 0), 0);
+    const average = total / this.vendor.services.length;
+    return average.toFixed(0);
+  }
+
+  // Helper method to get active services count
+  getActiveServicesCount(): number {
+    if (!this.vendor?.services) return 0;
+    return this.vendor.services.filter(service => service.status === 'ACTIVE').length;
+  }
+
   // Helper method to get rating breakdown
   getRatingBreakdown(): { [key: number]: { count: number; percentage: number } } {
     const breakdown = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
