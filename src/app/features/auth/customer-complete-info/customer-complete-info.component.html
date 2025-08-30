@@ -120,21 +120,45 @@
                 <span *ngIf="customerInfoForm.get('bio')?.errors?.['minlength']">Bio must be at least 10 characters</span>
               </div>
             </div>
-          </div>
+          </div> 
           
           <!-- Preferred Vendor Types Section -->
           <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Preferred Vendor Types *</h2>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">Select the types of vendors you're interested in working with</p>
             
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-              <div *ngFor="let vendorType of vendorTypes" class="flex items-center">
-                <input type="checkbox" [id]="vendorType" [value]="vendorType" 
-                       (change)="onVendorTypeChange(vendorType, $event)"
-                       class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                <label [for]="vendorType" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ vendorType }}</label>
+            <!-- Loading state -->
+            <div *ngIf="loadingVendorTypes" class="flex items-center justify-center p-6 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+              <div class="flex items-center space-x-2">
+                <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="text-sm text-gray-600 dark:text-gray-400">Loading vendor types...</span>
               </div>
             </div>
+            
+            <!-- Vendor types grid -->
+            <div *ngIf="!loadingVendorTypes" class="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <div *ngFor="let vendorType of vendorTypes" class="flex items-center">
+                <input type="checkbox" [id]="vendorType.vendorTypeName" [value]="vendorType.vendorTypeName" 
+                       [checked]="isVendorTypeSelected(vendorType)"
+                       (change)="onVendorTypeChange(vendorType, $event)"
+                       class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                <label [for]="vendorType.vendorTypeName" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ vendorType.vendorTypeName }}</label>
+              </div>
+            </div>
+            
+            <!-- Empty state -->
+            <div *ngIf="!loadingVendorTypes && vendorTypes.length === 0" class="p-4 bg-yellow-50 dark:bg-yellow-900 rounded-lg border border-yellow-200 dark:border-yellow-700">
+              <div class="flex items-center space-x-2">
+                <svg class="h-5 w-5 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.314 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                <span class="text-sm text-yellow-800 dark:text-yellow-300">No vendor types available at the moment. Please contact support.</span>
+              </div>
+            </div>
+            
             <div *ngIf="customerInfoForm.get('preferredVendorTypes')?.invalid && customerInfoForm.get('preferredVendorTypes')?.touched" class="text-red-500 text-sm mt-2">
               Please select at least one vendor type
             </div>

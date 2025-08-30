@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CustomerDetails } from '../../models/customer.model';
 import { CustomerService } from '../../services/customer.service';
 import { AuthService } from '../../../../shared/services/auth.service';
+import { VendorTypeService, VendorType } from '../../../admin/services/vendor-type.service';
 
 @Component({
   selector: 'app-edit-profile-modal',
@@ -22,6 +23,8 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
   userId: number | null = null;
   selectedProfileImage: File | null = null;
   profileImagePreview: string | null = null;
+  vendorTypes: VendorType[] = [];
+  loadingVendorTypes: boolean = false;
 
   budgetOptions = [
     'Under $5,000',
@@ -32,28 +35,17 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
     'Over $50,000'
   ];
 
-  vendorTypeOptions = [
-    'Photography',
-    'Videography',
-    'Catering',
-    'Venue',
-    'Decoration',
-    'Music/DJ',
-    'Flowers',
-    'Transportation',
-    'Wedding Cake',
-    'Planning Services'
-  ];
-
   constructor(
     private fb: FormBuilder,
     private customerService: CustomerService,
-    private authService: AuthService
+    private authService: AuthService,
+    private vendorTypeService: VendorTypeService
   ) {
     this.editForm = this.createForm();
   }
 
   ngOnInit(): void {
+    this.loadVendorTypes();
     if (this.profile) {
       this.populateForm();
     }
@@ -63,6 +55,34 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
     if (this.profile) {
       this.populateForm();
     }
+  }
+
+  loadVendorTypes(): void {
+    this.loadingVendorTypes = true;
+    this.vendorTypeService.getActiveVendorTypes().subscribe({
+      next: (vendorTypes: VendorType[]) => {
+        this.vendorTypes = vendorTypes;
+        this.loadingVendorTypes = false;
+        console.log('Loaded vendor types:', vendorTypes);
+      },
+      error: (error) => {
+        console.error('Error loading vendor types:', error);
+        this.loadingVendorTypes = false;
+        // Fallback to hardcoded options if API fails
+        this.vendorTypes = [
+          { vendorTypeName: 'Photography', isActive: true },
+          { vendorTypeName: 'Videography', isActive: true },
+          { vendorTypeName: 'Catering', isActive: true },
+          { vendorTypeName: 'Venue', isActive: true },
+          { vendorTypeName: 'Decoration', isActive: true },
+          { vendorTypeName: 'Music/DJ', isActive: true },
+          { vendorTypeName: 'Flowers', isActive: true },
+          { vendorTypeName: 'Transportation', isActive: true },
+          { vendorTypeName: 'Wedding Cake', isActive: true },
+          { vendorTypeName: 'Planning Services', isActive: true }
+        ];
+      }
+    });
   }
 
   // Keyboard navigation support
@@ -180,24 +200,24 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
     return this.selectedProfileImage !== null;
   }
 
-  onVendorTypeChange(event: any, vendorType: string): void {
+  onVendorTypeChange(event: any, vendorType: VendorType): void {
     const currentTypes = this.editForm.get('preferredVendorTypes')?.value || [];
     if (event.target.checked) {
-      if (!currentTypes.includes(vendorType)) {
+      if (!currentTypes.includes(vendorType.vendorTypeName)) {
         this.editForm.patchValue({
-          preferredVendorTypes: [...currentTypes, vendorType]
+          preferredVendorTypes: [...currentTypes, vendorType.vendorTypeName]
         });
       }
     } else {
       this.editForm.patchValue({
-        preferredVendorTypes: currentTypes.filter((type: string) => type !== vendorType)
+        preferredVendorTypes: currentTypes.filter((type: string) => type !== vendorType.vendorTypeName)
       });
     }
   }
 
-  isVendorTypeSelected(vendorType: string): boolean {
+  isVendorTypeSelected(vendorType: VendorType): boolean {
     const selectedTypes = this.editForm.get('preferredVendorTypes')?.value || [];
-    return selectedTypes.includes(vendorType);
+    return selectedTypes.includes(vendorType.vendorTypeName);
   }
 
   onSubmit(): void {

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { CustomerService, CustomerInfo } from '../services/customer.service';
 import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { VendorTypeService, VendorType } from '../../admin/services/vendor-type.service';
 
 @Component({
   selector: 'app-customer-complete-info',
@@ -13,28 +14,20 @@ import { NgxSpinnerService } from 'ngx-spinner';
 export class CustomerCompleteInfoComponent implements OnInit {
   customerInfoForm!: FormGroup;
   isSubmitting: boolean = false;
-  vendorTypes: string[] = [
-    'Photographer',
-    'Videographer',
-    'Florist',
-    'Caterer',
-    'DJ/Music',
-    'Decorator',
-    'Venue',
-    'Makeup Artist',
-    'Wedding Planner',
-    'Transportation'
-  ];
+  vendorTypes: VendorType[] = [];
+  loadingVendorTypes: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private customerService: CustomerService,
     private router: Router,
     private toastr: ToastrService,
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private vendorTypeService: VendorTypeService
   ) {}
 
   ngOnInit(): void {
+    this.loadVendorTypes();
     this.customerInfoForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
@@ -50,15 +43,44 @@ export class CustomerCompleteInfoComponent implements OnInit {
     });
   }
 
-  onVendorTypeChange(vendorType: string, event: any) {
+  loadVendorTypes(): void {
+    this.loadingVendorTypes = true;
+    this.vendorTypeService.getActiveVendorTypes().subscribe({
+      next: (vendorTypes: VendorType[]) => {
+        this.vendorTypes = vendorTypes;
+        this.loadingVendorTypes = false;
+        console.log('Loaded vendor types:', vendorTypes);
+      },
+      error: (error) => {
+        console.error('Error loading vendor types:', error);
+        this.loadingVendorTypes = false;
+        // Fallback to hardcoded options if API fails
+        this.vendorTypes = [
+          { vendorTypeName: 'Photographer', isActive: true },
+          { vendorTypeName: 'Videographer', isActive: true },
+          { vendorTypeName: 'Florist', isActive: true },
+          { vendorTypeName: 'Caterer', isActive: true },
+          { vendorTypeName: 'DJ/Music', isActive: true },
+          { vendorTypeName: 'Decorator', isActive: true },
+          { vendorTypeName: 'Venue', isActive: true },
+          { vendorTypeName: 'Makeup Artist', isActive: true },
+          { vendorTypeName: 'Wedding Planner', isActive: true },
+          { vendorTypeName: 'Transportation', isActive: true }
+        ];
+        this.toastr.warning('Failed to load vendor types from server. Using default options.');
+      }
+    });
+  }
+
+  onVendorTypeChange(vendorType: VendorType, event: any) {
     const preferredTypes = this.customerInfoForm.get('preferredVendorTypes')?.value || [];
     
     if (event.target.checked) {
-      if (!preferredTypes.includes(vendorType)) {
-        preferredTypes.push(vendorType);
+      if (!preferredTypes.includes(vendorType.vendorTypeName)) {
+        preferredTypes.push(vendorType.vendorTypeName);
       }
     } else {
-      const index = preferredTypes.indexOf(vendorType);
+      const index = preferredTypes.indexOf(vendorType.vendorTypeName);
       if (index > -1) {
         preferredTypes.splice(index, 1);
       }
@@ -67,6 +89,11 @@ export class CustomerCompleteInfoComponent implements OnInit {
     this.customerInfoForm.patchValue({
       preferredVendorTypes: preferredTypes
     });
+  }
+
+  isVendorTypeSelected(vendorType: VendorType): boolean {
+    const selectedTypes = this.customerInfoForm.get('preferredVendorTypes')?.value || [];
+    return selectedTypes.includes(vendorType.vendorTypeName);
   }
 
   onSubmit() {
