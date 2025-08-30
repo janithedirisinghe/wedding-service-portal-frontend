@@ -7,6 +7,7 @@ import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.compo
 import { VendorTypeManagementComponent } from './vendor-type-management/vendor-type-management.component';
 import { AdminProfileComponent } from './admin-profile/admin-profile.component';
 import { AdminHelpSupportComponent } from './admin-help-support/admin-help-support.component';
+import { AdminNotificationsComponent } from './admin-notifications/admin-notifications.component';
 import { AdminGuard } from '../../shared/guards/admin.guard';
 
 const routes: Routes = [
@@ -20,6 +21,7 @@ const routes: Routes = [
         { path: 'vendor-type-management', component: VendorTypeManagementComponent },
         { path: 'profile', component: AdminProfileComponent },
         { path: 'help-support', component: AdminHelpSupportComponent },
+        { path: 'notifications', component: AdminNotificationsComponent },
       ]
     },  
 ];

@@ -11,16 +11,18 @@ import { CustomerManagementComponent } from './customer-management/customer-mana
 import { VendorTypeManagementComponent } from './vendor-type-management/vendor-type-management.component';
 import { AdminProfileComponent } from './admin-profile/admin-profile.component';
 import { AdminHelpSupportComponent } from './admin-help-support/admin-help-support.component';
+import { AdminNotificationsComponent } from './admin-notifications/admin-notifications.component';
 
 @NgModule({
-declarations: [
+  declarations: [
     AdminBodyPageComponent,
     VendorManagementComponent,
     AdminDashboardComponent,
     CustomerManagementComponent,
     VendorTypeManagementComponent,
     AdminProfileComponent,
-    AdminHelpSupportComponent
+    AdminHelpSupportComponent,
+    AdminNotificationsComponent
   ],
   imports: [
     CommonModule,
@@ -29,9 +31,9 @@ declarations: [
     ReactiveFormsModule,
     FormsModule,
     AdminRoutingModule
-],
+  ],
   exports: [
-    
+
   ]
 })
 export class AdminModule { }
