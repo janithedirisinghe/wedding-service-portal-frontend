@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders, HttpResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable, map, catchError, throwError } from "rxjs";
-import { CustomerDetails } from "../models/customer.model";
+import { CustomerDetails, CustomerStats } from "../models/customer.model";
 import { environment } from "../../../../environments/environment";
 
 @Injectable({
@@ -206,5 +206,16 @@ updateCustomerProfileWithImageAlt(userId: number | null, customerDTO: Partial<Cu
                 return throwError(() => error);
             })
         );
+    }
+
+    /**
+     * Get customer stats (bookings, reviews, favorites count)
+     * @param userId - The ID of the customer
+     * @returns Observable containing customer stats
+     */
+    getCustomerStats(userId: number): Observable<CustomerStats> {
+        return this.http.get<CustomerStats>(`${this.apiUrl}stats/${userId}`, {
+            withCredentials: true
+        });
     }
 }

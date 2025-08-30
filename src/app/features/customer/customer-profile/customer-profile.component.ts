@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CustomerService } from '../services';
-import { CustomerDetails } from '../models';
+import { CustomerDetails, CustomerStats } from '../models';
 import { AuthService } from '../../../shared/services/auth.service';
 import { ChangePasswordRequest } from '../../../shared/Models/change-password.model';
 
@@ -15,6 +15,10 @@ export class CustomerProfileComponent implements OnInit {
   error: string | null = null;
   isEditModalOpen: boolean = false;
   isChangePasswordModalOpen: boolean = false;
+  
+  // Customer stats
+  stats: CustomerStats | null = null;
+  statsLoading: boolean = false;
   
   // Change password form data
   changePasswordData: ChangePasswordRequest = {
@@ -50,6 +54,8 @@ export class CustomerProfileComponent implements OnInit {
         this.profile = profile;
         this.loading = false;
         console.log('Customer profile loaded:', this.profile);
+        // Load stats after profile is loaded
+        this.loadCustomerStats(customerId);
       },
       error: (error) => {
         console.error('Error loading customer profile:', error);
@@ -57,6 +63,30 @@ export class CustomerProfileComponent implements OnInit {
         this.loading = false;
         // Fallback to dummy data for development
         this.loadDummyData();
+      }
+    });
+  }
+
+  /**
+   * Load customer stats from API
+   */
+  loadCustomerStats(userId: number): void {
+    this.statsLoading = true;
+    this.customerService.getCustomerStats(userId).subscribe({
+      next: (stats: CustomerStats) => {
+        this.stats = stats;
+        this.statsLoading = false;
+        console.log('Customer stats loaded:', this.stats);
+      },
+      error: (error) => {
+        console.error('Error loading customer stats:', error);
+        this.statsLoading = false;
+        // Fallback to default stats
+        this.stats = {
+          bookingsCount: 0,
+          reviewsCount: 0,
+          favoritesCount: 0
+        };
       }
     });
   }

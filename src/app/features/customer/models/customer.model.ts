@@ -26,3 +26,9 @@ export interface CustomerDetails {
   userName?: string;
   userEmail: string;
 }
+
+export interface CustomerStats {
+  favoritesCount: number;
+  reviewsCount: number;
+  bookingsCount: number;
+}

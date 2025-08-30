@@ -84,15 +84,24 @@
     <!-- Profile Stats Cards -->
     <div class="grid grid-cols-3 gap-2 sm:gap-4 mt-4 mb-6">
       <div class="bg-blue-50 rounded-lg p-3 sm:p-4 text-center transition-transform hover:transform hover:scale-105 duration-300">
-        <div class="text-xl sm:text-2xl font-bold text-blue-700">12</div>
+        <div class="text-xl sm:text-2xl font-bold text-blue-700" *ngIf="!statsLoading && stats">{{ stats.bookingsCount }}</div>
+        <div class="text-xl sm:text-2xl font-bold text-blue-700" *ngIf="statsLoading">
+          <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+        </div>
         <div class="text-xs sm:text-sm text-blue-600 font-medium">BOOKINGS</div>
       </div>
       <div class="bg-green-50 rounded-lg p-3 sm:p-4 text-center transition-transform hover:transform hover:scale-105 duration-300">
-        <div class="text-xl sm:text-2xl font-bold text-green-700">8</div>
+        <div class="text-xl sm:text-2xl font-bold text-green-700" *ngIf="!statsLoading && stats">{{ stats.reviewsCount }}</div>
+        <div class="text-xl sm:text-2xl font-bold text-green-700" *ngIf="statsLoading">
+          <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600 mx-auto"></div>
+        </div>
         <div class="text-xs sm:text-sm text-green-600 font-medium">REVIEWS</div>
       </div>
       <div class="bg-purple-50 rounded-lg p-3 sm:p-4 text-center transition-transform hover:transform hover:scale-105 duration-300">
-        <div class="text-xl sm:text-2xl font-bold text-purple-700">5</div>
+        <div class="text-xl sm:text-2xl font-bold text-purple-700" *ngIf="!statsLoading && stats">{{ stats.favoritesCount }}</div>
+        <div class="text-xl sm:text-2xl font-bold text-purple-700" *ngIf="statsLoading">
+          <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600 mx-auto"></div>
+        </div>
         <div class="text-xs sm:text-sm text-purple-600 font-medium">FAVORITES</div>
       </div>
     </div>
