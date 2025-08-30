@@ -1,0 +1,396 @@
+<div class="vendor-type-management">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="page-title">
+      <h1>Vendor Type Management</h1>
+      <p class="subtitle">Manage wedding vendor categories and types</p>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div *ngIf="successMessage" class="alert alert-success">
+      <i class="fas fa-check-circle"></i>
+      {{ successMessage }}
+    </div>
+    
+    <div *ngIf="errorMessage" class="alert alert-error">
+      <i class="fas fa-exclamation-triangle"></i>
+      {{ errorMessage }}
+    </div>
+    
+    <!-- Search and Actions -->
+    <div class="actions-bar">
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <i class="fas fa-search search-icon"></i>
+          <input 
+            type="text" 
+            [(ngModel)]="searchTerm" 
+            (input)="onSearch()"
+            placeholder="Search vendor types..."
+            class="search-input"
+          >
+          <button 
+            *ngIf="searchTerm" 
+            (click)="clearSearch()" 
+            class="clear-search-btn"
+            type="button"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      
+      <button 
+        (click)="openAddModal()" 
+        class="btn btn-primary add-btn"
+        type="button"
+      >
+        <i class="fas fa-plus"></i>
+        Add Vendor Type
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading vendor types...</p>
+  </div>
+
+  <!-- Vendor Types Table -->
+  <div *ngIf="!isLoading" class="table-container">
+    <div class="table-wrapper">
+      <table class="vendor-types-table">
+        <thead>
+          <tr>
+            <th class="col-id">#</th>
+            <th class="col-name">Type Name</th>
+            <th class="col-description">Description</th>
+            <th class="col-status">Status</th>
+            <th class="col-created">Created</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let vendorType of getPaginatedData(); let i = index" class="table-row">
+            <td class="col-id">{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+            <td class="col-name">
+              <div class="type-name">
+                <strong>{{ vendorType.vendorTypeName }}</strong>
+              </div>
+            </td>
+            <td class="col-description">
+              <div class="description" [title]="vendorType.description">
+                {{ vendorType.description || 'No description' }}
+              </div>
+            </td>
+            <td class="col-status">
+              <div class="status-container">
+                <label class="toggle-switch">
+                  <input 
+                    type="checkbox" 
+                    [checked]="vendorType.isActive"
+                    (change)="toggleStatus(vendorType)"
+                  >
+                  <span class="slider"></span>
+                </label>
+                <span class="status-text" [class.active]="vendorType.isActive">
+                  {{ vendorType.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </div>
+            </td>
+            <td class="col-created">
+              <div class="date-info">
+                {{ vendorType.createdDate | date:'MMM dd, yyyy' }}
+              </div>
+            </td>
+            <td class="col-actions">
+              <div class="action-buttons">
+                <button 
+                  (click)="openEditModal(vendorType)" 
+                  class="btn btn-sm btn-outline-primary"
+                  title="Edit"
+                  type="button"
+                >
+                  <i class="fas fa-edit"></i>
+                  Edit
+                </button>
+                <button 
+                  (click)="openDeleteModal(vendorType)" 
+                  class="btn btn-sm btn-outline-danger"
+                  title="Delete"
+                  type="button"
+                >
+                  <i class="fas fa-trash"></i>
+                  Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Empty State -->
+      <div *ngIf="filteredVendorTypes.length === 0" class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-list-alt"></i>
+        </div>
+        <h3>No vendor types found</h3>
+        <p *ngIf="searchTerm">No vendor types match your search criteria.</p>
+        <p *ngIf="!searchTerm">Get started by adding your first vendor type.</p>
+        <button 
+          *ngIf="!searchTerm" 
+          (click)="openAddModal()" 
+          class="btn btn-primary"
+          type="button"
+        >
+          <i class="fas fa-plus"></i>
+          Add First Vendor Type
+        </button>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="totalPages > 1" class="pagination-container">
+      <div class="pagination-info">
+        Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to 
+        {{ Math.min(currentPage * itemsPerPage, totalItems) }} of 
+        {{ totalItems }} entries
+      </div>
+      
+      <div class="pagination">
+        <button 
+          (click)="previousPage()" 
+          [disabled]="currentPage === 1"
+          class="btn btn-outline-secondary pagination-btn"
+          type="button"
+        >
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        
+        <button 
+          *ngFor="let page of getPageNumbers()"
+          (click)="goToPage(page)"
+          [class.active]="page === currentPage"
+          class="btn pagination-btn"
+          type="button"
+        >
+          {{ page }}
+        </button>
+        
+        <button 
+          (click)="nextPage()" 
+          [disabled]="currentPage === totalPages"
+          class="btn btn-outline-secondary pagination-btn"
+          type="button"
+        >
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Vendor Type Modal -->
+<div *ngIf="isAddModalOpen" class="modal-overlay" (click)="closeModals()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Add New Vendor Type</h2>
+      <button (click)="closeModals()" class="close-btn" type="button">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Error/Success Messages -->
+      <div *ngIf="successMessage" class="alert alert-success">
+        <i class="fas fa-check-circle"></i>
+        {{ successMessage }}
+      </div>
+      
+      <div *ngIf="errorMessage" class="alert alert-error">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ errorMessage }}
+      </div>
+
+      <form (ngSubmit)="createVendorType()" #addForm="ngForm">
+        <div class="form-group">
+          <label for="typeName">Type Name *</label>
+          <input 
+            type="text" 
+            id="typeName"
+            [(ngModel)]="selectedVendorType!.vendorTypeName"
+            name="typeName"
+            required
+            class="form-control"
+            placeholder="Enter vendor type name"
+          >
+        </div>
+        
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea 
+            id="description"
+            [(ngModel)]="selectedVendorType!.description"
+            name="description"
+            rows="3"
+            class="form-control"
+            placeholder="Enter description (optional)"
+          ></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="selectedVendorType!.isActive"
+              name="isActive"
+            >
+            <span class="checkmark"></span>
+            Active
+          </label>
+        </div>
+        
+        <div class="modal-actions">
+          <button type="button" (click)="closeModals()" class="btn btn-secondary">
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            [disabled]="!addForm.valid || !selectedVendorType?.vendorTypeName?.trim()"
+            class="btn btn-primary"
+          >
+            <i class="fas fa-plus"></i>
+            Add Vendor Type
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Vendor Type Modal -->
+<div *ngIf="isEditModalOpen" class="modal-overlay" (click)="closeModals()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Edit Vendor Type</h2>
+      <button (click)="closeModals()" class="close-btn" type="button">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Error/Success Messages -->
+      <div *ngIf="successMessage" class="alert alert-success">
+        <i class="fas fa-check-circle"></i>
+        {{ successMessage }}
+      </div>
+      
+      <div *ngIf="errorMessage" class="alert alert-error">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ errorMessage }}
+      </div>
+
+      <form (ngSubmit)="updateVendorType()" #editForm="ngForm">
+        <div class="form-group">
+          <label for="editTypeName">Type Name *</label>
+          <input 
+            type="text" 
+            id="editTypeName"
+            [(ngModel)]="selectedVendorType!.vendorTypeName"
+            name="typeName"
+            required
+            class="form-control"
+            placeholder="Enter vendor type name"
+          >
+        </div>
+        
+        <div class="form-group">
+          <label for="editDescription">Description</label>
+          <textarea 
+            id="editDescription"
+            [(ngModel)]="selectedVendorType!.description"
+            name="description"
+            rows="3"
+            class="form-control"
+            placeholder="Enter description (optional)"
+          ></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="selectedVendorType!.isActive"
+              name="isActive"
+            >
+            <span class="checkmark"></span>
+            Active
+          </label>
+        </div>
+        
+        <div class="modal-actions">
+          <button type="button" (click)="closeModals()" class="btn btn-secondary">
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            [disabled]="!editForm.valid || !selectedVendorType?.vendorTypeName?.trim()"
+            class="btn btn-primary"
+          >
+            <i class="fas fa-save"></i>
+            Update Vendor Type
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div *ngIf="isDeleteModalOpen" class="modal-overlay" (click)="closeModals()">
+  <div class="modal-content delete-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Confirm Deletion</h2>
+      <button (click)="closeModals()" class="close-btn" type="button">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Error/Success Messages -->
+      <div *ngIf="successMessage" class="alert alert-success">
+        <i class="fas fa-check-circle"></i>
+        {{ successMessage }}
+      </div>
+      
+      <div *ngIf="errorMessage" class="alert alert-error">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ errorMessage }}
+      </div>
+
+      <div class="delete-warning">
+        <i class="fas fa-exclamation-triangle warning-icon"></i>
+        <h3>Are you sure?</h3>
+        <p>
+          You are about to delete the vendor type "<strong>{{ selectedVendorType?.vendorTypeName }}</strong>".
+          This action cannot be undone.
+        </p>
+      </div>
+      
+      <div class="modal-actions">
+        <button type="button" (click)="closeModals()" class="btn btn-secondary">
+          Cancel
+        </button>
+        <button 
+          type="button" 
+          (click)="deleteVendorType()" 
+          class="btn btn-danger"
+        >
+          <i class="fas fa-trash"></i>
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

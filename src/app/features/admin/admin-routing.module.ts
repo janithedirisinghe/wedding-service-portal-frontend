@@ -4,6 +4,7 @@ import { AdminBodyPageComponent } from './admin-body-page/admin-body-page.compon
 import { VendorManagementComponent } from './vendor-management/vendor-management.component';
 import { CustomerManagementComponent } from './customer-management/customer-management.component';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+import { VendorTypeManagementComponent } from './vendor-type-management/vendor-type-management.component';
 
 const routes: Routes = [
     { path: '', component: AdminBodyPageComponent, 
@@ -12,6 +13,7 @@ const routes: Routes = [
         { path: 'dashboard', component: AdminDashboardComponent },
         { path: 'vendor-management', component: VendorManagementComponent },
         { path: 'customer-management', component: CustomerManagementComponent },
+        { path: 'vendor-type-management', component: VendorTypeManagementComponent },
       ]
     }, 
 ];
