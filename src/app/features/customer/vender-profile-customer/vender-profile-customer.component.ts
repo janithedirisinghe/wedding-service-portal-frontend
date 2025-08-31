@@ -111,7 +111,9 @@ export class VenderProfileCustomerComponent implements OnInit {
     this.reviewForm.get('rating')?.valueChanges.subscribe(value => {
       this.reviewRating = value;
     });
-  }  loadVendorDetails(): void {
+  }
+
+  loadVendorDetails(): void {
     if (!this.vendorId) return;
 
     this.isLoading = true;

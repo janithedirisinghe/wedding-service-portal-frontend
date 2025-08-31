@@ -302,6 +302,8 @@ export class CustomerTimelineComponent implements OnInit, OnDestroy {
    * Navigate to vendor profile page
    */
   navigateToVendor(vendorId: number) {
-    this.router.navigate(['/customer/vendor-profile', vendorId]);
+    this.router.navigate(['/vender-profile'], {
+      queryParams: { vendorId: vendorId }
+    });
   }
 }
