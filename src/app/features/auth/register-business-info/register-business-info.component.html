@@ -1,78 +1,215 @@
-<section class="bg-gray-50 dark:bg-gray-900">
-    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-      <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-        <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-          <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-            Business Details
-          </h1>
-          <form [formGroup]="bussinesForm" (ngSubmit)="onSubmit()" class="space-y-4 md:space-y-6" action="#">
-            <div>
-              <label for="businessName" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Business Name</label>
-              <input type="text" formControlName="businessName" name="businessName" id="businessName" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Business Name" required>
-            </div>
-            <div>
-              <label for="location" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Location</label>
-              <input type="text" formControlName="location" name="location" id="location" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Location" required>
-            </div>
-            <div>
-              <label for="bio" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Bio</label>
-              <input type="text" formControlName="bio" name="bio" id="bio" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Bio of the Bussiness" required>
-            </div>
-            <div>
-              <label for="telNo" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tel No</label>
-              <input type="text" formControlName="telNo" name="telNo" id="telNo" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Telephone Number" required>
-            </div>
-            <div> 
-              <label for="VenType" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Vendor Type</label>
-              
-              <!-- Loading state -->
-              <div *ngIf="loadingVendorTypes" class="bg-gray-50 border border-gray-300 text-gray-500 text-sm rounded-lg p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400">
-                <div class="flex items-center">
-                  <svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Loading vendor types...
-                </div>
-              </div>
-              
-              <!-- Vendor type select -->
-              <select 
-                *ngIf="!loadingVendorTypes" 
-                id="VenType" 
-                formControlName="VenType" 
-                name="VenType" 
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                <option value="" disabled selected>Select a vendor type</option>
-                <option *ngFor="let vendorType of vendorTypes" [value]="vendorType.vendorTypeName">
-                  {{ vendorType.vendorTypeName }}
-                </option>
-              </select>
-              
-              <!-- Empty state -->
-              <div *ngIf="!loadingVendorTypes && vendorTypes.length === 0" class="bg-yellow-50 border border-yellow-300 text-yellow-800 text-sm rounded-lg p-2.5">
-                <div class="flex items-center">
-                  <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.314 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                  </svg>
-                  No vendor types available. Please contact support.
-                </div>
-              </div>
-            </div> 
-            <div>
-              <label for="brn" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Business Registration Number</label>
-              <input type="text" name="brn" formControlName="brn" id="brn" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Registration Number" required>
-            </div>
-            <div>
-              <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Country</label>
-              <input type="text" name="country" formControlName="country" id="country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Country" required>
-            </div>
-            <button type="submit" (click)="onSubmit()" [disabled]="isSubmitting" class="w-full text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-              <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-              Submit
-            </button>
-          </form>
+<section class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div class="w-full max-w-2xl">
+
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <img class="mx-auto w-16 h-16 mb-4 rounded-full shadow-lg"
+                src="https://untgtsclbjlgemwljimq.supabase.co/storage/v1/object/public/Wedding%20Vender%20managment%20System//logo.png"
+                alt="Wedding Portal Logo" />
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">Business Information</h1>
+            <p class="text-gray-600">Tell us about your business to complete your vendor profile</p>
         </div>
-      </div>
+
+        <!-- Form Card -->
+        <div class="bg-white rounded-lg shadow-xl p-8">
+
+            <form [formGroup]="bussinesForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+                <!-- Business Name -->
+                <div>
+                    <label for="businessName" class="block text-sm font-semibold text-gray-700 mb-2">Business Name</label>
+                    <div class="relative">
+                        <input type="text" formControlName="businessName" name="businessName" id="businessName"
+                            class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 bg-gray-50 focus:bg-white"
+                            placeholder="Enter your business name">
+                        <svg class="absolute left-4 top-3.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                    </div>
+                    <div *ngIf="bussinesForm.get('businessName')?.invalid && bussinesForm.get('businessName')?.touched" class="text-red-500 text-sm mt-1 flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        Business name is required
+                    </div>
+                </div>
+
+                <!-- Location -->
+                <div>
+                    <label for="location" class="block text-sm font-semibold text-gray-700 mb-2">Location</label>
+                    <div class="relative">
+                        <input type="text" formControlName="location" name="location" id="location"
+                            class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 bg-gray-50 focus:bg-white"
+                            placeholder="City, State/Country">
+                        <svg class="absolute left-4 top-3.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </div>
+                    <div *ngIf="bussinesForm.get('location')?.invalid && bussinesForm.get('location')?.touched" class="text-red-500 text-sm mt-1 flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        Location is required
+                    </div>
+                </div>
+
+                <!-- Bio -->
+                <div>
+                    <label for="bio" class="block text-sm font-semibold text-gray-700 mb-2">Business Description</label>
+                    <div class="relative">
+                        <textarea formControlName="bio" name="bio" id="bio" rows="4"
+                            class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 bg-gray-50 focus:bg-white resize-none"
+                            placeholder="Tell customers about your business, services, and what makes you special..."></textarea>
+                        <svg class="absolute left-4 top-3.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                    </div>
+                    <div *ngIf="bussinesForm.get('bio')?.invalid && bussinesForm.get('bio')?.touched" class="text-red-500 text-sm mt-1 flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        Business description is required
+                    </div>
+                </div>
+
+                <!-- Contact Info Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- Telephone Number -->
+                    <div>
+                        <label for="telNo" class="block text-sm font-semibold text-gray-700 mb-2">Telephone Number</label>
+                        <div class="relative">
+                            <input type="text" formControlName="telNo" name="telNo" id="telNo"
+                                class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 bg-gray-50 focus:bg-white"
+                                placeholder="+1 (555) 123-4567">
+                            <svg class="absolute left-4 top-3.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                            </svg>
+                        </div>
+                        <div *ngIf="bussinesForm.get('telNo')?.invalid && bussinesForm.get('telNo')?.touched" class="text-red-500 text-sm mt-1 flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                            </svg>
+                            Telephone number is required
+                        </div>
+                    </div>
+
+                    <!-- Country -->
+                    <div>
+                        <label for="country" class="block text-sm font-semibold text-gray-700 mb-2">Country</label>
+                        <div class="relative">
+                            <input type="text" formControlName="country" name="country" id="country"
+                                class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 bg-gray-50 focus:bg-white"
+                                placeholder="United States">
+                            <svg class="absolute left-4 top-3.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"></path>
+                            </svg>
+                        </div>
+                        <div *ngIf="bussinesForm.get('country')?.invalid && bussinesForm.get('country')?.touched" class="text-red-500 text-sm mt-1 flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                            </svg>
+                            Country is required
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Vendor Type Selection -->
+                <div>
+                    <label for="VenType" class="block text-sm font-semibold text-gray-700 mb-3">Vendor Type</label>
+
+                    <!-- Loading state -->
+                    <div *ngIf="loadingVendorTypes" class="bg-gray-50 border border-gray-300 rounded-lg p-4 flex items-center justify-center">
+                        <svg class="animate-spin h-5 w-5 text-indigo-600 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span class="text-gray-600">Loading vendor types...</span>
+                    </div>
+
+                    <!-- Vendor type select -->
+                    <div *ngIf="!loadingVendorTypes" class="relative">
+                        <select formControlName="VenType" name="VenType" id="VenType"
+                            class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 bg-gray-50 focus:bg-white appearance-none">
+                            <option value="" disabled selected>Select your vendor type</option>
+                            <option *ngFor="let vendorType of vendorTypes" [value]="vendorType.vendorTypeName">
+                                {{ vendorType.vendorTypeName }}
+                            </option>
+                        </select>
+                        <svg class="absolute left-4 top-3.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                        <svg class="absolute right-4 top-3.5 h-5 w-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+
+                    <!-- Empty state -->
+                    <div *ngIf="!loadingVendorTypes && vendorTypes.length === 0" class="bg-yellow-50 border border-yellow-300 rounded-lg p-4 flex items-center">
+                        <svg class="h-5 w-5 text-yellow-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.314 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        <span class="text-yellow-800">No vendor types available. Please contact support.</span>
+                    </div>
+
+                    <div *ngIf="bussinesForm.get('VenType')?.invalid && bussinesForm.get('VenType')?.touched" class="text-red-500 text-sm mt-1 flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        Please select a vendor type
+                    </div>
+                </div>
+
+                <!-- Business Registration Number -->
+                <div>
+                    <label for="brn" class="block text-sm font-semibold text-gray-700 mb-2">Business Registration Number</label>
+                    <div class="relative">
+                        <input type="text" name="brn" formControlName="brn" id="brn"
+                            class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 bg-gray-50 focus:bg-white"
+                            placeholder="Enter your business registration number">
+                        <svg class="absolute left-4 top-3.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <div *ngIf="bussinesForm.get('brn')?.invalid && bussinesForm.get('brn')?.touched" class="text-red-500 text-sm mt-1 flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        Business registration number is required
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" [disabled]="isSubmitting"
+                    class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 disabled:from-indigo-400 disabled:to-blue-400 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 disabled:cursor-not-allowed shadow-lg hover:shadow-xl">
+                    <span *ngIf="!isSubmitting" class="flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Complete Business Profile
+                    </span>
+                    <span *ngIf="isSubmitting" class="flex items-center justify-center">
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Submitting...
+                    </span>
+                </button>
+
+            </form>
+
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="mt-8 text-center">
+            <p class="text-gray-600">Step 3 of 3 - Almost there!</p>
+            <div class="mt-2 bg-gray-200 rounded-full h-2">
+                <div class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 100%"></div>
+            </div>
+        </div>
+
     </div>
-  </section>
+</section>

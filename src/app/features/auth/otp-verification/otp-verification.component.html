@@ -1,22 +1,121 @@
-<section class="bg-gray-50 dark:bg-gray-900">
-    <div class="flex flex-col items-center px-6 py-24 mx-auto md:h-auto">
-      <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-        <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-          <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-            OTP Verification
-          </h1>
-          <p class="">Please Enter the OTP that send to the E mail</p>
-          <form [formGroup]="otpForm" class="space-y-4 md:space-y-6" (ngSubmit)="onSubmit()">
-            <div>
-              <label for="otp" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Enter OTP</label>
-              <input type="text" formControlName="otp" name="otp" id="otp" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Enter OTP" required>
+<section class="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100">
+    <div class="container mx-                </form>
+
+            </div>-8">
+        <div class="max-w-md mx-auto">
+
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <img class="mx-auto w-16 h-16 mb-4 rounded-full shadow-lg"
+                    src="https://untgtsclbjlgemwljimq.supabase.co/storage/v1/object/public/Wedding%20Vender%20managment%20System//logo.png"
+                    alt="Wedding Portal Logo" />
+                <h1 class="text-2xl font-bold text-gray-800 mb-2">Verify Your Account</h1>
+                <p class="text-gray-600">We've sent a verification code to your email</p>
             </div>
-            <button type="submit" (click)="onSubmit()" [disabled]="isSubmitting" class="w-full text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-              <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-              Verify OTP
-            </button>
-          </form>
+
+            <!-- Progress Indicator -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <div class="flex items-center justify-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <span class="text-sm font-medium text-gray-700">Registration</span>
+                    </div>
+                    <div class="w-8 h-0.5 bg-gray-300"></div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <span class="text-sm font-medium text-gray-700">Verification</span>
+                    </div>
+                    <div class="w-8 h-0.5 bg-gray-300"></div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+                            <span class="text-sm font-semibold text-white">4</span>
+                        </div>
+                        <span class="text-sm font-semibold text-purple-600">OTP</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OTP Form Card -->
+            <div class="bg-white rounded-lg shadow-xl p-8">
+
+                <!-- Email Display -->
+                <div class="text-center mb-6">
+                    <div class="inline-flex items-center px-4 py-2 bg-purple-50 rounded-lg">
+                        <svg class="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        <span class="text-sm font-medium text-purple-700">{{ emaill }}</span>
+                    </div>
+                </div>
+
+                <form [formGroup]="otpForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+                    <!-- OTP Input -->
+                    <div>
+                        <label for="otp" class="block text-sm font-semibold text-gray-700 mb-4 text-center">
+                            Enter the 6-digit verification code
+                        </label>
+                        <div class="flex justify-center">
+                            <input type="text" formControlName="otp" name="otp" id="otp"
+                                class="w-full max-w-xs text-center text-2xl font-bold tracking-widest border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 bg-gray-50 focus:bg-white px-4 py-3"
+                                placeholder="000000"
+                                maxlength="6">
+                        </div>
+                        <div *ngIf="otpForm.get('otp')?.invalid && otpForm.get('otp')?.touched" class="text-red-500 text-sm mt-2 text-center flex items-center justify-center">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span *ngIf="otpForm.get('otp')?.errors?.['required']">Verification code is required</span>
+                            <span *ngIf="otpForm.get('otp')?.errors?.['pattern']">Please enter a valid 6-digit code</span>
+                        </div>
+                    </div>
+
+                    <!-- Help Text -->
+                    <div class="text-center">
+                        <p class="text-sm text-gray-600">
+                            Didn't receive the code?
+                            <button type="button" class="text-purple-600 hover:text-purple-500 font-medium">Resend</button>
+                        </p>
+                    </div>
+
+                    <!-- Verify Button -->
+                    <button type="submit" [disabled]="otpForm.invalid || isSubmitting"
+                        class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-purple-400 disabled:to-pink-400 text-white font-semibold py-4 px-4 rounded-lg transition duration-200 disabled:cursor-not-allowed shadow-lg hover:shadow-xl">
+                        <span *ngIf="!isSubmitting" class="flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Verify Account
+                        </span>
+                        <span *ngIf="isSubmitting" class="flex items-center justify-center">
+                            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Verifying...
+                        </span>
+                    </button>
+
+                </form>
+
+            </div>
+
+            <!-- Help Text -->
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-500">
+                    Having trouble? Check your spam folder or
+                    <a href="mailto:support@weddingportal.com" class="text-purple-600 hover:text-purple-500 font-medium">contact support</a>
+                </p>
+            </div>
+
         </div>
-      </div>
     </div>
-  </section>
+</section>
