@@ -6,3 +6,4 @@ export * from './meeting.model';
 export * from './review.model';
 export * from './vendor.model';
 export * from './booking.model';
+export * from './vendor-list-dto';

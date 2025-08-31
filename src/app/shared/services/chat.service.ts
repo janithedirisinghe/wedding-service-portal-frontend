@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ChatRoomDTO, ChatMessageDTO, StartChatRequest, SendMessageRequest } from '../../features/customer/models';
+import { ChatRoomDTO, ChatMessageDTO, StartChatRequest, SendMessageRequest, VendorListDTO } from '../../features/customer/models';
 
 // Re-export types for easier importing
 export { ChatRoomDTO, ChatMessageDTO, StartChatRequest, SendMessageRequest } from '../../features/customer/models';
@@ -24,6 +24,14 @@ export class ChatService {
   getUserChatRooms(userId: number): Observable<ChatRoomDTO[]> {
     return this.http.get<ChatRoomDTO[]>(`${this.baseUrl}/rooms`, { params: { userId } });
   }
+
+  getCustomerChatRooms(userId: number): Observable<ChatRoomDTO[]> {
+    return this.http.get<ChatRoomDTO[]>(`${this.baseUrl}/customer/rooms`, { params: { userId } });
+  }
+
+  getVendorChatRooms(userId: number): Observable<ChatRoomDTO[]> {
+    return this.http.get<ChatRoomDTO[]>(`${this.baseUrl}/vendor/rooms`, { params: { userId } });
+  }
  
   getChatMessages(chatRoomId: number, page = 0, size = 50): Observable<ChatMessageDTO[]> {
     const params = new HttpParams().set('page', page).set('size', size);
@@ -32,6 +40,10 @@ export class ChatService {
 
   markMessagesAsRead(chatRoomId: number): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/room/${chatRoomId}/mark-read`, {});
+  }
+
+  getAllVendorsForChat(): Observable<VendorListDTO[]> {
+    return this.http.get<VendorListDTO[]>(`${this.baseUrl}/vendors`);
   }
 
   deriveRoomDisplayName(room: ChatRoomDTO, currentUserId?: number): string {
@@ -58,8 +70,7 @@ export class ChatService {
 
   getMessageTimestamp(msg: ChatMessageDTO): Date | null {
     if (!msg) return null;
-    if (msg.timestamp) return new Date(msg.timestamp);
-    if ((msg as any).createdAt) return new Date((msg as any).createdAt);
+    if (msg.sentAt) return new Date(msg.sentAt);
     return null;
   }
 }

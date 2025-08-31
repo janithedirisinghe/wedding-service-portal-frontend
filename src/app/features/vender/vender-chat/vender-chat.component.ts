@@ -1,35 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ChatService, ChatRoomDTO, ChatMessageDTO } from '../../../shared/services/chat.service';
+import { ChatService } from '../../../shared/services/chat.service';
 import { ChatWebsocketService } from '../../../shared/services/chat-websocket.service';
 import { AuthService } from '../../../shared/services/auth.service';
-
-// Interfaces
-interface Message {
-  user: string;
-  text: string;
-  timestamp: Date;
-}
-
-interface Chat {
-  id: number;
-  name: string;
-  profileImage: string;
-  category: string;
-  messages: Message[];
-  lastMessage: string | null;
-  lastMessageTime: Date | null;
-  unreadCount: number;
-  isOnline: boolean;
-}
-
-interface User {
-  id: number;
-  name: string;
-  profileImage: string;
-  email: string;
-  category: string;
-  isOnline: boolean;
-}
+import { ChatRoomDTO, ChatMessageDTO, Message, Chat, User, VendorListDTO } from '../../customer/models';
 
 @Component({
   selector: 'app-vender-chat',
@@ -58,16 +31,6 @@ export class VenderChatComponent implements OnInit, OnDestroy {
   searchTerm: string = '';
   filteredChats: Chat[] = this.chats;
 
-  showNewConversationPopup = false;
-  newConversationSearchTerm = '';
-  filteredUsers: User[] = [];
-  allUsers: User[] = [
-    { id: 1, name: 'Noah Davis', profileImage: 'https://primefaces.org/cdn/primeng/images/demo/avatar/stephenshaw.png', email: 'noah@example.com', category: 'Customer', isOnline: true },
-    { id: 2, name: 'Olivia Brown', profileImage: 'https://primefaces.org/cdn/primeng/images/demo/avatar/elwinsharvill.png', email: 'olivia@example.com', category: 'Customer', isOnline: true },
-    { id: 3, name: 'Sophia Wilson', profileImage: 'https://primefaces.org/cdn/primeng/images/demo/avatar/ionibowcher.png', email: 'sophia@example.com', category: 'Customer', isOnline: false },
-    { id: 4, name: 'Jackson Miller', profileImage: 'https://primefaces.org/cdn/primeng/images/demo/avatar/xuxuefeng.png', email: 'jackson@example.com', category: 'Customer', isOnline: true }
-  ];
-
   isTyping = false;
   typingTimeout: any;
   private currentRoomId?: number;
@@ -79,7 +42,6 @@ export class VenderChatComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.filteredUsers = this.allUsers;
     this.username = this.auth.getUserName() || 'You';
     this.loadRooms();
     this.ws.connect();
@@ -92,15 +54,15 @@ export class VenderChatComponent implements OnInit, OnDestroy {
 
   private loadRooms(): void {
     const userId = Number(this.auth.getUserId());
-    this.chatApi.getUserChatRooms(userId).subscribe({
+    this.chatApi.getVendorChatRooms(userId).subscribe({
       next: rooms => { 
-        console.log('Loaded chat rooms:', rooms); // Debug log
+        console.log('Loaded vendor chat rooms:', rooms); // Debug log
         const uid = this.auth.getUserId() || undefined;
         this.chats = rooms.map(r => ({
           id: this.chatApi.getRoomId(r),
           name: this.chatApi.deriveRoomDisplayName(r, uid),
-          profileImage: 'assets/placeholder-vendor.jpg',
-          category: r.vendorBusinessName || 'Chat',
+          profileImage: r.customerProfileImageUrl || 'assets/placeholder-vendor.jpg',
+          category: 'Customer',
           messages: [],
           lastMessage: r.recentMessages && r.recentMessages.length > 0 ? r.recentMessages[r.recentMessages.length - 1].content : null,
           lastMessageTime: r.lastMessageAt ? new Date(r.lastMessageAt) : null,
@@ -112,6 +74,9 @@ export class VenderChatComponent implements OnInit, OnDestroy {
           this.onChatSelectedSetup(this.selectedChat);
         }
         this.sortChatsByLastMessage();
+      },
+      error: (error) => {
+        console.error('Failed to load vendor chat rooms:', error);
       }
     });
   }
@@ -132,15 +97,20 @@ export class VenderChatComponent implements OnInit, OnDestroy {
       next: msgs => {
         chat.messages = msgs.map(m => this.fromDtoToMessage(m));
         this.sortChatsByLastMessage();
+        setTimeout(() => this.scrollToBottom(), 100);
       }
     });
     this.chatApi.markMessagesAsRead(chat.id).subscribe();
     this.ws.subscribe(`/topic/chat/${chat.id}`, (payload: ChatMessageDTO) => {
-      const msg = this.fromDtoToMessage(payload);
-      chat.messages.push(msg);
-      chat.lastMessage = msg.text;
-      chat.lastMessageTime = msg.timestamp;
-      this.sortChatsByLastMessage();
+      const existingMessage = chat.messages.find(msg => msg.messageId === payload.messageId);
+      if (!existingMessage) {
+        const msg = this.fromDtoToMessage(payload);
+        chat.messages.push(msg);
+        chat.lastMessage = msg.text;
+        chat.lastMessageTime = msg.timestamp;
+        this.sortChatsByLastMessage();
+        setTimeout(() => this.scrollToBottom(), 100);
+      }
     });
     this.ws.joinRoom(chat.id);
   }
@@ -151,13 +121,14 @@ export class VenderChatComponent implements OnInit, OnDestroy {
     const roomId = this.selectedChat.id;
     this.ws.send(`/app/chat/${roomId}`, { chatRoomId: roomId, content: text });
     this.newMessage = '';
+    this.reloadChatMessages(roomId);
   }
 
   private fromDtoToMessage(dto: ChatMessageDTO): Message {
     const myId = this.auth.getUserId();
     const ts = this.chatApi.getMessageTimestamp(dto) || new Date();
     const senderName = dto.senderId && myId && dto.senderId === myId ? (this.username || 'You') : (dto.senderName || 'User');
-    return { user: senderName, text: dto.content, timestamp: ts };
+    return { messageId: dto.messageId, user: senderName, text: dto.content, timestamp: ts };
   }
 
   private sortChatsByLastMessage(): void {
@@ -176,49 +147,26 @@ export class VenderChatComponent implements OnInit, OnDestroy {
     );
   }
 
-  openNewConversationPopup(): void {
-    this.showNewConversationPopup = true;
-    this.newConversationSearchTerm = '';
-    this.filteredUsers = this.allUsers;
+  private reloadChatMessages(chatRoomId: number): void {
+    if (!this.selectedChat) return;
+
+    this.chatApi.getChatMessages(chatRoomId, 0, 50).subscribe({
+      next: msgs => {
+        this.selectedChat.messages = msgs.map(m => this.fromDtoToMessage(m));
+        this.sortChatsByLastMessage();
+        setTimeout(() => this.scrollToBottom(), 100);
+      },
+      error: (error) => {
+        console.error('Failed to reload chat messages:', error);
+      }
+    });
   }
 
-  closeNewConversationPopup(): void {
-    this.showNewConversationPopup = false;
-    this.newConversationSearchTerm = '';
-  }
-
-  filterUsers(): void {
-    this.filteredUsers = this.allUsers.filter((user: User) =>
-      user.name.toLowerCase().includes(this.newConversationSearchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(this.newConversationSearchTerm.toLowerCase()) ||
-      user.category.toLowerCase().includes(this.newConversationSearchTerm.toLowerCase())
-    );
-  }
-
-  startConversation(user: User): void {
-    const existingChat = this.chats.find((chat: Chat) => chat.name === user.name);
-
-    if (existingChat) {
-      this.selectedChat = existingChat;
-    } else {
-      const newChat: Chat = {
-        id: this.chats.length + 1,
-        name: user.name,
-        profileImage: user.profileImage,
-        category: user.category,
-        messages: [],
-        lastMessage: null,
-        lastMessageTime: null,
-        unreadCount: 0,
-        isOnline: user.isOnline
-      };
-
-      this.chats.unshift(newChat);
-      this.selectedChat = newChat;
-      this.filterChats();
+  private scrollToBottom(): void {
+    const messagesContainer = document.querySelector('.messages-container') as HTMLElement;
+    if (messagesContainer) {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
-
-    this.closeNewConversationPopup();
   }
 
   getRelativeTime(date: Date | null): string {

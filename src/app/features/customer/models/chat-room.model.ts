@@ -1,12 +1,16 @@
 export interface ChatMessageDTO {
-  id?: number;
+  messageId: number;
   chatRoomId: number;
+  senderId: number;
+  senderName: string;
+  senderType: string; // CUSTOMER or VENDOR
   content: string;
-  senderId?: number;
-  senderName?: string;
-  senderType?: string;
-  timestamp?: string;
-  createdAt?: string;
+  sentAt: string;
+  messageType: string;
+  status: string;
+  readAt?: string;
+  attachmentUrl?: string;
+  attachmentType?: string;
 }
 
 export interface ChatRoomDTO {
@@ -17,6 +21,8 @@ export interface ChatRoomDTO {
   vendorId: number;
   vendorName: string;
   vendorBusinessName: string;
+  vendorProfileImageUrl: string;
+  customerProfileImageUrl: string;
   createdAt: string;
   lastMessageAt: string;
   status: 'ACTIVE' | 'INACTIVE' | 'BLOCKED'; // ChatRoom.ChatStatus enum
@@ -36,6 +42,7 @@ export interface SendMessageRequest {
 
 // Frontend-specific interfaces for UI
 export interface Message {
+  messageId?: number;
   user: string;
   text: string;
   timestamp: Date;

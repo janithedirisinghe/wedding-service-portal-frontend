@@ -8,6 +8,13 @@
   overflow-y: auto;
 }
 
+// Messages container with fixed height and smooth scrolling
+.messages-container {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
 // Custom scrollbar for chat list
 .chat-list::-webkit-scrollbar {
   width: 4px;
@@ -148,16 +155,28 @@
   .chat-list {
     max-height: calc(100vh - 300px);
   }
+
+  .messages-container {
+    max-height: calc(100vh - 220px);
+  }
 }
 
 @media (min-width: 768px) {
   .message-bubble {
     max-width: 60%;
   }
+
+  .messages-container {
+    max-height: calc(100vh - 200px);
+  }
 }
 
 @media (min-width: 1024px) {
   .message-bubble {
     max-width: 50%;
+  }
+
+  .messages-container {
+    max-height: calc(100vh - 200px);
   }
 }
