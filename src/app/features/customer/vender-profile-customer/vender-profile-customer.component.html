@@ -32,7 +32,7 @@
         <div>
           <h2 class="text-2xl font-semibold">{{vendor?.businessName}}</h2>
           <div class="flex items-center text-yellow-500">
-            <span class="text-lg font-semibold">4.9</span>
+            <span class="text-lg font-semibold">{{ vendorStats?.averageRating || 0 }}</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" fill="currentColor" viewBox="0 0 20 20">
               <path d="M10 15l-5.878 3.09 1.122-6.54L1 7.09l6.561-.95L10 1l2.439 5.14 6.561.95-4.244 4.46 1.122 6.54z"/>
             </svg>
@@ -52,9 +52,9 @@
   
     <!-- Profile Stats -->
     <div class="flex space-x-6 mt-4 text-gray-600">
-      <div><span class="font-semibold">335</span> FOLLOWERS</div>
-      <div><span class="font-semibold">10</span> POSTS</div>
-      <div><span class="font-semibold">20</span> REVIEWS</div>
+      <div><span class="font-semibold">{{ vendorStats?.followerCount || 0 }}</span> FOLLOWERS</div>
+      <div><span class="font-semibold">{{ vendorStats?.postCount || 0 }}</span> POSTS</div>
+      <div><span class="font-semibold">{{ vendorStats?.reviewCount || 0 }}</span> REVIEWS</div>
     </div>
 
     <!-- New Buttons -->

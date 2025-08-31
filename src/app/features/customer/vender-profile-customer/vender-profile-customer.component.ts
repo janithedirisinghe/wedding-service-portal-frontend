@@ -11,6 +11,7 @@ import { BookingService } from '../services/booking.service';
 import { BookingRequest } from '../models/booking.model';
 import { AuthService } from '../../../shared/services/auth.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { VendorStatsWithRatingDTO } from '../models/vendor-stats.model';
 
 @Component({
   selector: 'app-vender-profile-customer',
@@ -19,6 +20,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class VenderProfileCustomerComponent implements OnInit {
   vendor: any = null;
+  vendorStats: VendorStatsWithRatingDTO | null = null;
   reviews: ReviewModel[] = [];
   selectedTab: string = 'posts';
   reviewRating: number = 0;
@@ -119,6 +121,7 @@ export class VenderProfileCustomerComponent implements OnInit {
       next: (response) => {
         if (response) {
           this.vendor = response;
+          this.loadVendorStats(); // Load vendor stats
           this.loadVendorReviews(); // Load real reviews
           this.loadVendorPosts(); // Load vendor posts
         } else {
@@ -130,6 +133,22 @@ export class VenderProfileCustomerComponent implements OnInit {
         console.error('Error loading vendor details:', error);
         this.error = 'Failed to load vendor details';
         this.isLoading = false;
+      }
+    });
+  }
+
+  loadVendorStats(): void {
+    if (!this.vendorId) return;
+
+    this.customerService.getVendorStatsWithRating(this.vendorId).subscribe({
+      next: (stats) => {
+        this.vendorStats = stats;
+        console.log('Vendor stats loaded:', stats);
+      },
+      error: (error) => {
+        console.error('Error loading vendor stats:', error);
+        // Don't set main error for stats failure, just log it
+        this.vendorStats = null;
       }
     });
   }

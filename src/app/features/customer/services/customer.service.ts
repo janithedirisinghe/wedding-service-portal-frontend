@@ -3,6 +3,7 @@ import { Injectable } from "@angular/core";
 import { Observable, map, catchError, throwError } from "rxjs";
 import { CustomerDetails, CustomerStats } from "../models/customer.model";
 import { VendorSuggestionResponseDTO } from "../models/vendor-suggestion.model";
+import { VendorStatsWithRatingDTO } from "../models/vendor-stats.model";
 import { environment } from "../../../../environments/environment";
 
 @Injectable({
@@ -187,6 +188,17 @@ updateCustomerProfileWithImageAlt(userId: number | null, customerDTO: Partial<Cu
      */
     getVendorDetails(vendorId: number): Observable<any> {
         return this.http.get<any>(`${this.vendorApiUrl}getvenderByVenderId/${vendorId}`, {
+            withCredentials: true
+        });
+    }
+
+    /**
+     * Get vendor stats with rating by vendor ID
+     * @param vendorId - The ID of the vendor to fetch stats for
+     * @returns Observable containing vendor stats with rating
+     */
+    getVendorStatsWithRating(vendorId: number): Observable<VendorStatsWithRatingDTO> {
+        return this.http.get<VendorStatsWithRatingDTO>(`${this.vendorApiUrl}stats/vendor/${vendorId}`, {
             withCredentials: true
         });
     }
