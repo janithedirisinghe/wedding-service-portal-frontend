@@ -62,7 +62,7 @@ export class VenderChatComponent implements OnInit, OnDestroy {
           id: this.chatApi.getRoomId(r),
           name: this.chatApi.deriveRoomDisplayName(r, uid),
           profileImage: r.customerProfileImageUrl || 'assets/placeholder-vendor.jpg',
-          category: 'Customer',
+          category: r.customerName,
           messages: [],
           lastMessage: r.recentMessages && r.recentMessages.length > 0 ? r.recentMessages[r.recentMessages.length - 1].content : null,
           lastMessageTime: r.lastMessageAt ? new Date(r.lastMessageAt) : null,
