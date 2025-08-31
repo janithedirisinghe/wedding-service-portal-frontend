@@ -244,7 +244,7 @@
     <!-- Vendor List -->
     <div class="space-y-4" *ngIf="!suggestionsLoading && !suggestionsError">
       <div *ngFor="let vendor of suggestedVendors" class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer" (click)="navigateToVendor(vendor.vendorId)">
-        <img [src]="getVendorProfileImage(vendor)" [alt]="vendor.businessName + ' profile'" class="w-10 h-10 rounded-full object-cover">
+        <img [src]="getVendorProfileImage(vendor)" [alt]="vendor.businessName + ' profile'" class="w-10 h-10 rounded-full object-cover" (error)="onImageError($event)">
         <div class="flex-1 min-w-0">
           <p class="font-medium text-sm truncate">{{ vendor.businessName }}</p>
           <p class="text-xs text-gray-500">{{ vendor.venType }}</p>

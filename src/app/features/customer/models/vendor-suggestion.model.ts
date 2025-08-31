@@ -7,6 +7,7 @@ export interface SuggestedVendorDTO {
   bio: string;
   telNo: string;
   userEmail: string;
+  profileImageUrl: string;
   averageRating: number;
   reviewCount: number;
   minServicePrice: number;

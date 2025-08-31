@@ -294,8 +294,8 @@ export class CustomerTimelineComponent implements OnInit, OnDestroy {
    * Get vendor profile image with fallback
    */
   getVendorProfileImage(vendor: SuggestedVendorDTO): string {
-    // For now, return a placeholder since the DTO doesn't include profile image
-    return 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png';
+    // Use the profile image URL from the vendor data, with fallback to placeholder
+    return vendor.profileImageUrl || 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png';
   }
 
   /**
