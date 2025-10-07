@@ -12,6 +12,7 @@ import { VendorTypeManagementComponent } from './vendor-type-management/vendor-t
 import { AdminProfileComponent } from './admin-profile/admin-profile.component';
 import { AdminHelpSupportComponent } from './admin-help-support/admin-help-support.component';
 import { AdminNotificationsComponent } from './admin-notifications/admin-notifications.component';
+import { VendorEarningsComponent } from './vendor-earnings/vendor-earnings.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { AdminNotificationsComponent } from './admin-notifications/admin-notific
     VendorTypeManagementComponent,
     AdminProfileComponent,
     AdminHelpSupportComponent,
-    AdminNotificationsComponent
+    AdminNotificationsComponent,
+    VendorEarningsComponent
   ],
   imports: [
     CommonModule,

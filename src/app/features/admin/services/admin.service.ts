@@ -7,6 +7,7 @@ import { DashboardStatsDTO, OverviewStats, RevenueStats, BookingStats, VendorSta
 import { AdminAnalyticsDTO } from '../models/admin-analytics.model';
 import { RevenueAnalyticsDTO } from '../models/revenue-analytics.model';
 import { BookingAnalyticsDTO } from '../models/booking-analytics.model';
+import { VendorRevenue } from '../models/vendor-earnings.model';
 
 @Injectable({
   providedIn: 'root'
@@ -223,4 +224,20 @@ export class AdminService {
       withCredentials: true
     });
   }
+
+  /**
+   * Get vendor revenue data
+   * @param vendorIds Optional comma-separated list of vendor IDs to filter
+   * @returns Observable<VendorRevenue[]>
+   */
+  getVendorRevenue(vendorIds?: string): Observable<VendorRevenue[]> {
+    const url = vendorIds 
+      ? `${this.apiUrl}/analytics/vendor-revenue?vendorIds=${vendorIds}`
+      : `${this.apiUrl}/analytics/vendor-revenue`;
+    
+    return this.http.get<VendorRevenue[]>(url, {
+      withCredentials: true
+    });
+  }
 }
+

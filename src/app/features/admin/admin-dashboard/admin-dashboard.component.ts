@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { AdminService } from '../services/admin.service';
 import { DashboardStatsDTO, OverviewStats, RevenueStats, BookingStats, VendorStats, CustomerStats, RecentActivityDTO } from '../models/dashboard-stats.model';
 import { AdminAnalyticsDTO } from '../models/admin-analytics.model';
@@ -42,7 +43,7 @@ export class AdminDashboardComponent implements OnInit {
     dashboardWidgets: false
   };
 
-  constructor(private adminService: AdminService) { }
+  constructor(private adminService: AdminService, private router: Router) { }
 
   ngOnInit(): void {
     this.loadAllAnalytics();
@@ -252,5 +253,9 @@ export class AdminDashboardComponent implements OnInit {
     }
     if (typeof value === 'boolean') return value ? 'Yes' : 'No';
     return value.toString();
+  }
+
+  navigateToVendorEarnings(): void {
+    this.router.navigate(['/admin/vendor-earnings']);
   }
 }

@@ -84,7 +84,7 @@
     </div>
 
     <!-- Total Revenue -->
-    <div class="bg-white overflow-hidden shadow-lg rounded-lg border-l-4 border-yellow-500">
+    <div class="bg-white overflow-hidden shadow-lg rounded-lg border-l-4 border-yellow-500 cursor-pointer hover:shadow-xl transition-shadow duration-300" (click)="navigateToVendorEarnings()">
       <div class="p-5">
         <div class="flex items-center">
           <div class="flex-shrink-0">
@@ -103,6 +103,11 @@
                 <span *ngIf="!loading.platformOverview && !platformOverview">--</span>
               </dd>
             </dl>
+          </div>
+          <div class="flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
           </div>
         </div>
       </div>
