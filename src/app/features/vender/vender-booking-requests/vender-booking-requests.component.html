@@ -115,7 +115,7 @@
                         </td>
                         <td class="py-3 px-4">
                             <div class="text-sm">
-                                <p class="text-gray-700 font-medium">${{ request.totalAmount }}</p>
+                                <p class="text-gray-700 font-medium">Rs {{ request.totalAmount }}</p>
                                 <p class="text-xs text-gray-500">{{ request.paymentStatus }}</p>
                             </div>
                         </td>
@@ -276,7 +276,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Total Amount</label>
-                        <p class="mt-1 text-sm text-gray-900 font-medium">${{ selectedBooking.totalAmount }}</p>
+                        <p class="mt-1 text-sm text-gray-900 font-medium">Rs {{ selectedBooking.totalAmount }}</p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Payment Status</label>

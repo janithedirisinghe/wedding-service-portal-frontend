@@ -99,7 +99,7 @@
               <dt class="text-sm font-medium text-gray-500 truncate">Total Revenue</dt>
               <dd class="text-lg font-medium text-gray-900">
                 <span *ngIf="loading.platformOverview" class="text-gray-400">Loading...</span>
-                <span *ngIf="!loading.platformOverview && platformOverview">{{ platformOverview.totalRevenue | currency }}</span>
+                <span *ngIf="!loading.platformOverview && platformOverview">{{ platformOverview.totalRevenue | currency:'LKR':'symbol-narrow' }}</span>
                 <span *ngIf="!loading.platformOverview && !platformOverview">--</span>
               </dd>
             </dl>
@@ -132,11 +132,11 @@
         <div *ngIf="!loading.revenueAnalytics && revenueAnalytics" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div class="text-center p-4 bg-green-50 rounded-lg">
             <h4 class="text-sm font-medium text-gray-500">Monthly Revenue</h4>
-            <p class="text-2xl font-bold text-green-600">{{ revenueAnalytics.monthlyRevenue | currency }}</p>
+            <p class="text-2xl font-bold text-green-600">{{ revenueAnalytics.monthlyRevenue | currency:'LKR':'symbol-narrow' }}</p>
           </div>
           <div class="text-center p-4 bg-blue-50 rounded-lg">
             <h4 class="text-sm font-medium text-gray-500">Yearly Revenue</h4>
-            <p class="text-2xl font-bold text-blue-600">{{ revenueAnalytics.yearlyRevenue | currency }}</p>
+            <p class="text-2xl font-bold text-blue-600">{{ revenueAnalytics.yearlyRevenue | currency:'LKR':'symbol-narrow' }}</p>
           </div>
           <div class="text-center p-4 bg-purple-50 rounded-lg">
             <h4 class="text-sm font-medium text-gray-500">Growth Rate</h4>
@@ -144,7 +144,7 @@
           </div>
           <div class="text-center p-4 bg-indigo-50 rounded-lg">
             <h4 class="text-sm font-medium text-gray-500">Previous Month</h4>
-            <p class="text-2xl font-bold text-indigo-600">{{ revenueAnalytics.previousMonthRevenue | currency }}</p>
+            <p class="text-2xl font-bold text-indigo-600">{{ revenueAnalytics.previousMonthRevenue | currency:'LKR':'symbol-narrow' }}</p>
           </div>
         </div>
         <div *ngIf="!loading.revenueAnalytics && !revenueAnalytics" class="text-center py-8 text-gray-500">
@@ -373,15 +373,15 @@
               <div class="space-y-2 mt-2">
                 <div class="flex justify-between">
                   <p class="text-sm text-gray-600">Platform Revenue</p>
-                  <p class="font-bold text-yellow-600">{{ detailedAnalytics.financialMetrics.totalPlatformRevenue | currency }}</p>
+                  <p class="font-bold text-yellow-600">{{ detailedAnalytics.financialMetrics.totalPlatformRevenue | currency:'LKR':'symbol-narrow' }}</p>
                 </div>
                 <div class="flex justify-between">
                   <p class="text-sm text-gray-600">Avg Transaction</p>
-                  <p class="font-bold text-yellow-600">{{ detailedAnalytics.financialMetrics.averageTransactionValue | currency }}</p>
+                  <p class="font-bold text-yellow-600">{{ detailedAnalytics.financialMetrics.averageTransactionValue | currency:'LKR':'symbol-narrow' }}</p>
                 </div>
                 <div class="flex justify-between">
                   <p class="text-sm text-gray-600">Monthly Recurring</p>
-                  <p class="font-bold text-yellow-600">{{ detailedAnalytics.financialMetrics.monthlyRecurringRevenue | currency }}</p>
+                  <p class="font-bold text-yellow-600">{{ detailedAnalytics.financialMetrics.monthlyRecurringRevenue | currency:'LKR':'symbol-narrow' }}</p>
                 </div>
               </div>
             </div>
@@ -493,7 +493,7 @@
                 </div>
                 <div class="flex justify-between">
                   <span class="text-sm opacity-90">Revenue:</span>
-                  <span class="text-sm font-bold">{{ vendor.totalRevenue | currency }}</span>
+                  <span class="text-sm font-bold">{{ vendor.totalRevenue | currency:'LKR':'symbol-narrow' }}</span>
                 </div>
               </div>
             </div>

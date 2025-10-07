@@ -615,7 +615,7 @@
         <div *ngFor="let service of selectedVendorServices; let i = index" class="border border-gray-200 rounded-lg p-4 mb-4 last:mb-0">
           <div class="flex justify-between items-start mb-2">
             <h4 class="text-lg font-semibold text-gray-900">{{service.name}}</h4>
-            <span class="text-lg font-bold text-green-600">${{service.pricing}}</span>
+            <span class="text-lg font-bold text-green-600">Rs {{service.pricing}}</span>
           </div>
           <p class="text-sm text-gray-600 mb-2">{{service.description}}</p>
           <div class="flex items-center text-xs text-gray-500">

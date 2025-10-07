@@ -27,12 +27,12 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
   loadingVendorTypes: boolean = false;
 
   budgetOptions = [
-    'Under $5,000',
-    '$5,000 - $10,000',
-    '$10,000 - $15,000',
-    '$15,000 - $25,000',
-    '$25,000 - $50,000',
-    'Over $50,000'
+    'Under Rs 5,000',
+    'Rs 5,000 - Rs 10,000',
+    'Rs 10,000 - Rs 15,000',
+    'Rs 15,000 - Rs 25,000',
+    'Rs 25,000 - Rs 50,000',
+    'Over Rs 50,000'
   ];
 
   constructor(
