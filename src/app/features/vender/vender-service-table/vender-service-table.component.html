@@ -62,7 +62,7 @@
                           }">{{ selectedService.status || 'N/A' }}</span>
                         </div>
                         <div><span class="font-medium text-gray-700">Pricing Model:</span> {{ selectedService.pricingModel || 'N/A' }}</div>
-                        <div><span class="font-medium text-gray-700">Base Pricing:</span> ₹{{ selectedService.pricing }}</div>
+                        <div><span class="font-medium text-gray-700">Base Pricing:</span> SLRs {{ selectedService.pricing }}</div>
                         <div><span class="font-medium text-gray-700">Available:</span>
                           <span [ngClass]="selectedService.isAvailable ? 'text-green-600' : 'text-red-600'">{{ selectedService.isAvailable ? 'Yes' : 'No' }}</span>
                         </div>
@@ -111,7 +111,7 @@
             </svg>
           </div>
           <div>
-            <div class="text-2xl font-bold text-gray-800">₹{{ getTotalRevenue() }}</div>
+            <div class="text-2xl font-bold text-gray-800">SLRs {{ getTotalRevenue() }}</div>
             <div class="text-xs text-gray-500">Total Revenue</div>
           </div>
         </div>
@@ -250,7 +250,7 @@
               </div>
             </td>
             <td class="py-4 px-6">
-              <div class="text-sm font-medium text-gray-800">{{ service.pricing }}</div>
+              <div class="text-sm font-medium text-gray-800">SLRs {{ service.pricing }}</div>
               <div class="text-xs text-gray-500">
                 <span *ngIf="service.pricing > 2000" class="text-purple-600">Premium</span>
                 <span *ngIf="service.pricing <= 2000" class="text-green-600">Standard</span>
@@ -378,7 +378,7 @@
           <input formControlName="name" type="text" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Pricing (₹)</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Pricing (SLRs)</label>
           <input formControlName="pricing" type="number" min="0" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400" />
         </div>
       </div>

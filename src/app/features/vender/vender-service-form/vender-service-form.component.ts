@@ -38,6 +38,17 @@ export class VenderServiceFormComponent implements OnInit {
   }
 
   onSubmit() {
+    // Mark all fields as touched to show validation errors
+    Object.keys(this.serviceForm.controls).forEach(key => {
+      this.serviceForm.get(key)?.markAsTouched();
+    });
+
+    // Check if form is valid
+    if (this.serviceForm.invalid) {
+      this.toastr.error('Please fix all validation errors before submitting', 'Form Invalid');
+      return;
+    }
+
     if (this.isSubmitting) return;
     this.isSubmitting = true;
 
@@ -58,24 +69,30 @@ export class VenderServiceFormComponent implements OnInit {
     };
     const venderId = this.userId;
     formvalues.userId = venderId ? Number(venderId) : 0;
-    // debugger;
 
     this.ServiceServices.createService(formvalues).subscribe(
       (response: any) => {
         if (response.message === 'Service created successfully!') {
           console.log('Service created successfully', response);
+          this.toastr.success('Service created successfully!', 'Success');
           this.serviceForm.reset();
+          // Reset form to initial values
+          this.serviceForm.patchValue({
+            pricingModel: 'FIXED',
+            status: 'ACTIVE',
+            isAvailable: true,
+            serviceAreaType: 'LOCAL'
+          });
           this.isSubmitting = false;
           this.router.navigate(['vender/serviceList']);
         }
       },
       (error: any) => {
         console.error('Error creating service', error);
-        this.serviceForm.reset();
+        this.toastr.error('Failed to create service. Please try again.', 'Error');
         this.isSubmitting = false;
       }
     );
-    this.serviceForm.reset();
   }
 
 }
