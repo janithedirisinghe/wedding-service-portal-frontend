@@ -7,15 +7,19 @@ import { VenderLoginComponent } from './vender-login/vender-login.component';
 import { AuthPageBodyComponent } from './auth-page-body/auth-page-body.component';
 import { CustomerLoginComponent } from './customer-login/customer-login.component';
 import { CustomerRegisterComponent } from './customer-register/customer-register.component';
+import { CustomerCompleteInfoComponent } from './customer-complete-info/customer-complete-info.component';
 import { RegisterBusinessInfoComponent } from './register-business-info/register-business-info.component';
 import { OtpVerificationComponent } from './otp-verification/otp-verification.component';
 import { RegisterVenderInfoComponent } from './register-vender-info/register-vender-info.component';
+import { AdminRegisterComponent } from './admin-register/admin-register.component';
+import { AdminLoginComponent } from './admin-login/admin-login.component';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { AuthService } from '../../shared/services/auth.service';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 
 
 @NgModule({
@@ -26,9 +30,13 @@ declarations: [
     AuthPageBodyComponent,
     CustomerLoginComponent,
     CustomerRegisterComponent,
+    CustomerCompleteInfoComponent,
     RegisterBusinessInfoComponent,
     OtpVerificationComponent,
-    RegisterVenderInfoComponent
+    RegisterVenderInfoComponent,
+    AdminRegisterComponent,
+    AdminLoginComponent,
+    ForgotPasswordComponent
   ],
   imports: [
     CommonModule,

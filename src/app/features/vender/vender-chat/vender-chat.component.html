@@ -1,0 +1,173 @@
+<app-vender-header pageTitle="Messages" subtitle="Chat with customers"></app-vender-header>
+
+<div class="flex h-[calc(100vh-20px)] bg-gradient-to-br from-blue-50 to-purple-50">
+    <!-- Chat List (Left Side) -->
+    <div class="w-1/3 bg-white shadow-lg border-r border-blue-100 overflow-hidden">
+      <!-- Header with gradient background -->
+      <div class="p-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+          <span>Customer Chats</span>
+        </div>
+      </div>
+
+      <!-- Search Section -->
+      <div class="p-4 bg-gradient-to-r from-blue-50 to-purple-50">
+        <div class="relative">
+          <input [(ngModel)]="searchTerm" (input)="filterChats()"
+                 class="w-full p-3 pl-10 border border-blue-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200"
+                 placeholder="Search conversations...">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Chat List -->
+      <div class="overflow-auto chat-list" style="scrollbar-width: none; -ms-overflow-style: none;">
+        <style>
+          .chat-list::-webkit-scrollbar {
+            display: none;
+          }
+        </style>
+        <div *ngFor="let chat of filteredChats; let i = index" (click)="selectChat(chat)"
+             class="p-4 cursor-pointer border-b border-gray-100 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 flex items-center transition-all duration-200 group"
+             [ngClass]="{'bg-gradient-to-r from-blue-100 to-purple-100 border-l-4 border-l-blue-500': chat === selectedChat}">
+          <div class="relative">
+            <img [src]="chat.profileImage" alt="{{ chat.name }}" class="w-12 h-12 rounded-full shadow-md group-hover:shadow-lg transition-shadow duration-200">
+          </div>
+          <div class="ml-4 flex-1">
+            <div class="flex justify-between items-start">
+              <div class="font-semibold text-gray-800 group-hover:text-blue-700 transition-colors duration-200">{{ chat.category }}</div>
+              <div class="flex items-center space-x-2">
+                <div class="text-xs text-gray-400">{{ getRelativeTime(chat.lastMessageTime) }}</div>
+                <div *ngIf="chat.unreadCount > 0"
+                     class="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                  {{ chat.unreadCount }}
+                </div>
+              </div>
+            </div>
+            <div class="text-sm text-gray-600 mb-1">{{ chat.category }}</div>
+            <div class="text-xs text-gray-500 truncate">
+              {{ chat.lastMessage || 'Click to start conversation...' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Window (Right Side) -->
+    <div class="w-2/3 flex flex-col bg-white shadow-lg">
+      <!-- Chat Header -->
+      <div class="p-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white flex items-center justify-between shadow-md">
+        <div class="flex items-center space-x-3">
+          <img [src]="selectedChat.profileImage" alt="{{ selectedChat.name }}" class="w-10 h-10 rounded-full border-2 border-white shadow-sm">
+          <div>
+            <div class="font-semibold">{{ selectedChat.category }}</div>
+            <div class="text-sm text-blue-100">{{ selectedChat.name }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages Area -->
+      <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-br from-gray-50 to-blue-50 messages-container"
+           style="max-height: calc(100vh - 200px); scrollbar-width: thin; scrollbar-color: #cbd5e1 #f1f5f9;">
+        <style>
+          .messages-container::-webkit-scrollbar {
+            width: 6px;
+          }
+          .messages-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+          }
+          .messages-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+          }
+          .messages-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+          }
+        </style>
+
+        <!-- Welcome Message when no messages -->
+        <div *ngIf="selectedChat.messages.length === 0" class="flex flex-col items-center justify-center h-full text-center">
+          <div class="w-20 h-20 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-700 mb-2">Start your conversation with {{ selectedChat.category }}</h3>
+          <p class="text-gray-500 max-w-md">Send a message to begin chatting. Discuss services, share availability, or answer customer questions.</p>
+        </div>
+
+        <!-- Message List -->
+        <div *ngFor="let message of selectedChat.messages" class="flex"
+             [ngClass]="{'justify-end': message.user === username, 'justify-start': message.user !== username}">
+          <div class="max-w-xs lg:max-w-md">
+            <!-- Received Message -->
+            <div *ngIf="message.user !== username" class="flex items-start space-x-2">
+              <img [src]="selectedChat.profileImage" alt="{{ selectedChat.name }}" class="w-8 h-8 rounded-full shadow-sm">
+              <div class="bg-white rounded-2xl rounded-tl-sm p-3 shadow-sm border border-gray-100">
+                <div class="text-sm text-gray-800">{{ message.text }}</div>
+                <div class="text-xs text-gray-400 mt-1">{{ message.timestamp | date:'shortTime' }}</div>
+              </div>
+            </div>
+
+            <!-- Sent Message -->
+            <div *ngIf="message.user === username" class="flex items-start space-x-2 justify-end">
+              <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl rounded-tr-sm p-3 shadow-sm">
+                <div class="text-sm">{{ message.text }}</div>
+                <div class="text-xs text-blue-100 mt-1 text-right">{{ message.timestamp | date:'shortTime' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div *ngIf="isTyping" class="flex justify-start">
+          <div class="max-w-xs lg:max-w-md">
+            <div class="flex items-start space-x-2">
+              <img [src]="selectedChat.profileImage" alt="{{ selectedChat.name }}" class="w-8 h-8 rounded-full shadow-sm">
+              <div class="bg-white rounded-2xl rounded-tl-sm p-3 shadow-sm border border-gray-100">
+                <div class="typing-indicator">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message Input Area -->
+      <div class="p-4 bg-white border-t border-gray-100 shadow-lg">
+        <div class="flex items-center space-x-3">
+          <button class="p-2 text-gray-400 hover:text-blue-500 rounded-full hover:bg-blue-50 transition-all duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+            </svg>
+          </button>
+          <div class="flex-1 relative">
+            <input [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" (keyup)="onMessageInputKeyup()"
+                   class="w-full p-3 pr-12 border border-gray-200 rounded-full bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent focus:bg-white transition-all duration-200"
+                   placeholder="Type your message...">
+            <button class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-500 transition-colors duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1a3 3 0 000-6h-1m2 13V9a4 4 0 118 0v3.688M7 7h.01" />
+              </svg>
+            </button>
+          </div>
+          <button (click)="sendMessage()"
+                  class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white p-3 rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
+                  [disabled]="!newMessage.trim()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+</div>

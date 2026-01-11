@@ -1,0 +1,148 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
+import { FollowRequest, FollowResponse } from '../models/follow.model';
+import { FollowingResponse, validateBackendVendor } from '../models/vendor.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class FollowService {
+  private apiUrl = `${environment.apiUrl}/api/followers`;
+
+  constructor(private http: HttpClient) {}
+
+  /**
+   * Follow a vendor
+   * @param userId - User ID (Customer ID)
+   * @param vendorId - Vendor ID to follow
+   * @returns Observable containing follow response
+   */
+  followVendor(userId: number, vendorId: number): Observable<FollowResponse> {
+    const followRequest: FollowRequest = {
+      userId,
+      vendorId
+    };
+
+    return this.http.post<FollowResponse>(`${this.apiUrl}/follow`, followRequest);
+  }
+
+  /**
+   * Unfollow a vendor
+   * @param userId - User ID (Customer ID)
+   * @param vendorId - Vendor ID to unfollow
+   * @returns Observable containing unfollow response
+   */
+  unfollowVendor(userId: number, vendorId: number): Observable<FollowResponse> {
+    const followRequest: FollowRequest = {
+      userId,
+      vendorId
+    };
+
+    return this.http.post<FollowResponse>(`${this.apiUrl}/unfollow`, followRequest);
+  }
+
+  /**
+   * Toggle follow status for a vendor
+   * @param userId - User ID (Customer ID)
+   * @param vendorId - Vendor ID
+   * @param isCurrentlyFollowing - Current follow status
+   * @returns Observable containing response
+   */
+  toggleFollow(userId: number, vendorId: number, isCurrentlyFollowing: boolean): Observable<FollowResponse> {
+    if (isCurrentlyFollowing) {
+      return this.unfollowVendor(userId, vendorId);
+    } else {
+      return this.followVendor(userId, vendorId);
+    }
+  }
+
+  /**
+   * Check if user is following a specific vendor
+   * @param userId - User ID (Customer ID)
+   * @param vendorId - Vendor ID to check
+   * @returns Observable containing follow status response
+   */
+  checkFollowStatus(userId: number, vendorId: number): Observable<{success: boolean, isFollowing: boolean}> {
+    return this.http.get<{success: boolean, isFollowing: boolean}>(`${this.apiUrl}/check/${userId}/${vendorId}`);
+  }
+
+  /**
+   * Check follow status for multiple vendors
+   * @param userId - User ID (Customer ID)
+   * @param vendorIds - Array of vendor IDs to check
+   * @returns Observable containing follow status for each vendor
+   */
+  checkMultipleFollowStatus(userId: number, vendorIds: number[]): Observable<{[vendorId: number]: boolean}> {
+    return new Observable(observer => {
+      if (vendorIds.length === 0) {
+        observer.next({});
+        observer.complete();
+        return;
+      }
+
+      const followStatus: {[vendorId: number]: boolean} = {};
+      let completed = 0;
+
+      vendorIds.forEach(vendorId => {
+        this.checkFollowStatus(userId, vendorId).subscribe({
+          next: (response) => {
+            followStatus[vendorId] = response.success ? response.isFollowing : false;
+            completed++;
+            
+            if (completed === vendorIds.length) {
+              observer.next(followStatus);
+              observer.complete();
+            }
+          },
+          error: (error) => {
+            console.error(`Error checking follow status for vendor ${vendorId}:`, error);
+            followStatus[vendorId] = false;
+            completed++;
+            
+            if (completed === vendorIds.length) {
+              observer.next(followStatus);
+              observer.complete();
+            }
+          }
+        });
+      });
+    });
+  }
+
+  /**
+   * Get all vendors followed by a customer with full vendor details
+   * @param userId - Customer user ID
+   * @returns Observable containing following response with vendor details
+   */
+  getCustomerFollowing(userId: number): Observable<FollowingResponse> {
+    return this.http.get<FollowingResponse>(`${this.apiUrl}/customer/${userId}/following`).pipe(
+      map(resp => {
+        if (!resp || !Array.isArray(resp.following)) {
+          return { success: false, followingCount: 0, following: [], message: 'Malformed response' };
+        }
+        const cleaned = resp.following
+          .map(v => validateBackendVendor(v))
+          .filter((v): v is NonNullable<typeof v> => !!v);
+        return {
+          success: resp.success !== false,
+          followingCount: resp.followingCount ?? cleaned.length,
+          following: cleaned,
+          followingSummaries: resp.followingSummaries,
+          message: resp.message
+        };
+      }),
+      catchError((error) => {
+        console.error('Error fetching customer following:', error);
+        return of({
+          success: false,
+          followingCount: 0, 
+          following: [],
+          message: 'Failed to load favorites'
+        });
+      })
+    );
+  }
+}

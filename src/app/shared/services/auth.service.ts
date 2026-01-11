@@ -1,8 +1,10 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, catchError, of, BehaviorSubject, filter, take, map } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 import { Login } from '../Models/login.model';
+import { ChangePasswordRequest, ChangePasswordResponse } from '../Models/change-password.model';
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +18,72 @@ export class AuthService {
     username: string;
   } | null = null;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  // Track authentication state and initialization
+  private authInitializedSubject = new BehaviorSubject<boolean>(false);
+  public authInitialized$ = this.authInitializedSubject.asObservable();
+
+  constructor(
+    private http: HttpClient, 
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    // Initialize auth state from localStorage on service creation
+    this.initializeAuthState();
+    // Validate session with backend on app load (browser only)
+    if (isPlatformBrowser(this.platformId)) {
+      this.validateSessionWithBackend();
+    } else {
+      // If not in browser, mark as initialized
+      this.authInitializedSubject.next(true);
+    }
+  }
+
+  private initializeAuthState(): void {
+    // Only access localStorage in browser environment
+    if (isPlatformBrowser(this.platformId)) {
+      // Try to restore from localStorage
+      const storedUser = localStorage.getItem('userSession');
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          this.userData = parsedUser; 
+        } catch (e) {
+          // If parsing fails, remove invalid data
+          localStorage.removeItem('userSession');
+        }
+      }
+    }
+  }
+
+  /**
+   * Validate session with backend using httpOnly cookie
+   * If not authenticated, auto-logout and clear local state
+   */
+  private validateSessionWithBackend(): void {
+    this.http.get<{ role: string; userId: number; username: string }>(`${this.apiUrl}/session`, { withCredentials: true })
+      .pipe(
+        catchError(() => of(null))
+      )
+      .subscribe((response) => {
+        if (response && response.userId) {
+          // Session is valid, update local userData and localStorage
+          this.userData = {
+            role: response.role,
+            userId: response.userId,
+            username: response.username
+          };
+          if (isPlatformBrowser(this.platformId)) {
+            localStorage.setItem('userSession', JSON.stringify(this.userData));
+          }
+        } else {
+          // Session invalid, clear local state but don't redirect here
+          // Let components handle the redirect based on their needs
+          this.clearAuthState();
+        }
+        // Mark authentication as initialized regardless of success/failure
+        this.authInitializedSubject.next(true);
+      });
+  }
 
   login(login: Login): Observable<any> {
     return this.http.post<{ role: string; userId: number; username: string }>(
@@ -30,20 +97,82 @@ export class AuthService {
           userId: response.userId,
           username: response.username
         };
+        // Store session info in localStorage for persistence across refreshes
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.setItem('userSession', JSON.stringify(this.userData));
+        }
         this.redirectUser(response.role);
       })
     );
   }
 
+  // Method to validate current session with backend (optional)
+  validateSession(): Observable<boolean> {
+    // This method can be called periodically to validate the session
+    // For now, it just checks if localStorage has session data
+    return of(this.isLoggedIn());
+  }
+
   logout(): void {
-    this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true }).subscribe(() => {
-      this.userData = null;
-      this.router.navigate(['/login']);
+    // Get user role before clearing auth state
+    const userRole = this.getUserRole();
+    
+    this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true }).subscribe({
+      next: () => {
+        this.clearAuthState();
+        this.redirectToLoginPage(userRole);
+      },
+      error: () => {
+        // Even if logout request fails, clear local state
+        this.clearAuthState();
+        this.redirectToLoginPage(userRole);
+      }
     });
+  }
+
+  private redirectToLoginPage(userRole: string | null): void {
+    let loginRoute = '/auth/customer-login'; // Default to customer login
+    
+    if (userRole) {
+      const role = userRole.toLowerCase();
+      switch (role) {
+        case 'admin':
+          loginRoute = '/auth/admin-login';
+          break;
+        case 'vendor':
+        case 'vender':
+          loginRoute = '/auth/vender-login';
+          break;
+        case 'customer':
+        default:
+          loginRoute = '/auth/customer-login';
+          break;
+      }
+    }
+    
+    this.router.navigate([loginRoute]);
+  }
+
+  private clearAuthState(): void {
+    this.userData = null;
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('userSession');
+    }
   }
 
   isLoggedIn(): boolean {
     return !!this.userData;
+  }
+
+  /**
+   * Wait for auth initialization to complete, then check if user is logged in
+   */
+  waitForAuthInitialization(): Observable<boolean> {
+    return this.authInitialized$.pipe(
+      filter(initialized => initialized),
+      take(1),
+      map(() => this.isLoggedIn())
+    );
   }
 
   getUserRole(): string | null {
@@ -58,6 +187,17 @@ export class AuthService {
     return this.userData?.username || null;
   }
 
+  /**
+   * Change user password
+   */
+  changePassword(changePasswordData: ChangePasswordRequest): Observable<ChangePasswordResponse> {
+    return this.http.post<ChangePasswordResponse>(
+      `${this.apiUrl}/change-password`,
+      changePasswordData,
+      { withCredentials: true }
+    );
+  }
+
   redirectUser(role: string): void {
     switch (role) {
       case 'ADMIN':
@@ -67,10 +207,10 @@ export class AuthService {
         this.router.navigate(['/vender']);
         break;
       case 'CUSTOMER':
-        this.router.navigate(['/customer/home']);
-        break;
+        this.router.navigate(['/customer/timeline']);
+        break; 
       default:
-        this.router.navigate(['/login']);
+        this.router.navigate(['/auth/customer-login']);
         break;
     }
   }

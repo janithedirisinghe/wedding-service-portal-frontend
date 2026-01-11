@@ -4,7 +4,11 @@ import { VenderRegisterComponent } from './vender-register/vender-register.compo
 import { AuthPageBodyComponent } from './auth-page-body/auth-page-body.component';
 import { CustomerLoginComponent } from './customer-login/customer-login.component';
 import { CustomerRegisterComponent } from './customer-register/customer-register.component';
+import { CustomerCompleteInfoComponent } from './customer-complete-info/customer-complete-info.component';
 import { VenderLoginComponent } from './vender-login/vender-login.component';
+import { AdminRegisterComponent } from './admin-register/admin-register.component';
+import { AdminLoginComponent } from './admin-login/admin-login.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 
 const routes: Routes = [
   {
@@ -14,7 +18,11 @@ const routes: Routes = [
       { path: 'vender-register', component: VenderRegisterComponent },
       { path: 'customer-login', component: CustomerLoginComponent },
       { path: 'customer-register', component: CustomerRegisterComponent },
-      { path: 'vender-login', component: VenderLoginComponent}
+      { path: 'customer-complete-info', component: CustomerCompleteInfoComponent },
+      { path: 'vender-login', component: VenderLoginComponent},
+      { path: 'admin-register', component: AdminRegisterComponent },
+      { path: 'admin-login', component: AdminLoginComponent },
+      { path: 'forgot-password', component: ForgotPasswordComponent }
     ],
   },
 ];

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PostService } from '../../../features/vender/services/post.service';
 import { PostModel } from '../../../features/vender/models/post.model';
+import { CreatePostDTO } from '../../../features/vender/models/create-post.model';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -18,6 +19,11 @@ export class FileUploaderComponent implements OnInit {
   isExpanded: boolean = false;
   currentDate: string = '';
   currentTime: string = '';
+  
+  // Error handling
+  errorMessage: string | null = null;
+  successMessage: string | null = null;
+  fileErrors: string[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -98,11 +104,26 @@ export class FileUploaderComponent implements OnInit {
   }
 
   private addFiles(files: File[]): void {
+    // Clear previous file errors
+    this.fileErrors = [];
+    
+    // Validate files using the service
+    const validation = this.postService.validateImageFiles([...this.selectedFiles, ...files]);
+    
+    if (!validation.isValid) {
+      this.fileErrors = validation.errors;
+      return;
+    }
+    
     const imageFiles = files.filter(file => file.type.startsWith('image/'));
     
     // Limit to maximum 10 images
     const remainingSlots = 10 - this.selectedFiles.length;
     const filesToAdd = imageFiles.slice(0, remainingSlots);
+    
+    if (filesToAdd.length < imageFiles.length) {
+      this.fileErrors.push(`Only ${filesToAdd.length} images were added. Maximum 10 images allowed.`);
+    }
     
     this.selectedFiles.push(...filesToAdd);
     
@@ -121,39 +142,71 @@ export class FileUploaderComponent implements OnInit {
       return;
     }
 
-    this.isSubmitting = true;
+    // Clear previous messages
+    this.errorMessage = null;
+    this.successMessage = null;
+    this.fileErrors = [];
 
-    const vendorId = this.authService.getUserId();
-    if (!vendorId) {
-      console.error('Vendor ID not found');
-      this.isSubmitting = false;
+    const userId = this.authService.getUserId();
+    if (!userId) {
+      this.errorMessage = 'User ID not found. Please log in again.';
       return;
     }
 
-    // Use current date timestamp as the backend expects
-    const postData = {
-      ...this.postForm.value,
-      vendorId: vendorId,
-      date: new Date().toISOString() // Send current timestamp as date
+    // Create post data using CreatePostDTO structure
+    const postData: CreatePostDTO = {
+      content: this.postForm.value.content,
+      location: this.postForm.value.location,
+      date: new Date().toISOString(),
+      userId: Number(userId)
     };
 
-    const formData = new FormData();
-    formData.append('post', new Blob([JSON.stringify(postData)], { type: 'application/json' }));
+    // Validate post data
+    const postValidation = this.postService.validatePostData(postData);
+    if (!postValidation.isValid) {
+      this.errorMessage = postValidation.errors.join(', ');
+      return;
+    }
 
-    this.selectedFiles.forEach(file => {
-      formData.append('images', file);
-    });
+    // Validate images
+    const imageValidation = this.postService.validateImageFiles(this.selectedFiles);
+    if (!imageValidation.isValid) {
+      this.fileErrors = imageValidation.errors;
+      return;
+    }
 
-    this.postService.createPost(formData).subscribe({
-      next: (response: any) => {
+    this.isSubmitting = true;
+
+    // Use the new structured method for creating posts with images
+    this.postService.createPostWithImages(postData, this.selectedFiles).subscribe({
+      next: (response: PostModel) => {
         console.log('Post created successfully:', response);
+        this.successMessage = 'Post created successfully!';
         this.resetForm();
-        // TODO: Add success notification
+        
+        // Clear success message after 3 seconds
+        setTimeout(() => {
+          this.successMessage = null;
+        }, 3000);
       },
       error: (error: any) => {
         console.error('Error creating post:', error);
         this.isSubmitting = false;
-        // TODO: Add error notification
+        
+        // Handle different error types
+        if (error.status === 0) {
+          this.errorMessage = 'Cannot connect to server. Please check your internet connection.';
+        } else if (error.status === 400) {
+          this.errorMessage = 'Invalid post data. Please check your input.';
+        } else if (error.status === 401) {
+          this.errorMessage = 'You are not authorized. Please log in again.';
+        } else if (error.status === 413) {
+          this.errorMessage = 'File size too large. Please reduce image sizes.';
+        } else if (error.status === 500) {
+          this.errorMessage = 'Server error occurred. Please try again later.';
+        } else {
+          this.errorMessage = `Error creating post: ${error.status}`;
+        }
       }
     });
   }
@@ -164,6 +217,8 @@ export class FileUploaderComponent implements OnInit {
     this.imagePreviewUrls = [];
     this.isSubmitting = false;
     this.isExpanded = false;
+    this.errorMessage = null;
+    this.fileErrors = [];
     this.setCurrentDateTime(); // Update time for next post
   }
 
@@ -176,5 +231,13 @@ export class FileUploaderComponent implements OnInit {
   clearAllFiles(): void {
     this.selectedFiles = [];
     this.imagePreviewUrls = [];
+    this.fileErrors = [];
+  }
+
+  // Method to clear error messages manually
+  clearMessages(): void {
+    this.errorMessage = null;
+    this.successMessage = null;
+    this.fileErrors = [];
   }
 }

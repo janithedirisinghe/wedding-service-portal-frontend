@@ -3,14 +3,17 @@ import { CommonModule } from '@angular/common';
 import { SharedModule } from '../../shared/shared.module';
 import { VenderBodyPageComponent } from './vender-body-page/vender-body-page.component';
 import { VenderRoutingModule } from './vender-routing.module';
-import { VenderSidebarComponent } from '../../shared/components/vender-sidebar/vender-sidebar.component';
 import { VenderPostsPageComponent } from './vender-posts-page/vender-posts-page.component';
 import { VenderCalenderComponent } from './vender-calender/vender-calender.component';
 import { VenderMeetingRequstsComponent } from './vender-meeting-requsts/vender-meeting-requsts.component';
+import { VenderBookingRequestsComponent } from './vender-booking-requests/vender-booking-requests.component';
 import { HttpClientModule } from '@angular/common/http';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { VenderServiceFormComponent } from './vender-service-form/vender-service-form.component';
 import { VenderServiceTableComponent } from './vender-service-table/vender-service-table.component';
+import { VenderChatComponent } from './vender-chat/vender-chat.component';
+import { VenderHelpSupportComponent } from './vender-help-support/vender-help-support.component';
+import { VenderProfileComponent } from './vender-profile/vender-profile.component';
 
 @NgModule({
 declarations: [
@@ -18,8 +21,11 @@ declarations: [
     VenderPostsPageComponent,
     VenderCalenderComponent,
     VenderMeetingRequstsComponent,
+    VenderBookingRequestsComponent,
     VenderServiceFormComponent,
-    VenderServiceTableComponent
+  VenderServiceTableComponent,
+  VenderChatComponent,
+  VenderHelpSupportComponent
 
   ],
   imports: [
@@ -27,7 +33,9 @@ declarations: [
     SharedModule,
     VenderRoutingModule,
     HttpClientModule,
-    ReactiveFormsModule
+  ReactiveFormsModule,
+  FormsModule,
+  VenderProfileComponent
 ],
   exports: [
     

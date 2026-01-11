@@ -1,12 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NotificationDropdownComponent } from '../notification-dropdown/notification-dropdown.component';
 
 @Component({
   selector: 'app-customer-header',
   templateUrl: './customer-header.component.html',
   styleUrls: ['./customer-header.component.scss'],
   standalone: true,
-  imports: [CommonModule]
+  imports: [CommonModule, NotificationDropdownComponent]
 })
 export class CustomerHeaderComponent implements OnInit {
   @Input() pageTitle: string = '';

@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { VenderService } from '../services/service.service';
 import { ServiceModel } from '../models/service.model';
 import { AuthService } from '../../../shared/services/auth.service';
+import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-vender-service-form',
@@ -14,45 +16,83 @@ export class VenderServiceFormComponent implements OnInit {
   serviceForm! : FormGroup;
   isSubmitting: boolean = false;
   userId: Number = 0;
-  constructor( private fb : FormBuilder, private ServiceServices: VenderService,private authService: AuthService) { 
-  }
+  constructor( private fb : FormBuilder, private ServiceServices: VenderService,private authService: AuthService, private router: Router,
+      private toastr: ToastrService) { 
+  } 
 
   ngOnInit(): void {
      this.userId = Number(this.authService.getUserId());
     this.serviceForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(3)]],
-      pricing: ['', [Validators.required, Validators.minLength(3)]],
+      pricing: [null, [Validators.required, Validators.min(0)]],
+      pricingModel: ['FIXED', [Validators.required]],
+      status: ['ACTIVE', [Validators.required]],
+      advancePercentage: [null, [Validators.min(0), Validators.max(100)]],
+      discountPercent: [null, [Validators.min(0), Validators.max(100)]],
+      bookBeforeDays: [null, [Validators.min(0)]],
+      isAvailable: [true],
+      serviceAreaType: ['LOCAL', [Validators.required]],
+      cancellationPolicy: [''],
     });
   }
 
   onSubmit() {
+    // Mark all fields as touched to show validation errors
+    Object.keys(this.serviceForm.controls).forEach(key => {
+      this.serviceForm.get(key)?.markAsTouched();
+    });
+
+    // Check if form is valid
+    if (this.serviceForm.invalid) {
+      this.toastr.error('Please fix all validation errors before submitting', 'Form Invalid');
+      return;
+    }
+
     if (this.isSubmitting) return;
     this.isSubmitting = true;
 
     const formData = this.serviceForm.value;
     const formvalues: ServiceModel = {
-      ...formData
-    }
+      name: formData.name,
+      description: formData.description,
+      pricing: Number(formData.pricing),
+      userId: Number(this.userId),
+      pricingModel: formData.pricingModel,
+      status: formData.status,
+      advancePercentage: formData.advancePercentage !== null ? Number(formData.advancePercentage) : null,
+      discountPercent: formData.discountPercent !== null ? Number(formData.discountPercent) : null,
+      bookBeforeDays: formData.bookBeforeDays !== null ? Number(formData.bookBeforeDays) : null,
+      isAvailable: formData.isAvailable,
+      serviceAreaType: formData.serviceAreaType,
+      cancellationPolicy: formData.cancellationPolicy,
+    };
     const venderId = this.userId;
-    formvalues.vendorId = venderId ? Number(venderId) : 0;
-    // debugger;
+    formvalues.userId = venderId ? Number(venderId) : 0;
 
     this.ServiceServices.createService(formvalues).subscribe(
       (response: any) => {
         if (response.message === 'Service created successfully!') {
           console.log('Service created successfully', response);
+          this.toastr.success('Service created successfully!', 'Success');
           this.serviceForm.reset();
+          // Reset form to initial values
+          this.serviceForm.patchValue({
+            pricingModel: 'FIXED',
+            status: 'ACTIVE',
+            isAvailable: true,
+            serviceAreaType: 'LOCAL'
+          });
           this.isSubmitting = false;
+          this.router.navigate(['vender/serviceList']);
         }
       },
       (error: any) => {
         console.error('Error creating service', error);
-        this.serviceForm.reset();
+        this.toastr.error('Failed to create service. Please try again.', 'Error');
         this.isSubmitting = false;
       }
     );
-    this.serviceForm.reset();
   }
 
 }

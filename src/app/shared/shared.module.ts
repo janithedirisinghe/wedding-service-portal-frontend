@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { HomeNavbarComponent } from './components/home-navbar/home-navbar.component';
 import { MenubarModule } from 'primeng/menubar';
 import { BadgeModule } from 'primeng/badge';
@@ -18,6 +19,7 @@ import { CustomerToolbarComponent } from './components/customer-toolbar/customer
 import { VenderHeaderComponent } from './components/vender-header/vender-header.component';
 import { CustomerHeaderComponent } from './components/customer-header/customer-header.component';
 import { NavbartwoComponent } from './components/navbartwo/navbartwo.component';
+import { CustomerNavbarComponent } from './components/customer-navbar/customer-navbar.component';
 import { AdminSidebarComponent } from './components/admin-sidebar/admin-sidebar.component';
 import { AdminNavbarComponent } from './components/admin-navbar/admin-navbar.component';
 import { PreventDefaultDirective } from './directives/prevent-default.directive';
@@ -33,6 +35,7 @@ import { PreventDefaultDirective } from './directives/prevent-default.directive'
     CustomerToolbarComponent,
     SidebarTwoComponent,
     NavbartwoComponent,
+    CustomerNavbarComponent,
     AdminSidebarComponent,
     AdminNavbarComponent,
     PreventDefaultDirective,
@@ -41,6 +44,7 @@ import { PreventDefaultDirective } from './directives/prevent-default.directive'
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    RouterModule,
     MenubarModule,
     BadgeModule,
     AvatarModule,
@@ -50,12 +54,17 @@ import { PreventDefaultDirective } from './directives/prevent-default.directive'
     VenderHeaderComponent,
     CustomerHeaderComponent,
   ],  exports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule,
     HomeNavbarComponent,
     HomeFooterComponent,
     MainNavbarComponent,
     VenderSidebarComponent,
     SidebarTwoComponent,
     NavbartwoComponent,
+    CustomerNavbarComponent,
     FileUploaderComponent,
     CustomerToolbarComponent,
     VenderHeaderComponent,

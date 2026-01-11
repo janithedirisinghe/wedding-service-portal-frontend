@@ -1,4 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { PostService } from '../../vender/services/post.service';
+import { PostModel } from '../../vender/models/post.model';
 
 @Component({
   selector: 'app-vender-postlist-customer',
@@ -6,93 +8,86 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
   styleUrl: './vender-postlist-customer.component.scss'
 })
 export class VenderPostlistCustomerComponent implements OnChanges {
-  @Input() vendorId: string | undefined;
-  timelineData = [
-    {
-      image: 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png',
-      name: 'Bonnie',
-      action: 'moved',
-      target: 'Jese Leos',
-      targetUrl: '#',
-      status: 'Funny Group',
-      time: 'just now',
-      images: ['/assets/images/post1.jpg', '/assets/images/post2.jpg', '/assets/images/post3.jpg'],
-      isFollowing: false
-    },
-    {
-      image: 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png',
-      name: 'Thomas Lean',
-      action: 'commented on',
-      target: 'Flowbite Pro',
-      targetUrl: '#',
-      time: '2 hours ago',
-      message: "Hi ya'll! I wanted to share a webinar zeroheight is having regarding how to best measure your design system!",
-      images: ['/assets/images/post4.jpg'],
-      isFollowing: false
-    },
-    {
-      image: 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png',
-      name: 'Jese Leos',
-      action: 'has changed',
-      target: 'Pricing page',
-      targetUrl: '#',
-      status: 'Finished',
-      time: '1 day ago',
-      images: ['/assets/images/post5.jpg', '/assets/images/post6.jpg'],
-      isFollowing: false
-    }
-  ];
+  @Input() vendorId: number | undefined;
+  
+  // Posts data
+  posts: PostModel[] = [];
+  loading: boolean = false;
+  error: string | null = null;
+  
+  constructor(private postService: PostService) {}
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['vendorId']) {
-      this.fetchTimelineData(this.vendorId);
+    if (changes['vendorId'] && this.vendorId) {
+      this.fetchVendorPosts(this.vendorId);
+      console.log(`Fetching posts for vendor ID: ${this.vendorId}`);
     }
   }
 
-  fetchTimelineData(vendorId: string | undefined) {
-    // Fetch the timeline data based on the vendorId
-    // This is a placeholder implementation
-    if (vendorId) {
-      // Replace this with actual data fetching logic
-      this.timelineData = [
-        {
-          image: 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png',
-          name: 'Bonnie',
-          action: 'moved',
-          target: 'Jese Leos', 
-          targetUrl: '#',
-          status: 'Funny Group',
-          time: 'just now',
-          images: ['/assets/images/post1.jpg', '/assets/images/post2.jpg', '/assets/images/post3.jpg'],
-          isFollowing: false
-        },
-        {
-          image: 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png',
-          name: 'Thomas Lean',
-          action: 'commented on',
-          target: 'Flowbite Pro',
-          targetUrl: '#',
-          time: '2 hours ago',
-          message: "Hi ya'll! I wanted to share a webinar zeroheight is having regarding how to best measure your design system!",
-          images: ['/assets/images/post4.jpg'],
-          isFollowing: false
-        },
-        {
-          image: 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png',
-          name: 'Jese Leos',
-          action: 'has changed',
-          target: 'Pricing page',
-          targetUrl: '#',
-          status: 'Finished',
-          time: '1 day ago',
-          images: ['/assets/images/post5.jpg', '/assets/images/post6.jpg'],
-          isFollowing: false
+  fetchVendorPosts(vendorId: number): void {
+    this.loading = true;
+    this.error = null;
+    
+    this.postService.getPostsByVendorId(vendorId).subscribe({
+      next: (posts) => {
+        // Sort posts by date (newest first) and postId (highest first) as secondary sort
+        this.posts = posts.sort((a, b) => {
+          // First sort by date
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          
+          if (dateA.getTime() !== dateB.getTime()) {
+            return dateB.getTime() - dateA.getTime(); // Newest first
+          }
+          
+          // If dates are equal, sort by postId (highest first)
+          return (b.postId || 0) - (a.postId || 0);
+        });
+        
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error fetching vendor posts:', error);
+        
+        // Determine error type and provide appropriate message
+        let errorMessage = 'Failed to load posts. ';
+        
+        if (error.status === 0) {
+          errorMessage += 'Cannot connect to server. Please check if the backend is running.';
+        } else if (error.status === 404) {
+          errorMessage += 'Posts not found.';
+        } else if (error.status === 500) {
+          errorMessage += 'Server error occurred.';
+        } else {
+          errorMessage += `Server responded with error: ${error.status}`;
         }
-      ];
-    }
+        
+        this.error = errorMessage;
+        this.loading = false;
+      }
+    });
   }
 
-  toggleFollow(event: any) {
-    event.isFollowing = !event.isFollowing;
+  // Helper method to format date
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 1) {
+      return 'Yesterday';
+    } else if (diffDays < 7) {
+      return `${diffDays} days ago`;
+    } else if (diffDays < 30) {
+      const diffWeeks = Math.floor(diffDays / 7);
+      return `${diffWeeks} week${diffWeeks > 1 ? 's' : ''} ago`;
+    } else {
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
   }
 }

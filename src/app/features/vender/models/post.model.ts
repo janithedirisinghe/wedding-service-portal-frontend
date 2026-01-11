@@ -9,5 +9,11 @@ export interface PostModel {
 
     vendorId: number;
 
+    userId?: number | null;
+
+    vendorName?: string;
+
+    vendorProfileImage?: string;
+
     itemUrls: string[];
 }

@@ -5,8 +5,11 @@
         <h1 class="text-2xl font-bold text-gray-900 transition-all duration-300 hover:text-blue-600">{{ pageTitle }}</h1>
         <p *ngIf="subtitle" class="text-sm text-gray-500">{{ subtitle }}</p>
       </div>
-      <div class="mt-3 md:mt-0">
-        <ng-content></ng-content>
+      <div class="mt-3 md:mt-0 flex items-center space-x-4">
+        <!-- Notification Dropdown -->
+        <!-- <app-notification-dropdown></app-notification-dropdown> -->
+        <!-- Other content -->
+        <!-- <ng-content></ng-content> -->
       </div>
     </div>
   </div>

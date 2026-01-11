@@ -1,8 +1,41 @@
 <div class="p-1">
-  <div class="logo flex items-center">
+  <div class="logo flex items-center mb-4">
     <span class="wed font-bold text-xl">Wed</span>
     <span class="ease text-xl text-indigo-600">Ease</span>
   </div>
+  
+  <!-- Vendor Profile Section -->
+  <div class="vendor-profile-section mb-6 p-3 bg-white bg-opacity-10 rounded-lg">
+    <div class="flex items-center space-x-3">
+      <!-- Profile Image -->
+      <div class="profile-image-container relative">
+        <img 
+          *ngIf="vendor?.profileImageUrl && !imageError"
+          [src]="vendor?.profileImageUrl" 
+          [alt]="vendor?.businessName || 'Vendor Profile'"
+          class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-md"
+          (error)="onImageError($event)">
+        <!-- Fallback initials if no image or image error -->
+        <div 
+          *ngIf="!vendor?.profileImageUrl || imageError" 
+          class="w-12 h-12 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold text-sm border-2 border-white shadow-md">
+          {{ getVendorInitials() }}
+        </div>
+      </div>
+      
+      <!-- Vendor Info -->
+      <div class="vendor-info flex-1 min-w-0">
+        <h3 class="text-sm font-semibold text-white truncate">
+          {{ vendor?.businessName || 'Loading...' }}
+        </h3>
+        <p class="text-xs text-gray-300 truncate">
+          {{ vendor?.VenType || 'Vendor' }}
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Navigation Menu -->
   <ul class="mt-4 space-y-2 text-white">
     <li><a routerLink="/vender/serviceList" class="block p-2 rounded hover:bg-gray-200 hover:bg-opacity-20">Services</a></li>
     <li><a routerLink="/vender/posts" class="block p-2 rounded hover:bg-gray-200 hover:bg-opacity-20">Posts</a></li>

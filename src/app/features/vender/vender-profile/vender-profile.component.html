@@ -4,7 +4,7 @@
 <div class="mx-auto bg-white shadow-lg rounded-lg overflow-hidden">  <!-- Cover Photo Section -->
   <div class="bg-gradient-to-r from-purple-500 to-indigo-600 h-32 sm:h-48 w-full relative">
     <!-- Edit Profile Button -->
-    <button class="absolute right-4 top-4 bg-white text-purple-600 hover:bg-purple-50 px-3 sm:px-4 py-1.5 rounded-full shadow-md flex items-center space-x-1 sm:space-x-1.5 text-xs sm:text-sm font-medium transition-all duration-300">
+    <button (click)="openEditModal()" class="absolute right-4 top-4 bg-white text-purple-600 hover:bg-purple-50 px-3 sm:px-4 py-1.5 rounded-full shadow-md flex items-center space-x-1 sm:space-x-1.5 text-xs sm:text-sm font-medium transition-all duration-300">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
       </svg>
@@ -16,7 +16,7 @@
   <div class="px-4 sm:px-8 pb-5 pt-0 relative">
     <div class="flex flex-col sm:flex-row sm:items-end -mt-16 sm:-mt-24 mb-6">
       <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-full border-4 border-white shadow-lg overflow-hidden z-10 bg-white">
-        <img src="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" alt="Profile Image" class="w-full h-full object-cover">
+        <img [src]="vendor?.profileImageUrl || 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png'" [alt]="vendor?.businessName + ' Profile Image'" class="w-full h-full object-cover">
       </div>
       <div class="mt-3 sm:mt-0 sm:ml-6 flex-1">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between">
@@ -24,12 +24,12 @@
             <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">{{vendor?.businessName}}</h2>
             <div class="flex items-center mt-1">
               <div class="flex items-center bg-yellow-100 px-2.5 py-1 rounded-full">
-                <span class="text-base font-semibold text-yellow-700">4.9</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                <span class="text-base font-semibold text-yellow-700">{{ getAverageRating() > 0 ? getAverageRating() : 'N/A' }}</span>
+                <svg *ngIf="getAverageRating() > 0" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M10 15l-5.878 3.09 1.122-6.54L1 7.09l6.561-.95L10 1l2.439 5.14 6.561.95-4.244 4.46 1.122 6.54z"/>
                 </svg>
               </div>
-              <span class="text-sm text-gray-500 ml-2">(48 reviews)</span>
+              <span class="text-sm text-gray-500 ml-2">({{ getTotalReviews() }} {{ getTotalReviews() === 1 ? 'review' : 'reviews' }})</span>
             </div>
           </div>
           <div class="mt-3 sm:mt-0 flex items-center">
@@ -42,15 +42,15 @@
     <!-- Profile Stats Cards -->
     <div class="grid grid-cols-3 gap-2 sm:gap-4 mt-4 mb-6">
       <div class="bg-purple-50 rounded-lg p-3 sm:p-4 text-center transition-transform hover:transform hover:scale-105 duration-300">
-        <div class="text-xl sm:text-2xl font-bold text-purple-700">335</div>
+        <div class="text-xl sm:text-2xl font-bold text-purple-700">{{ vendorStats?.followerCount || 0 }}</div>
         <div class="text-xs sm:text-sm text-purple-600 font-medium">FOLLOWERS</div>
       </div>
       <div class="bg-indigo-50 rounded-lg p-3 sm:p-4 text-center transition-transform hover:transform hover:scale-105 duration-300">
-        <div class="text-xl sm:text-2xl font-bold text-indigo-700">10</div>
+        <div class="text-xl sm:text-2xl font-bold text-indigo-700">{{ vendorStats?.postCount || posts.length }}</div>
         <div class="text-xs sm:text-sm text-indigo-600 font-medium">POSTS</div>
       </div>
       <div class="bg-blue-50 rounded-lg p-3 sm:p-4 text-center transition-transform hover:transform hover:scale-105 duration-300">
-        <div class="text-xl sm:text-2xl font-bold text-blue-700">20</div>
+        <div class="text-xl sm:text-2xl font-bold text-blue-700">{{ vendorStats?.reviewCount || getTotalReviews() }}</div>
         <div class="text-xs sm:text-sm text-blue-600 font-medium">REVIEWS</div>
       </div>
     </div>
@@ -66,6 +66,18 @@
           <div>
             <h4 class="text-sm uppercase tracking-wider text-gray-500 font-medium mb-1">Bio</h4>
             <p class="text-gray-700">{{vendor?.bio || 'Professional wedding service provider with years of experience in the industry.'}}</p>
+          </div>
+          
+          <div class="flex items-start">
+            <div class="mt-1 flex-shrink-0 text-purple-600">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0h3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h4 class="text-sm uppercase tracking-wider text-gray-500 font-medium">Service Type</h4>
+              <p class="text-gray-700">{{vendor?.VenType || 'Not specified'}}</p>
+            </div>
           </div>
           
           <div class="flex items-start">
@@ -122,6 +134,39 @@
       </div>
     </div>
   </div>
+
+  <!-- Security Section -->
+  <div class="bg-gradient-to-r from-red-50 to-orange-50 rounded-xl overflow-hidden border border-red-100 mt-6">
+    <div class="px-4 py-3 bg-white bg-opacity-70 border-b border-red-100">
+      <div class="flex justify-between items-center">
+        <h3 class="text-lg font-semibold text-red-800">Security</h3>
+        <button 
+          (click)="openChangePasswordModal()"
+          class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center space-x-1.5">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v-2H7v-2H4a1 1 0 01-1-1v-4a1 1 0 011-1h3l2.257-2.257A6 6 0 0121 9z" />
+          </svg>
+          <span>Change Password</span>
+        </button>
+      </div>
+    </div>
+    
+    <div class="p-5">
+      <div class="flex items-start">
+        <div class="mt-1 flex-shrink-0 text-red-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h4 class="text-sm uppercase tracking-wider text-gray-500 font-medium">Password</h4>
+          <p class="text-gray-700 font-semibold">••••••••</p>
+          <!-- <p class="text-xs text-gray-500 mt-1">Last changed: Never</p> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Tabs -->
   <div class="mt-8 mb-2">
     <div class="flex flex-wrap border-b border-gray-200">
@@ -139,9 +184,9 @@
               [class.text-gray-500]="selectedTab !== 'reviews'"
               [class.hover:text-purple-500]="selectedTab !== 'reviews'">
         <span>Reviews</span>
-        <span class="ml-2 bg-purple-100 text-purple-600 text-xs py-0.5 px-1.5 rounded-full">20</span>
+        <!-- <span class="ml-2 bg-purple-100 text-purple-600 text-xs py-0.5 px-1.5 rounded-full">20</span> -->
         <span *ngIf="selectedTab === 'reviews'" class="absolute bottom-0 left-0 w-full h-0.5 bg-purple-600"></span>
-      </button>
+      </button>  
       <button (click)="selectedTab = 'services'" 
               class="px-6 py-3 transition-all duration-200 text-base font-medium relative focus:outline-none"
               [class.text-purple-600]="selectedTab === 'services'"
@@ -238,26 +283,17 @@
         <div class="flex-1">
           <h3 class="text-lg font-semibold text-gray-800 mb-2">Overall Rating</h3>
           <div class="flex items-center">
-            <div class="text-4xl font-bold text-purple-700">4.9</div>
+            <div class="text-4xl font-bold text-purple-700">{{ getAverageRating() > 0 ? getAverageRating() : 'N/A' }}</div>
             <div class="ml-3">
-              <div class="flex text-yellow-500">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M10 15l-5.878 3.09 1.122-6.54L1 7.09l6.561-.95L10 1l2.439 5.14 6.561.95-4.244 4.46 1.122 6.54z"/>
-                </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M10 15l-5.878 3.09 1.122-6.54L1 7.09l6.561-.95L10 1l2.439 5.14 6.561.95-4.244 4.46 1.122 6.54z"/>
-                </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M10 15l-5.878 3.09 1.122-6.54L1 7.09l6.561-.95L10 1l2.439 5.14 6.561.95-4.244 4.46 1.122 6.54z"/>
-                </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M10 15l-5.878 3.09 1.122-6.54L1 7.09l6.561-.95L10 1l2.439 5.14 6.561.95-4.244 4.46 1.122 6.54z"/>
-                </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <div class="flex text-yellow-500" *ngIf="getAverageRating() > 0">
+                <svg *ngFor="let star of [1,2,3,4,5]" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" 
+                     [class.text-yellow-500]="star <= getAverageRating()" 
+                     [class.text-gray-300]="star > getAverageRating()"
+                     fill="currentColor" viewBox="0 0 20 20">
                   <path d="M10 15l-5.878 3.09 1.122-6.54L1 7.09l6.561-.95L10 1l2.439 5.14 6.561.95-4.244 4.46 1.122 6.54z"/>
                 </svg>
               </div>
-              <p class="text-sm text-gray-500">Based on 20 reviews</p>
+              <p class="text-sm text-gray-500">Based on {{ getTotalReviews() }} {{ getTotalReviews() === 1 ? 'review' : 'reviews' }}</p>
             </div>
           </div>
         </div>
@@ -265,68 +301,61 @@
         <!-- Rating Breakdown -->
         <div class="flex-1">
           <h3 class="text-lg font-semibold text-gray-800 mb-2">Rating Breakdown</h3>
-          <div class="space-y-2">
-            <div class="flex items-center">
-              <span class="text-sm w-16 text-gray-600">5 stars</span>
+          <div class="space-y-2" *ngIf="getTotalReviews() > 0">
+            <div *ngFor="let rating of [5,4,3,2,1]" class="flex items-center">
+              <span class="text-sm w-16 text-gray-600">{{ rating }} {{ rating === 1 ? 'star' : 'stars' }}</span>
               <div class="w-full bg-gray-200 rounded-full h-2 mx-2">
-                <div class="bg-yellow-500 h-2 rounded-full" style="width: 85%"></div>
+                <div class="bg-yellow-500 h-2 rounded-full" [style.width.%]="getRatingBreakdown()[rating].percentage"></div>
               </div>
-              <span class="text-sm w-8 text-gray-600">85%</span>
+              <span class="text-sm w-8 text-gray-600">{{ getRatingBreakdown()[rating].percentage }}%</span>
             </div>
-            <div class="flex items-center">
-              <span class="text-sm w-16 text-gray-600">4 stars</span>
-              <div class="w-full bg-gray-200 rounded-full h-2 mx-2">
-                <div class="bg-yellow-500 h-2 rounded-full" style="width: 10%"></div>
-              </div>
-              <span class="text-sm w-8 text-gray-600">10%</span>
-            </div>
-            <div class="flex items-center">
-              <span class="text-sm w-16 text-gray-600">3 stars</span>
-              <div class="w-full bg-gray-200 rounded-full h-2 mx-2">
-                <div class="bg-yellow-500 h-2 rounded-full" style="width: 5%"></div>
-              </div>
-              <span class="text-sm w-8 text-gray-600">5%</span>
-            </div>
-            <div class="flex items-center">
-              <span class="text-sm w-16 text-gray-600">2 stars</span>
-              <div class="w-full bg-gray-200 rounded-full h-2 mx-2">
-                <div class="bg-yellow-500 h-2 rounded-full" style="width: 0%"></div>
-              </div>
-              <span class="text-sm w-8 text-gray-600">0%</span>
-            </div>
-            <div class="flex items-center">
-              <span class="text-sm w-16 text-gray-600">1 star</span>
-              <div class="w-full bg-gray-200 rounded-full h-2 mx-2">
-                <div class="bg-yellow-500 h-2 rounded-full" style="width: 0%"></div>
-              </div>
-              <span class="text-sm w-8 text-gray-600">0%</span>
-            </div>
+          </div>
+          <div *ngIf="getTotalReviews() === 0" class="text-gray-500 text-sm">
+            No reviews available yet.
           </div>
         </div>
       </div>
     </div>
     
     <!-- Reviews List -->
-    <div class="space-y-5">
+    <!-- Loading State -->
+    <div *ngIf="reviewsLoading" class="flex justify-center items-center py-8">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+      <span class="ml-3 text-gray-600">Loading reviews...</span>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="reviewsError && !reviewsLoading" class="text-center py-8">
+      <div class="text-red-600 mb-2">{{ reviewsError }}</div>
+      <button (click)="fetchReviews(userId)" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+        Try Again
+      </button>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!reviewsLoading && !reviewsError && reviews.length === 0" class="text-center py-8">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10m0 0V6a2 2 0 00-2-2H9a2 2 0 00-2 2v2m0 0v10a2 2 0 002 2h6a2 2 0 002-2V8M9 12h6" />
+      </svg>
+      <h3 class="text-lg font-medium text-gray-500 mb-2">No reviews yet</h3>
+      <p class="text-gray-400">Reviews from customers will appear here once you start receiving them.</p>
+    </div>
+
+    <!-- Reviews Content -->
+    <div *ngIf="!reviewsLoading && !reviewsError && reviews.length > 0" class="space-y-5">
       <div *ngFor="let review of reviews" class="bg-white shadow-sm border border-gray-100 p-5 rounded-lg hover:shadow-md transition-shadow duration-300">
         <div class="flex justify-between flex-col sm:flex-row gap-3 sm:gap-0 mb-3">
           <div class="flex items-start"> 
             <div class="w-10 h-10 rounded-full overflow-hidden bg-purple-100 flex-shrink-0">
-              <img [src]="'https://ui-avatars.com/api/?name=' + review.name + '&background=8B5CF6&color=fff'" alt="{{ review.name }}" class="w-full h-full object-cover">
+              <img [src]="'https://ui-avatars.com/api/?name=' + review.customerName + '&background=8B5CF6&color=fff'" [alt]="review.customerName" class="w-full h-full object-cover">
             </div>
             <div class="ml-3">
-              <h4 class="font-semibold text-gray-800">{{ review.name }}</h4>
+              <h4 class="font-semibold text-gray-800">{{ review.customerName }}</h4>
               <p class="text-gray-500 text-xs flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                {{ review.location }}
-                <span class="mx-1">&bull;</span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                {{ review.date }}
+                {{ formatReviewDate(review.createdAt) }}
               </p>
             </div>
           </div>
@@ -339,12 +368,12 @@
         </div>
         
         <div class="bg-gray-50 rounded-lg p-4">
-          <p class="text-gray-700">{{ review.text }}</p>
+          <p class="text-gray-700">{{ review.comment }}</p>
         </div>
         
-        <!-- Service Type & Review Date -->
+        <!-- Review Date -->
         <div class="mt-3 flex justify-between items-center text-xs text-gray-500">
-          <div>Service: <span class="font-medium text-gray-700">Wedding Photography</span></div>
+          <div>Review ID: <span class="font-medium text-gray-700">#{{ review.reviewId }}</span></div>
           <div class="flex items-center space-x-3">
             <button class="text-purple-600 hover:text-purple-800 flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -401,7 +430,7 @@
             </div>
             <div>
               <div class="text-2xl font-bold text-gray-800">{{vendor?.services?.length || 0}}</div>
-              <div class="text-xs text-gray-500">Active Services</div>
+              <div class="text-xs text-gray-500">Total Services</div>
             </div>
           </div>
         </div>
@@ -413,8 +442,8 @@
               </svg>
             </div>
             <div>
-              <div class="text-2xl font-bold text-gray-800">85%</div>
-              <div class="text-xs text-gray-500">Approval Rate</div>
+              <div class="text-2xl font-bold text-gray-800">{{ getActiveServicesCount() }}</div>
+              <div class="text-xs text-gray-500">Active Services</div>
             </div>
           </div>
         </div>
@@ -422,12 +451,12 @@
           <div class="flex items-center">
             <div class="rounded-full bg-blue-100 p-2 mr-3">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
               </svg>
             </div>
             <div>
-              <div class="text-2xl font-bold text-gray-800">18</div>
-              <div class="text-xs text-gray-500">Bookings</div>
+              <div class="text-2xl font-bold text-gray-800">Rs. {{ getTotalServiceValue() }}</div>
+              <div class="text-xs text-gray-500">Total Value</div>
             </div>
           </div>
         </div>
@@ -439,8 +468,8 @@
               </svg>
             </div>
             <div>
-              <div class="text-2xl font-bold text-gray-800">4.9</div>
-              <div class="text-xs text-gray-500">Rating</div>
+              <div class="text-2xl font-bold text-gray-800">{{ getAveragePricing() }}</div>
+              <div class="text-xs text-gray-500">Avg. Price</div>
             </div>
           </div>
         </div>
@@ -459,11 +488,14 @@
       <!-- Service Categories -->
       <div class="flex overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-purple-200 scrollbar-track-gray-100">
         <button class="px-4 py-2 bg-purple-600 text-white rounded-full mr-2 whitespace-nowrap transform hover:scale-105 transition-all duration-200">All Services</button>
-        <button class="px-4 py-2 bg-white border border-gray-200 hover:bg-purple-50 text-gray-600 rounded-full mr-2 whitespace-nowrap transform hover:scale-105 transition-all duration-200">Photography</button>
-        <button class="px-4 py-2 bg-white border border-gray-200 hover:bg-purple-50 text-gray-600 rounded-full mr-2 whitespace-nowrap transform hover:scale-105 transition-all duration-200">Venue</button>
-        <button class="px-4 py-2 bg-white border border-gray-200 hover:bg-purple-50 text-gray-600 rounded-full mr-2 whitespace-nowrap transform hover:scale-105 transition-all duration-200">Catering</button>
-        <button class="px-4 py-2 bg-white border border-gray-200 hover:bg-purple-50 text-gray-600 rounded-full mr-2 whitespace-nowrap transform hover:scale-105 transition-all duration-200">Decoration</button>
-        <button class="px-4 py-2 bg-white border border-gray-200 hover:bg-purple-50 text-gray-600 rounded-full whitespace-nowrap transform hover:scale-105 transition-all duration-200">Entertainment</button>
+        <button 
+          *ngFor="let vendorType of vendorTypes" 
+          class="px-4 py-2 bg-white border border-gray-200 hover:bg-purple-50 text-gray-600 rounded-full mr-2 whitespace-nowrap transform hover:scale-105 transition-all duration-200"
+          [class.bg-purple-600]="selectedCategory === vendorType.vendorTypeName"
+          [class.text-white]="selectedCategory === vendorType.vendorTypeName"
+          (click)="selectCategory(vendorType.vendorTypeName)">
+          {{ vendorType.vendorTypeName }}
+        </button>
       </div>
     </div>
     
@@ -476,20 +508,25 @@
             <span class="text-white font-medium text-lg">{{service.name || 'Service Name'}}</span>
           </div>
           <div class="absolute top-3 right-3 flex space-x-2">
-            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 shadow-sm">
-              <span class="w-2 h-2 rounded-full bg-green-500 mr-1.5 animate-pulse"></span>
-              Available
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
+                  [class]="service.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+              <span class="w-2 h-2 rounded-full mr-1.5 animate-pulse"
+                    [class]="service.status === 'ACTIVE' ? 'bg-green-500' : 'bg-red-500'"></span>
+              {{service.status}}
+            </span>
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+              {{service.pricingModel}}
             </span>
           </div>
           <div class="absolute top-3 left-3">
             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-900 bg-opacity-70 text-white shadow-sm">
-              {{service.serviceId}} 
+              ID: {{service.serviceId}}
             </span>
           </div>
-          <!-- Featured/New Badge -->
+          <!-- Service Area Type Badge -->
           <div class="absolute bottom-3 left-3">
             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-500 text-white shadow-sm">
-              Featured
+              {{service.serviceAreaType}}
             </span>
           </div>
         </div>
@@ -529,33 +566,61 @@
             <div class="text-gray-600 text-sm space-y-2">
               <p>{{ service.description || 'No description available.' }}</p>
               
+              <!-- Service Details -->
+              <div class="pt-2 grid grid-cols-2 gap-2">
+                <div class="bg-gray-50 rounded p-2">
+                  <h5 class="font-medium text-gray-700 text-xs">Advance Payment</h5>
+                  <p class="text-gray-600 text-sm">{{service.advancePercentage}}%</p>
+                </div>
+                <div class="bg-gray-50 rounded p-2">
+                  <h5 class="font-medium text-gray-700 text-xs">Book Before</h5>
+                  <p class="text-gray-600 text-sm">{{service.bookBeforeDays}} days</p>
+                </div>
+                <div class="bg-gray-50 rounded p-2">
+                  <h5 class="font-medium text-gray-700 text-xs">Discount</h5>
+                  <p class="text-gray-600 text-sm">{{service.discountPercent}}%</p>
+                </div>
+                <div class="bg-gray-50 rounded p-2">
+                  <h5 class="font-medium text-gray-700 text-xs">Available</h5>
+                  <p class="text-gray-600 text-sm" [class]="service.isAvailable ? 'text-green-600' : 'text-red-600'">
+                    {{service.isAvailable ? 'Yes' : 'No'}}
+                  </p>
+                </div>
+              </div>
+              
+              <!-- Cancellation Policy -->
+              <div class="pt-2" *ngIf="service.cancellationPolicy">
+                <h5 class="font-medium text-gray-700 mb-1">Cancellation Policy:</h5>
+                <p class="text-xs text-gray-600 bg-red-50 p-2 rounded">{{service.cancellationPolicy}}</p>
+              </div>
+              
               <!-- Service Features -->
               <div class="pt-2">
-                <h5 class="font-medium text-gray-700 mb-1.5">Features:</h5>
+                <h5 class="font-medium text-gray-700 mb-1.5">Service Info:</h5>
                 <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-1">
                   <li class="text-xs text-gray-600 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-green-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
-                    Custom packages
+                    Created: {{service.createdAt ? (service.createdAt | date:'short') : 'N/A'}}
                   </li>
                   <li class="text-xs text-gray-600 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-green-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
-                    24/7 support
+                    Updated: {{service.updatedAt ? (service.updatedAt | date:'short') : 'N/A'}}
                   </li>
                   <li class="text-xs text-gray-600 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-green-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
-                    Free consultation
+                    Pricing Model: {{service.pricingModel}}
                   </li>
                   <li class="text-xs text-gray-600 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-green-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
-                    Premium quality
+                    Service Area: {{service.serviceAreaType}}
                   </li>
                 </ul>
               </div>
@@ -567,13 +632,19 @@
             <div class="flex justify-between items-end">
               <div>
                 <div class="flex items-center mb-1">
-                  <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded">
-                    Special Offer
+                  <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded mr-2">
+                    {{service.pricingModel}}
+                  </span>
+                  <span *ngIf="service.discountPercent > 0" class="text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded">
+                    {{service.discountPercent}}% OFF
                   </span>
                 </div>
                 <div class="flex items-baseline">
                   <span class="text-2xl font-bold text-purple-700">Rs. {{ service.pricing || '0' }}</span>
-                  <span class="text-gray-500 text-xs ml-1">/ package</span>
+                  <span class="text-gray-500 text-xs ml-1">/ {{service.pricingModel.toLowerCase()}}</span>
+                </div>
+                <div *ngIf="service.discountPercent > 0 && service.pricing" class="text-xs text-gray-500 mt-1">
+                  Original: Rs. {{ ((service.pricing || 0) / (1 - service.discountPercent / 100)).toFixed(2) }}
                 </div>
               </div>
               
@@ -599,13 +670,13 @@
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  12 Bookings
+                  Book {{service.bookBeforeDays}} days ahead
                 </span>
                 <span class="flex items-center text-gray-500">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  92% Success
+                  {{service.advancePercentage}}% Advance
                 </span>
               </div>
               <button class="text-purple-600 hover:text-purple-800 text-xs font-medium hover:underline">View Details</button>
@@ -640,6 +711,402 @@
         <button type="button" class="py-2 px-3 border-t border-b border-gray-300 bg-purple-100 text-sm font-medium text-purple-600">2</button>
         <button type="button" class="py-2 px-3 border border-gray-300 bg-white rounded-r-md text-sm font-medium text-gray-500 hover:bg-gray-50">Next</button>
       </nav>
+    </div>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div *ngIf="isChangePasswordModalOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-auto modal-enter">
+    <!-- Modal Header -->
+    <div class="px-6 py-4 border-b border-gray-200">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xl font-semibold text-gray-900 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v-2H7v-2H4a1 1 0 01-1-1v-4a1 1 0 011-1h3l2.257-2.257A6 6 0 0121 9z" />
+          </svg>
+          Change Password
+        </h3>
+        <button 
+          (click)="closeChangePasswordModal()"
+          class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="px-6 py-4">
+      <form (ngSubmit)="onChangePassword()">
+        <!-- Current Password -->
+        <div class="mb-4">
+          <label for="currentPassword" class="block text-sm font-medium text-gray-700 mb-2">
+            Current Password
+          </label>
+          <input
+            type="password"
+            id="currentPassword"
+            [(ngModel)]="changePasswordData.currentPassword"
+            name="currentPassword"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors duration-200"
+            placeholder="Enter your current password"
+          />
+        </div>
+
+        <!-- New Password -->
+        <div class="mb-4">
+          <label for="newPassword" class="block text-sm font-medium text-gray-700 mb-2">
+            New Password
+          </label>
+          <input
+            type="password"
+            id="newPassword"
+            [(ngModel)]="changePasswordData.newPassword"
+            name="newPassword"
+            required
+            minlength="6"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors duration-200"
+            placeholder="Enter your new password (min. 6 characters)"
+          />
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="mb-4">
+          <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">
+            Confirm New Password
+          </label>
+          <input
+            type="password"
+            id="confirmPassword"
+            [(ngModel)]="changePasswordData.confirmPassword"
+            name="confirmPassword"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors duration-200"
+            placeholder="Confirm your new password"
+          />
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="changePasswordError" class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+          {{ changePasswordError }}
+        </div>
+
+        <!-- Success Message -->
+        <div *ngIf="changePasswordSuccess" class="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg text-sm">
+          {{ changePasswordSuccess }}
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="flex space-x-3 pt-4">
+          <button
+            type="button"
+            (click)="closeChangePasswordModal()"
+            class="flex-1 px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors duration-200"
+            [disabled]="changePasswordLoading"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            [disabled]="changePasswordLoading"
+          >
+            <svg *ngIf="changePasswordLoading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ changePasswordLoading ? 'Changing...' : 'Change Password' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div *ngIf="showEditModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4 modal-backdrop">
+  <div class="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto modal-content">
+    <!-- Modal Header -->
+    <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-lg">
+      <div class="flex justify-between items-center">
+        <h3 class="text-xl font-semibold text-gray-800">Edit Profile</h3>
+        <button (click)="closeEditModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="px-6 py-4">
+      <!-- Success Message -->
+      <div *ngIf="editSuccess" class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+        <div class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          {{ editSuccess }}
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="editError" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+        <div class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          {{ editError }}
+        </div>
+      </div>
+
+      <!-- Edit Form -->
+      <form [formGroup]="editProfileForm" (ngSubmit)="onSubmitEditProfile()">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Profile Image Upload -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Profile Image
+            </label>
+            <div class="flex items-center space-x-6">
+              <!-- Current/Preview Image -->
+              <div class="w-24 h-24 rounded-full border-2 border-gray-300 overflow-hidden bg-gray-100 flex-shrink-0">
+                <img 
+                  [src]="previewImageUrl || vendor?.profileImageUrl || 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png'" 
+                  [alt]="vendor?.businessName + ' Profile Image'"
+                  class="w-full h-full object-cover"
+                >
+              </div>
+              
+              <!-- Upload Controls -->
+              <div class="flex-1">
+                <div class="flex items-center space-x-3">
+                  <!-- File Input -->
+                  <label class="relative cursor-pointer">
+                    <span class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium">
+                      {{ selectedProfileImage ? 'Change Image' : 'Upload Image' }}
+                    </span>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      (change)="onProfileImageSelected($event)"
+                      class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    >
+                  </label>
+                  
+                  <!-- Remove Button -->
+                  <button 
+                    *ngIf="selectedProfileImage || previewImageUrl"
+                    type="button"
+                    (click)="removeSelectedImage()"
+                    class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors text-sm font-medium"
+                  >
+                    Remove
+                  </button>
+                </div>
+                
+                <p class="text-xs text-gray-500 mt-2">
+                  Recommended: Square image, at least 400x400px. Max file size: 5MB.
+                </p>
+                
+                <!-- Selected file info -->
+                <div *ngIf="selectedProfileImage" class="mt-2 text-sm text-green-600">
+                  Selected: {{ selectedProfileImage.name }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Business Name -->
+          <div class="md:col-span-2">
+            <label for="businessName" class="block text-sm font-medium text-gray-700 mb-2">
+              Business Name *
+            </label>
+            <input
+              type="text"
+              id="businessName"
+              formControlName="businessName"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              [class.border-red-500]="isFieldInvalid('businessName')"
+              placeholder="Enter your business name"
+            >
+            <div *ngIf="isFieldInvalid('businessName')" class="text-red-500 text-sm mt-1">
+              {{ getFieldError('businessName') }}
+            </div>
+          </div>
+
+          <!-- Bio -->
+          <div class="md:col-span-2">
+            <label for="bio" class="block text-sm font-medium text-gray-700 mb-2">
+              Bio
+            </label>
+            <textarea
+              id="bio"
+              formControlName="bio"
+              rows="4"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              [class.border-red-500]="isFieldInvalid('bio')"
+              placeholder="Tell us about your business..."
+            ></textarea>
+            <div *ngIf="isFieldInvalid('bio')" class="text-red-500 text-sm mt-1">
+              {{ getFieldError('bio') }}
+            </div>
+          </div>
+
+          <!-- Telephone -->
+          <div>
+            <label for="telNo" class="block text-sm font-medium text-gray-700 mb-2">
+              Telephone *
+            </label>
+            <input
+              type="tel"
+              id="telNo"
+              formControlName="telNo"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              [class.border-red-500]="isFieldInvalid('telNo')"
+              placeholder="Enter your phone number"
+            >
+            <div *ngIf="isFieldInvalid('telNo')" class="text-red-500 text-sm mt-1">
+              {{ getFieldError('telNo') }}
+            </div>
+          </div>
+
+          <!-- Business Registration Number -->
+          <div>
+            <label for="brn" class="block text-sm font-medium text-gray-700 mb-2">
+              Business Registration Number *
+            </label>
+            <input
+              type="text"
+              id="brn"
+              formControlName="brn"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              [class.border-red-500]="isFieldInvalid('brn')"
+              placeholder="Enter your BRN"
+            >
+            <div *ngIf="isFieldInvalid('brn')" class="text-red-500 text-sm mt-1">
+              {{ getFieldError('brn') }}
+            </div>
+          </div>
+
+          <!-- Location -->
+          <div>
+            <label for="location" class="block text-sm font-medium text-gray-700 mb-2">
+              Location *
+            </label>
+            <input
+              type="text"
+              id="location"
+              formControlName="location"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              [class.border-red-500]="isFieldInvalid('location')"
+              placeholder="Enter your location"
+            >
+            <div *ngIf="isFieldInvalid('location')" class="text-red-500 text-sm mt-1">
+              {{ getFieldError('location') }}
+            </div>
+          </div>
+
+          <!-- Country -->
+          <div>
+            <label for="country" class="block text-sm font-medium text-gray-700 mb-2">
+              Country *
+            </label>
+            <select
+              id="country"
+              formControlName="country"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              [class.border-red-500]="isFieldInvalid('country')"
+            >
+              <option value="">Select Country</option>
+              <option value="Sri Lanka">Sri Lanka</option>
+              <option value="India">India</option>
+              <option value="United States">United States</option>
+              <option value="United Kingdom">United Kingdom</option>
+              <option value="Australia">Australia</option>
+              <option value="Canada">Canada</option>
+              <!-- Add more countries as needed -->
+            </select>
+            <div *ngIf="isFieldInvalid('country')" class="text-red-500 text-sm mt-1">
+              {{ getFieldError('country') }}
+            </div>
+          </div>
+
+          <!-- Vendor Type -->
+          <div class="md:col-span-2">
+            <label for="venType" class="block text-sm font-medium text-gray-700 mb-2">
+              Vendor Type *
+            </label>
+            
+            <!-- Loading state -->
+            <div *ngIf="loadingVendorTypes" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 flex items-center">
+              <svg class="animate-spin h-4 w-4 mr-2 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span class="text-sm text-gray-600">Loading vendor types...</span>
+            </div>
+            
+            <!-- Vendor type select -->
+            <select
+              *ngIf="!loadingVendorTypes"
+              id="venType"
+              formControlName="venType"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              [class.border-red-500]="isFieldInvalid('venType')"
+            >
+              <option value="">Select Vendor Type</option>
+              <option *ngFor="let vendorType of vendorTypes" [value]="vendorType.vendorTypeName">
+                {{ vendorType.vendorTypeName }}
+              </option>
+            </select>
+            
+            <!-- Empty state -->
+            <div *ngIf="!loadingVendorTypes && vendorTypes.length === 0" class="w-full px-3 py-2 border border-yellow-300 rounded-lg bg-yellow-50">
+              <div class="flex items-center">
+                <svg class="h-4 w-4 mr-2 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.314 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                <span class="text-sm text-yellow-800">No vendor types available. Please contact support.</span>
+              </div>
+            </div>
+            
+            <div *ngIf="isFieldInvalid('venType')" class="text-red-500 text-sm mt-1">
+              {{ getFieldError('venType') }}
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="sticky bottom-0 bg-gray-50 px-6 py-4 rounded-b-lg border-t border-gray-200">
+      <div class="flex justify-end space-x-3">
+        <button
+          type="button"
+          (click)="closeEditModal()"
+          class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+          [disabled]="isSubmitting"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          (click)="onSubmitEditProfile()"
+          class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center"
+          [disabled]="isSubmitting || editProfileForm.invalid"
+          [class.opacity-50]="isSubmitting || editProfileForm.invalid"
+        >
+          <svg *ngIf="isSubmitting" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          {{ isSubmitting ? 'Updating...' : 'Update Profile' }}
+        </button>
+      </div>
     </div>
   </div>
 </div>

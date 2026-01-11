@@ -36,6 +36,8 @@ export class CustomerToolbarComponent implements OnInit {
       this.activeTab = 'profile';
     } else if (url.includes('/favorites')) {
       this.activeTab = 'favorites';
+    } else if (url.includes('/search')) {
+      this.activeTab = 'search';
     } else {
       this.activeTab = 'timeline'; // default
     }
@@ -46,15 +48,11 @@ export class CustomerToolbarComponent implements OnInit {
   }
 
   navigateToFavorites() {
-    // Navigate to favorites/wishlist page (you may need to add this route)
-    console.log('Favorites functionality - route to be implemented');
-    // this.router.navigate(['/customer/favorites']);
+    this.router.navigate(['/customer/favorites']);
   }
 
   navigateToSearch() {
-    // Navigate to search page or open search modal
-    console.log('Search functionality - route to be implemented');
-    // this.router.navigate(['/customer/search']);
+    this.router.navigate(['/customer/search']);
   }
 
   navigateToWallet() {
@@ -79,5 +77,9 @@ export class CustomerToolbarComponent implements OnInit {
     this.router.navigate(['/customer/chat']);
     // Reset unread messages when user opens chat
     this.unreadMessages = 0;
+  }
+
+  navigateToHelpSupport() {
+    this.router.navigate(['/customer/help-support']);
   }
 }

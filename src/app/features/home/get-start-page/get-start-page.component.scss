@@ -1,7 +1,196 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
-.color{
-    background-color: rgb(59, 130, 246);
+
+/* Custom animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(236, 72, 153, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(236, 72, 153, 0.6); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Card hover effects */
+.role-card {
+  @apply relative bg-white rounded-3xl shadow-xl p-8 lg:p-12 h-full flex flex-col hover:shadow-2xl transition-all duration-300;
+}
+
+.role-card:hover {
+  transform: translateY(-8px);
+}
+
+/* Decorative background blur effect */
+.decorative-blur {
+  @apply absolute -inset-1 rounded-3xl blur opacity-25 transition duration-1000;
+}
+
+.group:hover .decorative-blur {
+  opacity: 0.75;
+}
+ 
+.customer-blur {
+  @apply bg-gradient-to-r from-rose-500 to-purple-600;
+}
+
+.vendor-blur {
+  @apply bg-gradient-to-r from-blue-500 to-cyan-600;
+}
+
+/* Icon styles */
+.role-icon {
+  @apply w-20 h-20 mx-auto mb-8 rounded-full flex items-center justify-center transition-transform duration-300;
+}
+
+.group:hover .role-icon {
+  transform: scale(1.1);
+}
+
+.customer-icon {
+  @apply bg-gradient-to-r from-rose-500 to-purple-600;
+}
+
+.vendor-icon {
+  @apply bg-gradient-to-r from-blue-500 to-cyan-600;
+}
+
+/* Button styles */
+.role-button {
+  @apply w-full py-4 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300;
+}
+
+.customer-button {
+  @apply bg-gradient-to-r from-rose-500 to-purple-600;
+}
+
+.vendor-button {
+  @apply bg-gradient-to-r from-blue-500 to-cyan-600;
+}
+
+.role-button:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.role-button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Feature checkmarks */
+.feature-check {
+  @apply w-5 h-5 rounded-full flex items-center justify-center;
+}
+
+.customer-check {
+  @apply bg-green-500;
+}
+
+.vendor-check {
+  @apply bg-blue-500;
+}
+
+/* Info card styles */
+.info-card {
+  @apply bg-white rounded-2xl shadow-lg p-8 max-w-3xl mx-auto;
+}
+
+.info-icon {
+  @apply w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center;
+}
+
+/* Trust indicators */
+.trust-indicator {
+  @apply flex items-center space-x-2;
+}
+
+/* Section divider */
+.section-divider {
+  @apply w-32 h-1 bg-gradient-to-r from-rose-500 to-purple-600 mx-auto rounded-full;
+}
+
+/* Responsive adjustments */
+@screen sm {
+  .role-card {
+    @apply p-6 lg:p-8;
+  }
+}
+
+@screen lg {
+  .role-card {
+    @apply p-8 lg:p-12;
+  }
+}
+
+/* Loading shimmer effect for images */
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Focus states for accessibility */
+.role-button:focus {
+  @apply ring-4 ring-opacity-50 outline-none;
+}
+
+.customer-button:focus {
+  @apply ring-rose-300;
+}
+
+.vendor-button:focus {
+  @apply ring-blue-300;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .role-card {
+    @apply border-2 border-gray-800;
+  }
+  
+  .role-button {
+    @apply border-2 border-white;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-glow,
+  .role-icon,
+  .role-button {
+    animation: none;
+    transition: none;
+  }
+  
+  .role-card:hover,
+  .role-button:hover {
+    transform: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .decorative-blur {
+    display: none;
+  }
+  
+  .role-card {
+    @apply shadow-none border border-gray-300;
+  }
+  
+  .role-button {
+    @apply bg-gray-600 text-white;
+  }
 }

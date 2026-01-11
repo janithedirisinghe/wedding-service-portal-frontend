@@ -1,0 +1,123 @@
+// Admin Register Component Styles
+ 
+.admin-register-container {
+  .stepper-container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px 10px 0 0;
+    
+    .step-item {
+      &.active {
+        .step-number {
+          background: white;
+          color: #667eea;
+          border-color: white;
+        }
+      }
+    }
+  }
+
+  .form-container {
+    .form-input {
+      transition: all 0.3s ease;
+      
+      &:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+    }
+
+    .submit-button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      transition: all 0.3s ease;
+      
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+      }
+      
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .info-panel {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    
+    .info-image {
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+  }
+}
+
+// Dark mode styles
+.dark {
+  .admin-register-container {
+    .form-container {
+      background: #1f2937;
+      
+      .form-input {
+        background: #374151;
+        border-color: #4b5563;
+        color: white;
+        
+        &::placeholder {
+          color: #9ca3af;
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .admin-register-container {
+    .stepper-container {
+      .step-item {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  }
+}
+
+// Animation for form validation
+.form-error {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+// Custom checkbox styling
+.form-checkbox {
+  appearance: none;
+  background-color: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  width: 1rem;
+  height: 1rem;
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  
+  &:checked {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+    
+    &:after {
+      content: '✓';
+      color: white;
+      font-size: 0.75rem;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+}

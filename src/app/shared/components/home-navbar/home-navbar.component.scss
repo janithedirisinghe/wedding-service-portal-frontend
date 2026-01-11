@@ -1,16 +1,150 @@
-.logo {
-    font-size: 24px;
-    font-weight: bold;
-  }
-  .logo .wed {
-    color: #FFD700; /* Yellow color */
-  }
-  .logo .ease {
-    color: #000000; /* Black color */
-  }
+ 
 
-  .card .p-menubar {
-    display: flex;
-    justify-content: flex-end; /* Move items to the right */
+/* Logo styling */
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.logo .wed {
+  color: #EAB308; /* Yellow-500 */
+}
+
+.logo .ease {
+  color: #111827; /* Gray-900 */
+}
+
+/* Navbar backdrop blur effect */
+nav {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Smooth transitions for mobile menu */
+#mobile-menu {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Active link styling */
+.router-link-active {
+  @apply text-rose-600 border-rose-600;
+}
+
+/* Hover effects for navigation links */
+nav a {
+  position: relative;
+  overflow: hidden;
+}
+
+nav a:hover::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #f43f5e, #a855f7);
+  transform: translateX(-100%);
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+@keyframes slideIn {
+  to {
+    transform: translateX(0);
   }
+}
+
+/* Button hover effects */
+.btn-gradient {
+  background: linear-gradient(45deg, #f43f5e, #a855f7);
+  transition: all 0.3s ease;
+}
+
+.btn-gradient:hover {
+  background: linear-gradient(45deg, #e11d48, #9333ea);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(244, 63, 94, 0.3);
+}
+
+/* Mobile menu animation */
+@media (max-width: 768px) {
+  #mobile-menu {
+    animation: slideDown 0.3s ease-out;
+  }
+  
+  #mobile-menu.hidden {
+    animation: slideUp 0.3s ease-out;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* Logo icon hover effect */
+.logo-icon {
+  transition: transform 0.3s ease;
+}
+
+.group:hover .logo-icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* Focus states for accessibility */
+button:focus,
+a:focus {
+  outline: 2px solid #f43f5e;
+  outline-offset: 2px;
+}
+
+/* Responsive text sizing */
+@media (max-width: 640px) {
+  .logo {
+    font-size: 20px;
+  }
+}
+
+/* Custom scrollbar for mobile menu if needed */
+#mobile-menu::-webkit-scrollbar {
+  width: 4px;
+}
+
+#mobile-menu::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+#mobile-menu::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #f43f5e, #a855f7);
+  border-radius: 2px;
+}
+
+/* Ensure navbar stays on top */
+nav {
+  z-index: 9999;
+}
+
+/* Smooth color transitions */
+* {
+  transition-property: color, background-color, border-color;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
   

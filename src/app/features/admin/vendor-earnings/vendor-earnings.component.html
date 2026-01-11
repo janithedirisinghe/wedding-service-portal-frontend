@@ -1,0 +1,206 @@
+<!-- Vendor Earnings Page -->
+<div class="max-w-7xl mx-auto p-6">
+  <!-- Header Section -->
+  <div class="mb-6">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <button 
+          (click)="navigateBack()" 
+          class="flex items-center text-gray-600 hover:text-gray-900 mb-2 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to Dashboard
+        </button>
+        <h1 class="text-3xl font-bold text-gray-900">Vendor Earnings Report</h1>
+        <p class="text-gray-600 mt-1">Detailed breakdown of vendor earnings and commissions</p>
+      </div>
+      <div class="flex items-center space-x-3">
+        <button 
+          (click)="refreshData()" 
+          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Refresh
+        </button>
+        <button 
+          (click)="exportToCSV()" 
+          class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Export CSV
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <div class="bg-white shadow-lg rounded-lg p-6 border-l-4 border-green-500">
+      <h3 class="text-sm font-medium text-gray-500 mb-2">Total Revenue</h3>
+      <p class="text-2xl font-bold text-green-600">{{ totalRevenue | currency:'LKR':'symbol-narrow' }}</p>
+    </div>
+    <div class="bg-white shadow-lg rounded-lg p-6 border-l-4 border-blue-500">
+      <h3 class="text-sm font-medium text-gray-500 mb-2">Total Payments</h3>
+      <p class="text-2xl font-bold text-blue-600">{{ totalPayments }}</p>
+    </div>
+    <div class="bg-white shadow-lg rounded-lg p-6 border-l-4 border-purple-500">
+      <h3 class="text-sm font-medium text-gray-500 mb-2">Active Vendors</h3>
+      <p class="text-2xl font-bold text-purple-600">{{ totalCount }}</p>
+    </div>
+    <div class="bg-white shadow-lg rounded-lg p-6 border-l-4 border-yellow-500">
+      <h3 class="text-sm font-medium text-gray-500 mb-2">Avg Revenue/Vendor</h3>
+      <p class="text-2xl font-bold text-yellow-600">{{ averageRevenuePerVendor | currency:'LKR':'symbol-narrow' }}</p>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="bg-white shadow-lg rounded-lg p-4 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="applyFilters()"
+          placeholder="Search vendor name or ID..."
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+        <select 
+          [(ngModel)]="sortBy"
+          (ngModelChange)="sortData()"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="totalRevenue">Total Revenue</option>
+          <option value="totalPayments">Total Payments</option>
+          <option value="vendorName">Vendor Name</option>
+          <option value="vendorId">Vendor ID</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
+        <select 
+          [(ngModel)]="sortOrder"
+          (ngModelChange)="sortData()"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="desc">Descending</option>
+          <option value="asc">Ascending</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="bg-white shadow-lg rounded-lg p-12 text-center">
+    <div class="flex justify-center items-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    </div>
+    <p class="text-gray-600 mt-4">Loading vendor earnings data...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
+    <div class="flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <h3 class="text-red-800 font-medium">Error Loading Data</h3>
+        <p class="text-red-600">{{ error }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vendor Earnings Table -->
+  <div *ngIf="!loading && !error" class="bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor ID</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor Name</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Revenue</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Payments</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Per Payment</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let vendor of getPaginatedData()" class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">#{{ vendor.vendorId }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">{{ vendor.vendorName }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-semibold text-green-600">{{ vendor.totalRevenue | currency:'LKR':'symbol-narrow' }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ vendor.totalPayments }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ getAveragePerPayment(vendor) | currency:'LKR':'symbol-narrow' }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm">
+              <button 
+                (click)="viewVendorDetails(vendor)"
+                class="text-blue-600 hover:text-blue-900 font-medium">
+                View Details
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <!-- Empty State -->
+      <div *ngIf="filteredVendorRevenues.length === 0" class="text-center py-12">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <p class="text-gray-500 text-lg">No vendor revenue data found</p>
+        <p class="text-gray-400 text-sm mt-2">Try adjusting your filters or search criteria</p>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+      <div class="flex items-center justify-between">
+        <div class="text-sm text-gray-700">
+          Showing <span class="font-medium">{{ (currentPage - 1) * pageSize + 1 }}</span> to 
+          <span class="font-medium">{{ Math.min(currentPage * pageSize, filteredVendorRevenues.length) }}</span> of 
+          <span class="font-medium">{{ filteredVendorRevenues.length }}</span> results
+        </div>
+        <div class="flex items-center space-x-2">
+          <button 
+            [disabled]="currentPage === 1"
+            (click)="previousPage()"
+            class="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+            Previous
+          </button>
+          <div class="flex space-x-1">
+            <button 
+              *ngFor="let page of getPageNumbers()"
+              [class.bg-blue-600]="page === currentPage"
+              [class.text-white]="page === currentPage"
+              [class.bg-white]="page !== currentPage"
+              [class.text-gray-700]="page !== currentPage"
+              (click)="goToPage(page)"
+              class="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50">
+              {{ page }}
+            </button>
+          </div>
+          <button 
+            [disabled]="currentPage === totalPages"
+            (click)="nextPage()"
+            class="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

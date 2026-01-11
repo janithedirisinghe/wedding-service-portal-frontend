@@ -5,37 +5,156 @@
     <div class="pb-6">
 
       <div class="mb-5">
-        <label for="service-name" class="block mb-2 text-sm font-semibold text-gray-700">Service Name</label>
+        <label for="service-name" class="block mb-2 text-sm font-semibold text-gray-700">Service Name <span class="text-red-500">*</span></label>
         <input type="text" id="service-name" formControlName="name" name="name"
+          [class.border-red-500]="serviceForm.get('name')?.invalid && serviceForm.get('name')?.touched"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
           placeholder="Enter Service name">
-        <p class="mt-1 text-xs text-gray-500">Give a name for the service</p>
+        <div *ngIf="serviceForm.get('name')?.invalid && serviceForm.get('name')?.touched">
+          <p *ngIf="serviceForm.get('name')?.errors?.['required']" class="mt-1 text-xs text-red-600">Service name is required</p>
+          <p *ngIf="serviceForm.get('name')?.errors?.['minlength']" class="mt-1 text-xs text-red-600">Service name must be at least 3 characters</p>
+        </div>
+        <p *ngIf="!serviceForm.get('name')?.invalid || !serviceForm.get('name')?.touched" class="mt-1 text-xs text-gray-500">Give a name for the service</p>
       </div>
 
       <div class="mb-5">
-        <label for="service-description" class="block mb-2 text-sm font-semibold text-gray-700">Service Description</label>
+        <label for="service-description" class="block mb-2 text-sm font-semibold text-gray-700">Service Description <span class="text-red-500">*</span></label>
         <textarea id="service-description" formControlName="description" name="description"
+          [class.border-red-500]="serviceForm.get('description')?.invalid && serviceForm.get('description')?.touched"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 min-h-[100px]"
           placeholder="Enter Service description"></textarea>
-        <p class="mt-1 text-xs text-gray-500">Provide a detailed description of the service</p>
+        <div *ngIf="serviceForm.get('description')?.invalid && serviceForm.get('description')?.touched">
+          <p *ngIf="serviceForm.get('description')?.errors?.['required']" class="mt-1 text-xs text-red-600">Service description is required</p>
+          <p *ngIf="serviceForm.get('description')?.errors?.['minlength']" class="mt-1 text-xs text-red-600">Description must be at least 3 characters</p>
+        </div>
+        <p *ngIf="!serviceForm.get('description')?.invalid || !serviceForm.get('description')?.touched" class="mt-1 text-xs text-gray-500">Provide a detailed description of the service</p>
       </div>
 
       <div class="mb-5">
-        <label for="service-pricing" class="block mb-2 text-sm font-semibold text-gray-700">Pricing</label>
+        <label for="service-pricing" class="block mb-2 text-sm font-semibold text-gray-700">Pricing <span class="text-red-500">*</span></label>
         <input type="number" id="service-pricing" formControlName="pricing" name="pricing"
+          [class.border-red-500]="serviceForm.get('pricing')?.invalid && serviceForm.get('pricing')?.touched"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
           placeholder="Enter Service pricing">
-        <p class="mt-1 text-xs text-gray-500">Specify the pricing for the service</p>
+        <div *ngIf="serviceForm.get('pricing')?.invalid && serviceForm.get('pricing')?.touched">
+          <p *ngIf="serviceForm.get('pricing')?.errors?.['required']" class="mt-1 text-xs text-red-600">Pricing is required</p>
+          <p *ngIf="serviceForm.get('pricing')?.errors?.['min']" class="mt-1 text-xs text-red-600">Pricing must be 0 or greater</p>
+        </div>
+        <p *ngIf="!serviceForm.get('pricing')?.invalid || !serviceForm.get('pricing')?.touched" class="mt-1 text-xs text-gray-500">Specify the pricing for the service</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="mb-5">
+          <label class="block mb-2 text-sm font-semibold text-gray-700">Pricing Model <span class="text-red-500">*</span></label>
+          <select formControlName="pricingModel" 
+            [class.border-red-500]="serviceForm.get('pricingModel')?.invalid && serviceForm.get('pricingModel')?.touched"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+            <option value="FIXED">Fixed Price</option>
+            <option value="PER_HOUR">Per Hour</option>
+            <option value="PER_DAY">Per Day</option>
+            <option value="PACKAGE">Package</option>
+          </select>
+          <div *ngIf="serviceForm.get('pricingModel')?.invalid && serviceForm.get('pricingModel')?.touched">
+            <p *ngIf="serviceForm.get('pricingModel')?.errors?.['required']" class="mt-1 text-xs text-red-600">Pricing model is required</p>
+          </div>
+          <p *ngIf="!serviceForm.get('pricingModel')?.invalid || !serviceForm.get('pricingModel')?.touched" class="mt-1 text-xs text-gray-500">Choose how you charge for this service.</p>
+        </div>
+
+        <div class="mb-5">
+          <label class="block mb-2 text-sm font-semibold text-gray-700">Status <span class="text-red-500">*</span></label>
+          <select formControlName="status" 
+            [class.border-red-500]="serviceForm.get('status')?.invalid && serviceForm.get('status')?.touched"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+            <option value="DRAFT">Draft</option>
+          </select>
+          <div *ngIf="serviceForm.get('status')?.invalid && serviceForm.get('status')?.touched">
+            <p *ngIf="serviceForm.get('status')?.errors?.['required']" class="mt-1 text-xs text-red-600">Status is required</p>
+          </div>
+          <p *ngIf="!serviceForm.get('status')?.invalid || !serviceForm.get('status')?.touched" class="mt-1 text-xs text-gray-500">Set current availability status.</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="mb-5">
+          <label class="block mb-2 text-sm font-semibold text-gray-700">Advance Percentage (%)</label>
+          <input type="number" formControlName="advancePercentage" min="0" max="100" 
+            [class.border-red-500]="serviceForm.get('advancePercentage')?.invalid && serviceForm.get('advancePercentage')?.touched"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="e.g. 30">
+          <div *ngIf="serviceForm.get('advancePercentage')?.invalid && serviceForm.get('advancePercentage')?.touched">
+            <p *ngIf="serviceForm.get('advancePercentage')?.errors?.['min']" class="mt-1 text-xs text-red-600">Must be at least 0</p>
+            <p *ngIf="serviceForm.get('advancePercentage')?.errors?.['max']" class="mt-1 text-xs text-red-600">Cannot exceed 100</p>
+          </div>
+          <p *ngIf="!serviceForm.get('advancePercentage')?.invalid || !serviceForm.get('advancePercentage')?.touched" class="mt-1 text-xs text-gray-500">Optional advance payment percentage.</p>
+        </div>
+        <div class="mb-5">
+          <label class="block mb-2 text-sm font-semibold text-gray-700">Discount (%)</label>
+          <input type="number" formControlName="discountPercent" min="0" max="100" 
+            [class.border-red-500]="serviceForm.get('discountPercent')?.invalid && serviceForm.get('discountPercent')?.touched"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="e.g. 10">
+          <div *ngIf="serviceForm.get('discountPercent')?.invalid && serviceForm.get('discountPercent')?.touched">
+            <p *ngIf="serviceForm.get('discountPercent')?.errors?.['min']" class="mt-1 text-xs text-red-600">Must be at least 0</p>
+            <p *ngIf="serviceForm.get('discountPercent')?.errors?.['max']" class="mt-1 text-xs text-red-600">Cannot exceed 100</p>
+          </div>
+          <p *ngIf="!serviceForm.get('discountPercent')?.invalid || !serviceForm.get('discountPercent')?.touched" class="mt-1 text-xs text-gray-500">Promotional discount (optional).</p>
+        </div>
+        <div class="mb-5">
+          <label class="block mb-2 text-sm font-semibold text-gray-700">Book Before (Days)</label>
+          <input type="number" formControlName="bookBeforeDays" min="0" 
+            [class.border-red-500]="serviceForm.get('bookBeforeDays')?.invalid && serviceForm.get('bookBeforeDays')?.touched"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="e.g. 7">
+          <div *ngIf="serviceForm.get('bookBeforeDays')?.invalid && serviceForm.get('bookBeforeDays')?.touched">
+            <p *ngIf="serviceForm.get('bookBeforeDays')?.errors?.['min']" class="mt-1 text-xs text-red-600">Must be at least 0</p>
+          </div>
+          <p *ngIf="!serviceForm.get('bookBeforeDays')?.invalid || !serviceForm.get('bookBeforeDays')?.touched" class="mt-1 text-xs text-gray-500">How many days in advance must bookings be made?</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="mb-5">
+          <label class="block mb-2 text-sm font-semibold text-gray-700">Service Area Type <span class="text-red-500">*</span></label>
+          <select formControlName="serviceAreaType" 
+            [class.border-red-500]="serviceForm.get('serviceAreaType')?.invalid && serviceForm.get('serviceAreaType')?.touched"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+            <option value="LOCAL">Local</option>
+            <option value="NATIONAL">National</option>
+            <option value="ONLINE">Online</option>
+            <option value="REMOTE">Remote</option>
+          </select>
+          <div *ngIf="serviceForm.get('serviceAreaType')?.invalid && serviceForm.get('serviceAreaType')?.touched">
+            <p *ngIf="serviceForm.get('serviceAreaType')?.errors?.['required']" class="mt-1 text-xs text-red-600">Service area type is required</p>
+          </div>
+          <p *ngIf="!serviceForm.get('serviceAreaType')?.invalid || !serviceForm.get('serviceAreaType')?.touched" class="mt-1 text-xs text-gray-500">Select the geographic coverage.</p>
+        </div>
+        <div class="mb-5 flex items-center gap-3">
+          <div>
+            <label class="block mb-2 text-sm font-semibold text-gray-700">Available</label>
+            <input type="checkbox" formControlName="isAvailable" class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <label class="block mb-2 text-sm font-semibold text-gray-700">Cancellation Policy</label>
+        <textarea formControlName="cancellationPolicy" rows="3" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Describe your cancellation or refund policy"></textarea>
       </div>
 
       <div class="flex justify-end mt-6">
         <button type="button" class="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 mr-3">
           Cancel
         </button>
-        <button type="submit" [disabled]="isSubmitting" 
+        <button type="submit" [disabled]="serviceForm.invalid || isSubmitting" 
+          [class.opacity-50]="serviceForm.invalid || isSubmitting"
+          [class.cursor-not-allowed]="serviceForm.invalid || isSubmitting"
           class="px-4 py-2 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300">
           {{ isSubmitting ? 'Submitting...' : 'Submit' }}
         </button>
+      </div>
+      
+      <!-- Overall form validation message -->
+      <div *ngIf="serviceForm.invalid && serviceForm.touched" class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+        <p class="text-sm text-red-600 font-semibold">Please fix the errors above before submitting the form.</p>
       </div>
     </div>
   </form>
